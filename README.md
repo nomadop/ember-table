@@ -11,7 +11,7 @@ that is easy to understand and extend.
 http://addepar.github.com/ember-table/
 
 
-## Getting Started
+## Installing in your Ember CLI app 
 
 #### JS Bin Starter Kit
 
@@ -22,7 +22,7 @@ http://emberjs.jsbin.com/fowoqu/1/edit
 ```bash
 # ember-cli >= 0.2.0
 ember install:addon ember-table
-
+      
 # ember-cli >= 0.2.3
 ember install ember-table
 ```
