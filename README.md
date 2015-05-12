@@ -1,6 +1,9 @@
 # Ember Table
 
 A table built using [Ember.js](http://emberjs.com/) that lazily renders rows.
+[![Build Status](https://travis-ci.org/hedgeserv/ember-table-addon.svg?branch=master)](https://travis-ci.org/hedgeserv/ember-table-addon)
+
+This is an Ember-CLI wrapper around [Addepar's Ember Table.](https://github.com/Addepar/ember-table).
 
 Ember Table allows you to handle very large data sets by only rendering the
 rows that are being displayed. It is written as an ember component with an API
