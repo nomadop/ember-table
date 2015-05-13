@@ -1,6 +1,5 @@
 import Ember from "ember";
 import { module, test } from 'qunit';
-//import LazyArray from '../../../models/lazy-array';
 import LazyArray from 'ember-table/models/lazy-array';
 
 module('Lazy Array', {
