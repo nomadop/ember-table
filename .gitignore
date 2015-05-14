@@ -18,5 +18,7 @@
 npm-debug.log
 testem.log
 
+.idea
+
 # grunt-release-it
 .stage
