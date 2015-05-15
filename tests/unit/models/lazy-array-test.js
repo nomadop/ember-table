@@ -60,6 +60,14 @@ function asyncAssert(callback) {
   });
 }
 
+test('Should load first 100 loans when accessing the 1th loans', function (assert) {
+  accessObject(1);
+
+  return asyncAssert(function () {
+    assert.equal(loadedCount, 100);
+  });
+});
+
 test('Should load next 100 loans when accessing the 90th loans', function (assert) {
   accessObject(90);
 
@@ -152,5 +160,13 @@ test('Should add the 289th to bottom fo the table when scroll to the 190th', fun
   });
 });
 
+test('Should not remove loans when ember table scrolled form a row of ember table to top', function (assert) {
+  accessObject(190);
+
+  return asyncAssert(function () {
+    accessObject(1);
+    assert.equal(loadedCount, 300);
+  });
+});
 
 
