@@ -15,7 +15,7 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
 
   rowWidth: Ember.computed(function() {
     var hasColumnGroup = this.get('tableComponent.hasGroupColumn');
-    return this.get(hasColumnGroup ? 'width' : 'controller._tableColumnsWidth')
+    return this.get(hasColumnGroup ? 'width' : 'controller._tableColumnsWidth');
   }),
   // Options for jQuery UI sortable
   sortableOption: Ember.computed(function() {

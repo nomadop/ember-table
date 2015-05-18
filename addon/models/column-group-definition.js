@@ -14,7 +14,7 @@ export default ColumnDefinition.extend({
     }, 0);
   }),
 
-  getCellContent: function(row) {
+  getCellContent: function() {
     return "";
   }
 });
