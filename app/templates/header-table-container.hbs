@@ -6,10 +6,20 @@
       height=headerHeight
     }}
   {{/if}}
-  {{view "header-block" classNames="ember-table-right-table-block"
+  {{#if hasColumnGroup}}
+    {{#each group in columnGroups}}
+      {{view "header-group" classNames="ember-table-right-table-block"
+      columnGroup=group
+      scrollLeft=_tableScrollLeft
+      height=headerHeight
+      }}
+    {{/each}}
+  {{else}}
+    {{view "header-block" classNames="ember-table-right-table-block"
     columns=tableColumns
     scrollLeft=_tableScrollLeft
     width=_tableBlockWidth
     height=headerHeight
-  }}
+    }}
+  {{/if}}
 </div>

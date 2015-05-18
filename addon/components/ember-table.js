@@ -75,6 +75,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
+  hasColumnGroup: false,
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------
@@ -186,6 +187,20 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   prepareTableColumns: function() {
     var _this = this;
     var columns = this.get('columns') || Ember.A();
+    if(this.get('hasColumnGroup')) {
+      this.set('columnGroups', columns);
+      columns = columns.reduce(function(result, col) {
+        var innerColumns = col.get('innerColumns');
+        if (innerColumns) {
+          return result.concat(innerColumns);
+        } else {
+          result.push(col);
+          return result;
+        }
+      }, []);
+      this.set('columns', columns);
+    }
+
     columns.setEach('controller', this);
     columns.forEach(function(col, i) {
       col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));

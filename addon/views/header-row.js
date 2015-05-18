@@ -8,11 +8,15 @@ export default Ember.View.extend(
 StyleBindingsMixin, RegisterTableComponentMixin, {
   templateName: 'header-row',
   classNames: ['ember-table-table-row', 'ember-table-header-row'],
-  styleBindings: ['width'],
+  styleBindings: ['width', 'top', 'height'],
   columns: Ember.computed.alias('content'),
   width: Ember.computed.alias('tableComponent._rowWidth'),
   scrollLeft: Ember.computed.alias('tableComponent._tableScrollLeft'),
 
+  rowWidth: Ember.computed(function() {
+    var hasColumnGroup = this.get('tableComponent.hasGroupColumn');
+    return this.get(hasColumnGroup ? 'width' : 'controller._tableColumnsWidth')
+  }),
   // Options for jQuery UI sortable
   sortableOption: Ember.computed(function() {
     return {
