@@ -2,19 +2,11 @@ import Ember from "ember";
 import { module, test } from 'qunit';
 import LazyArray from 'ember-table/models/lazy-array';
 
-module('Lazy Array', {
-  beforeEach: function () {
-    loadedCount = 0;
-    lazyArray = new LazyArray(totalCount, initSize, getNextChunk);
-  },
-
-  afterEach: function () {
-    lazyArray = null;
-  }
-});
-
 var loadedCount = 0;
 var pendingPromises = [];
+var initSize = 100;
+var lazyArray;
+
 function getNextChunk() {
   var promise = new Ember.RSVP.Promise(function (resolve) {
     Ember.run.later(function () {
@@ -31,11 +23,6 @@ function getNextChunk() {
   pendingPromises.push(promise);
   return promise;
 }
-
-var totalCount = 100;
-var initSize = 100;
-
-var lazyArray;
 
 function accessObject(idx) {
   return lazyArray.objectAt(idx - 1);
@@ -59,6 +46,17 @@ function asyncAssert(callback) {
     callback();
   });
 }
+
+module('Lazy Array TotalCount Of 200', {
+  beforeEach: function () {
+    loadedCount = 0;
+    lazyArray = new LazyArray(200, initSize, getNextChunk);
+  },
+
+  afterEach: function () {
+    lazyArray = null;
+  }
+});
 
 test('Should load first 100 loans when accessing the 1th loans', function (assert) {
   accessObject(1);
@@ -100,12 +98,11 @@ test('Should return the 101th loan When accessing the 101th loan ', function (as
   });
 });
 
-// TODO: Does this test make sense?
-//test('Should return length of 200 on init', function (assert) {
-//  return asyncAssert(function () {
-//    assert.equal(lazyArray.length, 200);
-//  });
-//});
+test('Should return length of 200 on init', function (assert) {
+  return asyncAssert(function () {
+    assert.equal(lazyArray.get('length'), 200);
+  });
+});
 
 test('Should be instance of Ember.ArrayProxy', function (assert) {
   return asyncAssert(function () {
@@ -152,21 +149,21 @@ test('Should not notify content length observer when load next chunk', function 
   });
 });
 
-test('Should add the 289th to bottom fo the table when scroll to the 190th', function (assert) {
+module('Lazy Array TotalCount Of 300', {
+  beforeEach: function () {
+    loadedCount = 0;
+    lazyArray = new LazyArray(300, initSize, getNextChunk);
+  },
+
+  afterEach: function () {
+    lazyArray = null;
+  }
+});
+
+test('Should load the 289th when access 190th', function (assert) {
   accessObject(190);
 
   return asyncAssert(function () {
-    assert.equal(accessObject(289).id, 288);
+    assert.ok(loadedCount > 289, '289th should be loaded');
   });
 });
-
-test('Should not remove loans when ember table scrolled form a row of ember table to top', function (assert) {
-  accessObject(190);
-
-  return asyncAssert(function () {
-    accessObject(1);
-    assert.equal(loadedCount, 300);
-  });
-});
-
-

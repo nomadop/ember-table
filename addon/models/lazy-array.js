@@ -1,26 +1,22 @@
-/* jshint loopfunc:true */
 import Ember from 'ember';
 
 export default function (totalCount, initSize, getNextChunk) {
-  var ret = Ember.A(new Array(totalCount));
-
-  var promise = getNextChunk();
-  promise.then(function (data) {
-    ret = data;
-  });
+  var ret = Ember.A(new Array(0));
 
   var LazyArray = Ember.ArrayProxy.extend({
     objectAt: function (index) {
-      var reloadValue = index + 11;
-      if (reloadValue >= ret.length) {
-        var loop = (reloadValue - ret.length) / 100 + 1;
-
-        while (loop > 0) {
-          getNextChunk().then(function (data) {
-            ret = ret.concat(data);
-          });
-          loop--;
+      var loadCount = index + 11;
+      if (loadCount >= ret.length) {
+        var chunksNeeded = parseInt((loadCount - ret.length) / 100) + 1;
+        var promises = [];
+        for(var i=0; i<chunksNeeded; i++) {
+          promises.push(getNextChunk());
         }
+        Ember.RSVP.all(promises).then(function (chunks) {
+          ret = chunks.reduce(function(result, chunk) {
+            return result.concat(chunk);
+          }, []);
+        });
       }
       return ret[index];
     },
@@ -29,7 +25,6 @@ export default function (totalCount, initSize, getNextChunk) {
   });
 
   return LazyArray.create({
-    content: Ember.A(new Array(totalCount))
+    content: Ember.A(new Array(0))
   });
 }
-
