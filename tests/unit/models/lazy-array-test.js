@@ -22,6 +22,7 @@ function getNextChunk() {
   });
   pendingPromises.push(promise);
   return promise;
+
 }
 
 function accessObject(idx) {
@@ -50,12 +51,25 @@ function asyncAssert(callback) {
 module('Lazy Array TotalCount Of 200', {
   beforeEach: function () {
     loadedCount = 0;
-    lazyArray = new LazyArray(200, initSize, getNextChunk);
+    lazyArray = LazyArray.create({
+      totalCount: 200,
+      callback: getNextChunk
+    });
   },
 
   afterEach: function () {
     lazyArray = null;
+    pendingPromises = [];
   }
+});
+
+test('Should return object immediately', function (assert) {
+  var obj = accessObject(1);
+
+  assert.ok(obj, 'Should return an object');
+  assert.ok(!obj.get('isLoaded'), 'Flag for unloaded object should be false');
+
+  return asyncAssert(function(){});
 });
 
 test('Should load first 100 loans when accessing the 1th loans', function (assert) {
@@ -82,11 +96,21 @@ test('Should not load next 100 loans When accessing the 89th loans', function (a
   });
 });
 
+test('Should set object property to isLoaded when 5th loan loaded', function(assert) {
+  var obj = accessObject(5);
+
+  assert.ok(!obj.get('isLoaded'), 'Load flag for unloaded object should be false');
+
+  return asyncAssert(function () {
+    assert.ok(accessObject(5).get('isLoaded'), 'Load flag should be set');
+  });
+});
+
 test('Should return the 5th loan When accessing the 5th loan ', function (assert) {
   accessObject(5);
 
   return asyncAssert(function () {
-    assert.equal(accessObject(5).id, 4);
+    assert.equal(accessObject(5).get('id'), 4);
   });
 });
 
@@ -94,7 +118,7 @@ test('Should return the 101th loan When accessing the 101th loan ', function (as
   accessObject(101);
 
   return asyncAssert(function () {
-    assert.equal(accessObject(101).id, 100);
+    assert.equal(accessObject(101).get('id'), 100);
   });
 });
 
@@ -149,10 +173,22 @@ test('Should not notify content length observer when load next chunk', function 
   });
 });
 
+test('Should load first chunk only one time When access object 1 then 2', function(assert) {
+  accessObject(1);
+  accessObject(2);
+
+  return asyncAssert(function() {
+    assert.ok(loadedCount === 100, 'only load first chunk');
+  });
+});
+
 module('Lazy Array TotalCount Of 300', {
   beforeEach: function () {
     loadedCount = 0;
-    lazyArray = new LazyArray(300, initSize, getNextChunk);
+    lazyArray = LazyArray.create({
+      totalCount: 300,
+      callback: getNextChunk
+    });
   },
 
   afterEach: function () {
