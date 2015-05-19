@@ -9,8 +9,8 @@ export default ColumnDefinition.extend({
   innerColumns:[],
 
   savedWidth: Ember.computed(function() {
-    return this.get('innerColumns').reduce(function(res, column) {
-      return res + column.get('savedWidth');
+    return this.get('innerColumns').getEach('savedWidth').reduce(function(res, width) {
+      return res + width;
     }, 0);
   }),
 

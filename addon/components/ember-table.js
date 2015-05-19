@@ -28,6 +28,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // TODO(new-api): Rename to `data`
   columns: null,
 
+  columnGroups: null,
   // The number of fixed columns on the left side of the table. Fixed columns
   // are always visible, even when the table is scrolled horizontally.
   numFixedColumns: 0,
@@ -75,7 +76,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
-  hasColumnGroup: false,
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------
@@ -176,7 +176,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('columns.[]', 'numFixedColumns'),
 
   tableColumns: Ember.computed(function() {
-    var columns = this.get('columns');
+    var columns = this.get('_flattenedColumns') || this.get('columns');
     if (!columns) {
       return Ember.A();
     }
@@ -187,9 +187,26 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   prepareTableColumns: function() {
     var _this = this;
     var columns = this.get('columns') || Ember.A();
+    columns.setEach('controller', this);
+    columns.forEach(function(col, i) {
+      col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));
+    });
+  },
+
+  hasColumnGroup: function () {
+    return this.get('columns')
+      .getEach('innerColumns')
+      .any(function (i) {
+        return !!i;
+      });
+  }.property(),
+
+  _flattenedColumns: function() {
+    var columns;
     if(this.get('hasColumnGroup')) {
+      columns = this.get('columns') || Ember.A();
       this.set('columnGroups', columns);
-      columns = columns.reduce(function(result, col) {
+      return columns.reduce(function(result, col) {
         var innerColumns = col.get('innerColumns');
         if (innerColumns) {
           return result.concat(innerColumns);
@@ -198,14 +215,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
           return result;
         }
       }, []);
-      this.set('columns', columns);
     }
-
-    columns.setEach('controller', this);
-    columns.forEach(function(col, i) {
-      col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));
-    });
-  },
+  }.property('columns.@each'),
 
   getNextResizableColumn: function(columns, index) {
     var column;

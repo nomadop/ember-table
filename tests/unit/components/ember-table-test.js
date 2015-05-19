@@ -6,13 +6,11 @@ import {
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
 
-var columns, table;
+var columns, firstColumn, secondColumn, thirdColumn, firstGroup;
 
 moduleForComponent('ember-table', 'EmberTableComponent', {
 
   beforeEach: function () {
-
-    var firstColumn, secondColumn, thirdColumn, firstGroup;
 
     firstColumn = ColumnDefinition.create({
       textAlign: 'text-align-left',
@@ -43,8 +41,6 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
       innerColumns: [secondColumn, thirdColumn]
     });
 
-    columns = [firstColumn, firstGroup];
-
   },
 
   needs: [
@@ -53,6 +49,7 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     'view:footer-table-container',
     'view:header-cell',
     'view:header-row',
+    'view:header-block',
     'view:header-table-container',
     'view:scroll-container',
     'view:lazy-table-block',
@@ -74,20 +71,55 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
   ]
 });
 
-test('it renders', function (assert) {
-
-  this.subject({
-    columns: columns,
+var setEmberTableWithGroup = function(obj) {
+  return obj.subject({
+    columns: [firstColumn, firstGroup],
     hasFooter: false,
-    enableContentSelection: true,
-    hasColumnGroup: true
+    enableContentSelection: true
   });
+};
 
+var setEmberTableWithoutGroup = function(obj) {
+  return obj.subject({
+    columns: [firstColumn, secondColumn, thirdColumn],
+    hasFooter: false,
+    enableContentSelection: true
+  });
+};
+
+// test hasColumnGroup
+
+test('it should has column group', function (assert) {
+  var component = setEmberTableWithGroup(this);
+
+  assert.ok(component.get('hasColumnGroup'));
+});
+
+test('it should not has column group', function (assert) {
+  var component = setEmberTableWithoutGroup(this);
+
+  assert.ok(!component.get('hasColumnGroup'));
+});
+
+// test template
+
+var validateColumnNames = function(assert, obj) {
+  assert.equal(obj.$('span:contains(Column1)').length, 1);
+  assert.equal(obj.$('span:contains(Column2)').length, 1);
+  assert.equal(obj.$('span:contains(Column3)').length, 1);
+};
+
+test('it should render all columns in two blocks', function (assert) {
+  setEmberTableWithGroup(this);
+
+  validateColumnNames(assert, this);
   assert.equal(this.$('.ember-table-header-block').length, 2);
-
-  assert.equal(this.$('span:contains(Column1)').length, 1);
-  assert.equal(this.$('span:contains(Column2)').length, 1);
-  assert.equal(this.$('span:contains(Column3)').length, 1);
   assert.equal(this.$('span:contains(Group1)').length, 1);
+});
 
+test('it should render all columns in one block', function (assert) {
+  setEmberTableWithoutGroup(this);
+
+  validateColumnNames(assert, this);
+  assert.equal(this.$('.ember-table-header-block').length, 1);
 });
