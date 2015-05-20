@@ -11,7 +11,7 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   // TODO: Doc
   templateName: 'header-cell',
   classNames: ['ember-table-cell', 'ember-table-header-cell'],
-  classNameBindings: ['column.isSortable:sortable', 'column.textAlign'],
+  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'column.cellStyle'],
   styleBindings: ['width', 'height'],
 
   // ---------------------------------------------------------------------------

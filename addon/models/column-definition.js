@@ -9,6 +9,8 @@ export default Ember.Object.extend({
   // TODO(new-api): Change to `columnName`
   headerCellName: undefined,
 
+  cellStyle: undefined,
+
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
   // the key.

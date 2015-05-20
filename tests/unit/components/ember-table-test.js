@@ -6,7 +6,7 @@ import {
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
 
-var columns, firstColumn, secondColumn, thirdColumn, firstGroup;
+var columns, firstColumn, secondColumn, thirdColumn, firstGroup, secondGroup;
 
 moduleForComponent('ember-table', 'EmberTableComponent', {
 
@@ -38,9 +38,18 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
 
     firstGroup = ColumnGroupDefinition.create({
       headerCellName: 'Group1',
+      cellStyle: 'group-1-cell-class',
+      groupStyle: 'group-1-class',
+      innerColumnStyle: 'group-1-inner-column',
       innerColumns: [secondColumn, thirdColumn]
     });
 
+    secondGroup = ColumnGroupDefinition.create({
+      headerCellName: 'Group2',
+      cellStyle: 'group-2-cell-class',
+      groupStyle: 'group-2-class',
+      innerColumns: [firstColumn, secondColumn]
+    });
   },
 
   needs: [
@@ -122,4 +131,25 @@ test('it should render all columns in one block', function (assert) {
 
   validateColumnNames(assert, this);
   assert.equal(this.$('.ember-table-header-block').length, 1);
+});
+
+test('it should render the group with group class', function(assert){
+  setEmberTableWithGroup(this);
+
+  assert.equal(this.$('.group-1-class').length, 1) ;
+});
+
+test('it should set cell class of group name cell', function(assert){
+  setEmberTableWithGroup(this);
+
+  assert.equal(this.$('.group-1-class .group-1-cell-class').text().trim(), 'Group1');
+});
+
+test('it should render grouped columns with class group-1-inner-column', function(assert){
+  setEmberTableWithGroup(this);
+
+  var columnElements = this.$('.group-1-class .group-1-inner-column');
+  assert.equal(columnElements.length, 2);
+  assert.equal(columnElements.first().text().trim(), 'Column2');
+  assert.equal(columnElements.last().text().trim(), 'Column3');
 });

@@ -2,6 +2,9 @@ import Ember from 'ember';
 import HeaderBlock from '../views/header-block';
 
 export default HeaderBlock.extend({
+
+  classNameBindings: [ 'columnGroup.groupStyle' ],
+
   width: Ember.computed(function() {
     return this.get('columnGroup').get('savedWidth');
   }),
@@ -11,7 +14,7 @@ export default HeaderBlock.extend({
   content: Ember.computed(function() {
     var group = this.get('columnGroup');
     if (group.get('innerColumns')) {
-      return [[group], group.get('innerColumns')];
+      return [[group], group.get('columns')];
     } else {
       group.set('headerCellHeight', this.get('headerHeight') * 2);
       return [[group]];
