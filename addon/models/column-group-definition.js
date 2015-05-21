@@ -18,9 +18,9 @@ export default ColumnDefinition.extend({
 
   groupStyle: undefined,
 
-  firstColumnClass: undefined,
+  firstColumnStyle: undefined,
 
-  lastColumnClass: undefined,
+  lastColumnStyle: undefined,
 
   getCellContent: function() {
     return "";
@@ -28,8 +28,14 @@ export default ColumnDefinition.extend({
 
   columns: Ember.computed(function(){
     var columns = this.get('innerColumns');
-    columns.setEach('cellStyle', this.get('innerColumnStyle'));
+    var innerColumnStyle = this.get('innerColumnStyle');
+
+    columns.setEach('cellStyle', innerColumnStyle);
+    
+    columns[0].set('cellStyle', this.get('firstColumnStyle') + ' ' + innerColumnStyle);
+    columns[columns.length - 1].set('cellStyle', this.get('lastColumnStyle') + ' ' + innerColumnStyle);
+
     return columns;
-  }).property('innerColumns.@each', 'innerColumnStyle')
+  }).property('innerColumns.@each', 'innerColumnStyle', 'lastColumnStyle', 'firstColumnStyle')
 
 });

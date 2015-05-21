@@ -1,21 +1,22 @@
 import {
   moduleForComponent,
   test
-  } from 'ember-qunit';
+}
+from 'ember-qunit';
 
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
 
-var columns, firstColumn, secondColumn, thirdColumn, firstGroup, secondGroup;
+var columns, firstColumn, secondColumn, thirdColumn, firstGroup;
 
 moduleForComponent('ember-table', 'EmberTableComponent', {
 
-  beforeEach: function () {
+  beforeEach: function() {
 
     firstColumn = ColumnDefinition.create({
       textAlign: 'text-align-left',
       headerCellName: 'Column1',
-      getCellContent: function (row) {
+      getCellContent: function(row) {
         return row.get('a');
       }
     });
@@ -23,7 +24,7 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     secondColumn = ColumnDefinition.create({
       textAlign: 'text-align-left',
       headerCellName: 'Column2',
-      getCellContent: function (row) {
+      getCellContent: function(row) {
         return row.get('b');
       }
     });
@@ -31,7 +32,7 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     thirdColumn = ColumnDefinition.create({
       textAlign: 'text-align-left',
       headerCellName: 'Column3',
-      getCellContent: function (row) {
+      getCellContent: function(row) {
         return row.get('c');
       }
     });
@@ -41,14 +42,9 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
       cellStyle: 'group-1-cell-class',
       groupStyle: 'group-1-class',
       innerColumnStyle: 'group-1-inner-column',
+      firstColumnStyle: 'group-1-first-column',
+      lastColumnStyle: 'group-1-last-column',
       innerColumns: [secondColumn, thirdColumn]
-    });
-
-    secondGroup = ColumnGroupDefinition.create({
-      headerCellName: 'Group2',
-      cellStyle: 'group-2-cell-class',
-      groupStyle: 'group-2-class',
-      innerColumns: [firstColumn, secondColumn]
     });
   },
 
@@ -98,13 +94,13 @@ var setEmberTableWithoutGroup = function(obj) {
 
 // test hasColumnGroup
 
-test('it should has column group', function (assert) {
+test('it should has column group', function(assert) {
   var component = setEmberTableWithGroup(this);
 
   assert.ok(component.get('hasColumnGroup'));
 });
 
-test('it should not has column group', function (assert) {
+test('it should not has column group', function(assert) {
   var component = setEmberTableWithoutGroup(this);
 
   assert.ok(!component.get('hasColumnGroup'));
@@ -118,7 +114,7 @@ var validateColumnNames = function(assert, obj) {
   assert.equal(obj.$('span:contains(Column3)').length, 1);
 };
 
-test('it should render all columns in two blocks', function (assert) {
+test('it should render all columns in two blocks', function(assert) {
   setEmberTableWithGroup(this);
 
   validateColumnNames(assert, this);
@@ -126,30 +122,42 @@ test('it should render all columns in two blocks', function (assert) {
   assert.equal(this.$('span:contains(Group1)').length, 1);
 });
 
-test('it should render all columns in one block', function (assert) {
+test('it should render all columns in one block', function(assert) {
   setEmberTableWithoutGroup(this);
 
   validateColumnNames(assert, this);
   assert.equal(this.$('.ember-table-header-block').length, 1);
 });
 
-test('it should render the group with group class', function(assert){
+test('it should render the group with group class', function(assert) {
   setEmberTableWithGroup(this);
 
-  assert.equal(this.$('.group-1-class').length, 1) ;
+  assert.equal(this.$('.group-1-class').length, 1);
 });
 
-test('it should set cell class of group name cell', function(assert){
+test('it should set cell class of group name cell', function(assert) {
   setEmberTableWithGroup(this);
 
   assert.equal(this.$('.group-1-class .group-1-cell-class').text().trim(), 'Group1');
 });
 
-test('it should render grouped columns with class group-1-inner-column', function(assert){
+test('it should render grouped columns with class group-1-inner-column', function(assert) {
   setEmberTableWithGroup(this);
 
   var columnElements = this.$('.group-1-class .group-1-inner-column');
   assert.equal(columnElements.length, 2);
   assert.equal(columnElements.first().text().trim(), 'Column2');
   assert.equal(columnElements.last().text().trim(), 'Column3');
+});
+
+test('it shoulld set the first column class in group', function(assert) {
+  setEmberTableWithGroup(this);
+
+  assert.equal(this.$('.group-1-first-column').text().trim(), 'Column2');
+});
+
+test('it should set the last column class in group', function(assert) {
+  setEmberTableWithGroup(this);
+
+  assert.equal(this.$('.group-1-last-column').text().trim(), 'Column3');
 });
