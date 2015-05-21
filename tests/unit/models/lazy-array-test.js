@@ -238,3 +238,28 @@ test('Should return 51th When access 51th', function (assert) {
     assert.ok(accessObject(51).get('id') === 50, 'should be id of 51th');
   });
 });
+
+module('Lazy Array TotalCount in String', {
+  beforeEach: function () {
+    loadedCount = 0;
+    chunkSize = 50;
+    lazyArray = LazyArray.create({
+      totalCount: "50",
+      chunkSize: chunkSize,
+      callback: getChunk
+    });
+  },
+
+  afterEach: function () {
+    lazyArray = null;
+  }
+});
+
+test('Should allow String type for parameter totalCount', function(assert) {
+  accessObject(1);
+
+  return asyncAssert(function () {
+    assert.ok(accessObject(1).get('id') === 0, 'should be id of 1st');
+  });
+});
+

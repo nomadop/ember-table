@@ -13,9 +13,8 @@ export default Ember.ArrayProxy.extend({
   chunkSize: undefined,
 
   init: function () {
-    var totalCount = this.get('totalCount');
+    var totalCount = this.get('_totalCount');
     var lazyContent = new Array(totalCount);
-    lazyContent[0] = undefined; //hack: array[0] will be set to length of array in Chrome
 
     this.set('_lazyContent', lazyContent);
   },
@@ -30,13 +29,13 @@ export default Ember.ArrayProxy.extend({
     return lazyContent[index];
   },
 
-  length: Ember.computed.alias('totalCount'),
+  length: Ember.computed.alias('_totalCount'),
 
   loadOneChunk: function (chunkIndex) {
     var lazyContent = this.get('_lazyContent');
     var chunkSize = this.get('chunkSize');
     var chunkStart = chunkIndex * chunkSize;
-    var totalCount = this.get('totalCount');
+    var totalCount = this.get('_totalCount');
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
       lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false});
     }
@@ -52,13 +51,17 @@ export default Ember.ArrayProxy.extend({
 
   tryPreload: function (index, chunkSize) {
     var chunkEndIndex = Math.floor(index / chunkSize + 1) * chunkSize - 1;
-    var lastRowIndex = this.get('totalCount') - 1;
+    var lastRowIndex = this.get('_totalCount') - 1;
     if (chunkEndIndex >= lastRowIndex) { return; }
 
     if (chunkEndIndex - index <= this.get('_preloadGate')) {
       this.objectAt(chunkEndIndex + 1);
     }
   },
+
+  _totalCount: Ember.computed(function() {
+    return parseInt(this.get('totalCount'));
+  }).property('totalCount'),
 
   _lazyContent: null,
   _preloadGate: 10
