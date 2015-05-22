@@ -1,0 +1,1 @@
+export { default } from 'ember-table/component-tests/lazy-array-sort';

@@ -12,6 +12,8 @@ export default Ember.ArrayProxy.extend({
 
   chunkSize: undefined,
 
+  content: Ember.computed.alias('_lazyContent'),
+
   init: function () {
     var totalCount = this.get('_totalCount');
     var lazyContent = new Array(totalCount);
@@ -62,6 +64,22 @@ export default Ember.ArrayProxy.extend({
   _totalCount: Ember.computed(function() {
     return parseInt(this.get('totalCount'));
   }).property('totalCount'),
+
+  isCompleted: Ember.computed(function(){
+    var content = this.get('_lazyContent');
+    var hasUnloaded = content.getEach('isLoaded').any(function(isLoaded){ return !isLoaded; });
+    return  !hasUnloaded && content.length === this.get('totalCount');
+  }).property('_lazyContent.[]', '_lazyContent.@each', 'totalCount'),
+
+  order: function (callback){
+    var content;
+    if(this.get('isCompleted')){
+      content = this.get('_lazyContent').sort(function(prev, next){
+        return callback(prev.get('content'), next.get('content'));
+      });
+    }
+    this.set('_lazyContent', content || []);
+  },
 
   _lazyContent: null,
   _preloadGate: 10

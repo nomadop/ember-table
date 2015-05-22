@@ -13,7 +13,8 @@ function getChunk(chunkIndex) {
       var chunk = [];
       for (var i = 0; i < chunkSize; i++) {
         chunk.push({
-          id: i + chunkIndex * chunkSize
+          id: i + chunkIndex * chunkSize,
+          state: 10000 - chunkSize * chunkIndex - i
         });
       }
       loadedCount += chunkSize;
@@ -30,9 +31,7 @@ function accessObject(idx) {
 }
 
 function asyncAssert(callback) {
-  return Ember.RSVP.all(pendingPromises).then(function () {
-    callback();
-  });
+  return Ember.RSVP.all(pendingPromises).then(callback);
 }
 
 module('Lazy Array TotalCount Of 200, Chunk size is 100', {
@@ -239,6 +238,20 @@ test('Should return 51th When access 51th', function (assert) {
   });
 });
 
+test('it should return reorder lazy content when sort by id', function (assert) {
+
+  accessObject(50);
+
+  return asyncAssert(function(){
+
+    lazyArray.order(function(prev, next){
+      return prev.state - next.state;
+    });
+
+    assert.equal(accessObject(1).get('content.id'), 50);
+  });
+});
+
 module('Lazy Array TotalCount in String', {
   beforeEach: function () {
     loadedCount = 0;
@@ -262,4 +275,3 @@ test('Should allow String type for parameter totalCount', function(assert) {
     assert.ok(accessObject(1).get('id') === 0, 'should be id of 1st');
   });
 });
-

@@ -11,6 +11,8 @@ export default Ember.Object.extend({
 
   cellStyle: undefined,
 
+  orderCallBack: undefined,
+
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
   // the key.

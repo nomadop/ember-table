@@ -128,6 +128,22 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       throw 'Missing dependency: antiscroll.js';
     }
     this.prepareTableColumns();
+    return this.prepareTableColumns();
+  },
+
+  _reloadBody: false,
+
+  // TODO(azirbel): Document
+  actions: {
+    addColumn: Ember.K,
+    sortByColumn: function(column){
+      this.get('content').order(column.orderCallBack);
+      this.set('_reloadBody', !this.get('_reloadBody'));
+      this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
+      if (this.get('columnsFillTable')) {
+        return this.doForceFillColumns();
+      }
+    }
   },
 
   height: Ember.computed.alias('_tablesContainerHeight'),
@@ -155,7 +171,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       itemController: Row,
       content: this.get('content')
     });
-  }).property('content.[]'),
+  }).property('content.[]', '_reloadBody'),
 
   // An array of Ember.Table.Row
   footerContent: Ember.computed(function(key, value) {
@@ -594,11 +610,5 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       return view.get('row');
     }
     return null;
-  },
-
-  // TODO(azirbel): Document
-  actions: {
-    addColumn: Ember.K,
-    sortByColumn: Ember.K
   }
 });
