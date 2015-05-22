@@ -178,3 +178,4 @@ test('Should resize group width when inner column size changed', function(assert
   });
   assert.ok(getGroupColumnWidth(this) === 650, 'Should be width after change');
 });
+
