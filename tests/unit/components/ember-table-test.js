@@ -1,3 +1,4 @@
+import Ember from 'ember';
 import {
   moduleForComponent,
   test
@@ -160,4 +161,20 @@ test('it should set the last column class in group', function(assert) {
   setEmberTableWithGroup(this);
 
   assert.equal(this.$('.group-1-last-column').text().trim(), 'Column3');
+});
+
+function getGroupColumnWidth(table) {
+  return table.$('.ember-table-header-container ' +
+    '.ember-table-header-block:nth-child(2) ' +
+    '.ember-table-header-row:nth-child(1)').width();
+}
+
+test('Should resize group width when inner column size changed', function(assert) {
+  setEmberTableWithGroup(this);
+  assert.ok(getGroupColumnWidth(this) === 300, 'Should be width before change');
+
+  Ember.run(function () {
+    thirdColumn.set('savedWidth', 500);
+  });
+  assert.ok(getGroupColumnWidth(this) === 650, 'Should be width after change');
 });

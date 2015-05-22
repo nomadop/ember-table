@@ -12,7 +12,7 @@ export default ColumnDefinition.extend({
     return this.get('innerColumns').getEach('savedWidth').reduce(function(res, width) {
       return res + width;
     }, 0);
-  }),
+  }).property('innerColumns.@each.savedWidth'),
 
   innerColumnStyle: undefined,
 
