@@ -9,9 +9,6 @@ export default Ember.Object.extend({
   // TODO(new-api): Change to `columnName`
   headerCellName: undefined,
 
-  // Indicate parent group id
-  parentGroupId: undefined,
-
   cellStyle: undefined,
 
   orderCallBack: undefined,
@@ -58,10 +55,10 @@ export default Ember.Object.extend({
 
   // Override to customize how the column gets data from each row object.
   // Given a row, should return a formatted cell value, e.g. $20,000,000.
-  getCellContent: function (row) {
+  getCellContent: function(row) {
     var path = this.get('contentPath');
     Ember.assert("You must either provide a contentPath or override " +
-      "getCellContent in your column definition", path != null);
+                 "getCellContent in your column definition", path != null);
     return Ember.get(row, path);
   },
 
@@ -81,7 +78,7 @@ export default Ember.Object.extend({
   // Not part of the official API, but can be overridden if you need custom
   // behavior (e.g. persistence) when the column is resized, and `savedWidth`
   // doesn't solve your problem.
-  resize: function (width) {
+  resize: function(width) {
     this.set('savedWidth', width);
     this.set('width', width);
   },
@@ -91,11 +88,11 @@ export default Ember.Object.extend({
   nextColumn: null,
   prevColumn: null,
 
-  isAtMinWidth: Ember.computed(function () {
+  isAtMinWidth: Ember.computed(function() {
     return this.get('width') === this.get('minWidth');
   }).property('width', 'minWidth'),
 
-  isAtMaxWidth: Ember.computed(function () {
+  isAtMaxWidth: Ember.computed(function() {
     return this.get('width') === this.get('maxWidth');
   }).property('width', 'maxWidth')
 });
