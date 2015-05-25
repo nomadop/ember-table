@@ -22,8 +22,8 @@ export default Ember.Controller.extend({
   tableContent: Ember.computed(function() {
     var normal = d3.random.normal(1.5, 3);
     var data;
-    return _.range(100).map(function(index) {
-      data = _.range(100).map(function(i) {
+    return Array.apply(null, new Array(100)).map(function(_, index) {
+      data = Array.apply(null, new Array(100)).map(function(_, i) {
         return [i, normal()];
       });
       return {

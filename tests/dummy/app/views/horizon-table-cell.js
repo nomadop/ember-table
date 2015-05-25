@@ -8,7 +8,7 @@ export default TableCell.extend({
 
   horizonContent: Ember.computed(function() {
     var normal = d3.random.normal(1.5, 3);
-    return _.range(100).map(function(index) {
+    return Array.apply(null, new Array(100)).map(function(_, index) {
       return [index, normal()];
     });
   }).property(),

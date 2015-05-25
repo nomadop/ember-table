@@ -62,7 +62,7 @@ export default Ember.Controller.extend({
   }),
 
   content: Ember.computed(function() {
-    return _.range(100).map(function(index) {
+    return Array.apply(null, new Array(100)).map(function(_, index) {
       var date = new Date();
       date.setDate(date.getDate() + index);
       return {

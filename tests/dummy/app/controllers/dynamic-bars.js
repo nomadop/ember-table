@@ -44,7 +44,7 @@ export default Ember.Controller.extend({
   }),
 
   tableContent: Ember.computed(function() {
-    return _.range(100).map(function(index) {
+    return Array.apply(null, new Array(100)).map(function(_, index) {
       return Ember.Object.create({
         key: index,
         value1: Math.random() * 80 + 10,
