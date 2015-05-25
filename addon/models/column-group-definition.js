@@ -26,7 +26,19 @@ export default ColumnDefinition.extend({
     return "";
   },
 
-  columns: Ember.computed(function(){
+  contains: function (col) {
+    return this.get('innerColumns').indexOf(col) > 0;
+  },
+
+  isGroup: true,
+
+  reorder: function(index, col) {
+    if (this.get('innerColumns').indexOf(col) === -1) { return; }
+    this.get('innerColumns').removeObject(col);
+    this.get('innerColumns').insertAt(index, col);
+  },
+
+  columns: Ember.computed(function () {
     var columns = this.get('innerColumns');
     var innerColumnStyle = this.get('innerColumnStyle');
 
