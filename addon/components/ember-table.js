@@ -127,7 +127,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     if (!Ember.$().antiscroll) {
       throw 'Missing dependency: antiscroll.js';
     }
-    this.prepareTableColumns();
     return this.prepareTableColumns();
   },
 
@@ -157,9 +156,18 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     // Fixed columns are not affected by column reordering
     var numFixedColumns = this.get('fixedColumns.length');
     var columns = this.get('columns');
-    columns.removeObject(column);
-    columns.insertAt(numFixedColumns + newIndex, column);
-    this.prepareTableColumns();
+
+    if (columns.indexOf(column) != -1) {
+      columns.removeObject(column);
+      columns.insertAt(numFixedColumns + newIndex, column);
+    }
+    else {
+      Ember.A(columns)
+        .filterBy('isGroup', true)
+        .invoke('reorder', newIndex, column);
+    }
+
+    return this.prepareTableColumns();
   },
 
   // An array of Ember.Table.Row computed based on `content`
@@ -198,7 +206,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     }
     var numFixedColumns = this.get('numFixedColumns') || 0;
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('columns.[]', 'numFixedColumns'),
+  }).property('columns.@each', 'numFixedColumns'),
 
   prepareTableColumns: function() {
     var _this = this;
@@ -219,10 +227,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _flattenedColumns: function() {
     var columns;
-    if(this.get('hasColumnGroup')) {
+    if (this.get('hasColumnGroup')) {
       columns = this.get('columns') || Ember.A();
       this.set('columnGroups', columns);
-      return columns.reduce(function(result, col) {
+      return columns.reduce(function (result, col) {
         var innerColumns = col.get('innerColumns');
         if (innerColumns) {
           return result.concat(innerColumns);
@@ -351,7 +359,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
           column.set('width', newWidth);
           nextColumnsToResize.pushObject(column);
         }
-        columnsToResize = nextColumnsToResize;
       });
     }
   },

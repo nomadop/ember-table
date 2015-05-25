@@ -6,9 +6,10 @@ export default ColumnDefinition.extend({
   // API - Inputs
   // ---------------------------------------------------------------------------
 
-  innerColumns:[],
+  // Indicate columns which in the group
+  innerColumns: [],
 
-  savedWidth: Ember.computed(function() {
+  savedWidth: Ember.computed(function () {
     return this.get('innerColumns').getEach('savedWidth').reduce(function (res, width) {
       return res + width;
     }, 0);
@@ -22,11 +23,24 @@ export default ColumnDefinition.extend({
 
   lastColumnStyle: undefined,
 
-  getCellContent: function() {
+  getCellContent: function () {
     return "";
   },
 
-  columns: Ember.computed(function(){
+  contains: function (col) {
+    return this.get('innerColumns').indexOf(col) > 0;
+  },
+
+  isGroup: true,
+
+  reorder: function(index, col) {
+    if (this.get('innerColumns').indexOf(col) === -1)
+      return;
+    this.get('innerColumns').removeObject(col);
+    this.get('innerColumns').insertAt(index, col);
+  },
+
+  columns: Ember.computed(function () {
     var columns = this.get('innerColumns');
     var innerColumnStyle = this.get('innerColumnStyle');
 
@@ -38,14 +52,13 @@ export default ColumnDefinition.extend({
     return columns;
   }).property('innerColumns.@each', 'innerColumnStyle', 'lastColumnStyle', 'firstColumnStyle'),
 
-  lastColumn: Ember.computed(function() {
+  lastColumn: Ember.computed(function () {
     var columns = this.get('columns');
     return columns[columns.length - 1];
   }).property('columns'),
 
-  resize: function(groupWidth) {
+  resize: function (groupWidth) {
     var lastColumnWidth = this.get('lastColumn.savedWidth');
     this.get('lastColumn').resize(lastColumnWidth + groupWidth - this.get('savedWidth'));
   }
-
 });
