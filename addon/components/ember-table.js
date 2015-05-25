@@ -136,12 +136,19 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   actions: {
     addColumn: Ember.K,
     sortByColumn: function(column){
-      this.get('content').order(column.orderCallBack);
-      this.set('_reloadBody', !this.get('_reloadBody'));
-      this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
-      if (this.get('columnsFillTable')) {
-        return this.doForceFillColumns();
+      var sortFn = column.sortFn();
+      if(sortFn){
+        this.get('content').sort(sortFn);
+        this.set('_reloadBody', !this.get('_reloadBody'));
+        this.updateAntiscroll();
       }
+    }
+  },
+
+  updateAntiscroll: function() {
+    this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
+    if (this.get('columnsFillTable')) {
+      return this.doForceFillColumns();
     }
   },
 
@@ -316,11 +323,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     if ((this.get('_state') || this.get('state')) !== 'inDOM') {
       return;
     }
-    // updating antiscroll
-    this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
-    if (this.get('columnsFillTable')) {
-      this.doForceFillColumns();
-    }
+    // update antiscroll
+    this.updateAntiscroll();
   },
 
   // Iteratively adjusts column widths to adjust to a changed table width.

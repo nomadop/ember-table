@@ -71,12 +71,10 @@ export default Ember.ArrayProxy.extend({
     return  !hasUnloaded && content.length === this.get('totalCount');
   }).property('_lazyContent.[]', '_lazyContent.@each', 'totalCount'),
 
-  order: function (callback){
+  sort: function (callback){
     var content;
     if(this.get('isCompleted')){
-      content = this.get('_lazyContent').sort(function(prev, next){
-        return callback(prev.get('content'), next.get('content'));
-      });
+      content = this.get('_lazyContent').sort(callback);
     }
     this.set('_lazyContent', content || []);
   },

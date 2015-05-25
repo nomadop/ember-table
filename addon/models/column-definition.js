@@ -11,7 +11,7 @@ export default Ember.Object.extend({
 
   cellStyle: undefined,
 
-  orderCallBack: undefined,
+  sortBy: undefined,
 
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
@@ -94,5 +94,19 @@ export default Ember.Object.extend({
 
   isAtMaxWidth: Ember.computed(function() {
     return this.get('width') === this.get('maxWidth');
-  }).property('width', 'maxWidth')
+  }).property('width', 'maxWidth'),
+
+  sortFn: function(){
+    if(!this.sortBy){
+      return;
+    }
+    var sortDirect = this.get('_asc') ? 1 : -1;
+    var _column = this;
+    this.set('_asc', !this.get('_asc'));
+    return function(prev, next){
+      return sortDirect * _column.sortBy(prev, next);
+    };
+  },
+
+  _asc: true
 });

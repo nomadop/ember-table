@@ -244,11 +244,11 @@ test('it should return reorder lazy content when sort by id', function (assert) 
 
   return asyncAssert(function(){
 
-    lazyArray.order(function(prev, next){
-      return prev.state - next.state;
+    lazyArray.sort(function(prev, next){
+      return -prev.get('id') + next.get('id');
     });
 
-    assert.equal(accessObject(1).get('content.id'), 50);
+    assert.equal(accessObject(1).get('id'), 50);
   });
 });
 
