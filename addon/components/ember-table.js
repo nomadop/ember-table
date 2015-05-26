@@ -76,6 +76,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
+  setSortFn: null,
+
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------
@@ -138,17 +140,12 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     sortByColumn: function(column){
       var sortFn = column.sortFn();
       if(sortFn){
-        this.get('content').sort(sortFn);
+        var content = this.get('content');
+        this.sendAction('setSortFn', column);
+        content.sort(sortFn);
         this.set('_reloadBody', !this.get('_reloadBody'));
-        this.updateAntiscroll();
+        Ember.run.next(this, this.updateLayout);
       }
-    }
-  },
-
-  updateAntiscroll: function() {
-    this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
-    if (this.get('columnsFillTable')) {
-      return this.doForceFillColumns();
     }
   },
 
@@ -324,7 +321,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       return;
     }
     // update antiscroll
-    this.updateAntiscroll();
+    this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
+    if (this.get('columnsFillTable')) {
+      return this.doForceFillColumns();
+    }
   },
 
   // Iteratively adjusts column widths to adjust to a changed table width.

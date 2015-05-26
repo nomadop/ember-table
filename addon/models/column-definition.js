@@ -100,13 +100,17 @@ export default Ember.Object.extend({
     if(!this.sortBy){
       return;
     }
+    this.set('_asc', !this.get('_asc'));
     var sortDirect = this.get('_asc') ? 1 : -1;
     var _column = this;
-    this.set('_asc', !this.get('_asc'));
     return function(prev, next){
       return sortDirect * _column.sortBy(prev, next);
     };
   },
 
-  _asc: true
+  _asc: undefined,
+
+  currentDirect: Ember.computed(function(){
+    return this.get('_asc') ? 'asc' : 'desc';
+  }).property('_asc')
 });
