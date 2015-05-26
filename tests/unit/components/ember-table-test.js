@@ -2,8 +2,8 @@ import Ember from 'ember';
 import {
   moduleForComponent,
   test
-}
-from 'ember-qunit';
+  }
+  from 'ember-qunit';
 
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
@@ -179,3 +179,15 @@ test('Should resize group width when inner column size changed', function(assert
   assert.ok(getGroupColumnWidth(this) === 650, 'Should be width after change');
 });
 
+
+test('Should reorder inner column when dragging inner column', function(assert) {
+  setEmberTableWithGroup(this);
+  let firstCol = firstGroup.innerColumns[0];
+  let secondCol = firstGroup.innerColumns[1];
+
+  Ember.run(function () {
+    firstGroup.reorder(1, firstCol);
+  });
+  assert.equal(firstGroup.innerColumns[1], firstCol);
+  assert.equal(firstGroup.innerColumns[0], secondCol);
+});

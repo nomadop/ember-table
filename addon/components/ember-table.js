@@ -169,6 +169,13 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       Ember.A(columns)
         .filterBy('isGroup', true)
         .invoke('reorder', newIndex, column);
+      this.set("_innerColumnReordered", !this.get('_innerColumnReordered'));
+      //for (let i = 0; i < columns.length; i++) {
+      //  if (columns[i].get('isGroup')) {
+      //    columns[i].reorder(newIndex, column);
+      //  }
+      //}
+      //this.set("_innerColumnReordered", column);
     }
 
     return this.prepareTableColumns();
@@ -210,7 +217,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     }
     var numFixedColumns = this.get('numFixedColumns') || 0;
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('columns.@each', 'numFixedColumns'),
+  }).property('columns.@each', 'numFixedColumns', "_innerColumnReordered"),
 
   prepareTableColumns: function() {
     var _this = this;
@@ -244,7 +251,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         }
       }, []);
     }
-  }.property('columns.@each'),
+  }.property('columns.@each', '_innerColumnReordered'),
 
   getNextResizableColumn: function(columns, index) {
     var column;
@@ -379,6 +386,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _tableScrollTop: 0,
   _tableScrollLeft: 0,
+  _innerColumnReordered: false,
 
   _width: null,
   _height: null,

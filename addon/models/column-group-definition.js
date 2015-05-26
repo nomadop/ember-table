@@ -26,10 +26,6 @@ export default ColumnDefinition.extend({
     return "";
   },
 
-  contains: function (col) {
-    return this.get('innerColumns').indexOf(col) > 0;
-  },
-
   isGroup: true,
 
   reorder: function(index, col) {
