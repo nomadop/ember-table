@@ -8,6 +8,9 @@ export default ColumnDefinition.extend({
 
   innerColumns:[],
 
+  //minWidth of a column group is used to stop resizing to left,
+  //when resizing a column group, the last inner column should reduce its width
+  //until reaching its minWidth, and the width of all other inner columns should not change
   minWidth: Ember.computed(function() {
     var innerColumns = this.get('innerColumns');
     var result = 0;

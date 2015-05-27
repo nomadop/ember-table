@@ -117,7 +117,6 @@ module('column group definition min width', {
 });
 
 test('min width', function(assert) {
-  console.log(group.get('minWidth'));
   assert.ok(group.get('minWidth') === 175,
       'should be sum of width of first column and min width of last column ');
 });
