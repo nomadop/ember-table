@@ -8,7 +8,7 @@ export default Ember.View.extend(
 StyleBindingsMixin, RegisterTableComponentMixin, {
   templateName: 'header-row',
   classNames: ['ember-table-table-row', 'ember-table-header-row'],
-  styleBindings: ['width', 'top', 'height'],
+  styleBindings: ['top', 'height'],
   columns: Ember.computed.alias('content'),
   width: Ember.computed.alias('tableComponent._rowWidth'),
   scrollLeft: Ember.computed.alias('tableComponent._tableScrollLeft'),

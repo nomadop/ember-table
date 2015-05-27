@@ -3,7 +3,7 @@ import HeaderBlock from '../views/header-block';
 
 export default HeaderBlock.extend({
 
-  classNameBindings: [ 'columnGroup.groupStyle' ],
+  classNameBindings: [ 'columnGroup.groupStyle', 'hasMultiInnerColumns:ember-table-multi-inner-block' ],
 
   width: Ember.computed.alias('columnGroup.savedWidth'),
 
@@ -18,6 +18,11 @@ export default HeaderBlock.extend({
       return [[group]];
     }
   }).property('columnGroup'),
+
+  hasMultiInnerColumns: Ember.computed(function() {
+    var innerColumns = this.get('columnGroup.innerColumns');
+    return innerColumns && innerColumns.length > 1;
+  }).property("columnGroup.innerColumns.[]"),
 
   createChildView: function(viewClass, attrs) {
     var vc = viewClass.extend({

@@ -195,6 +195,8 @@
   > div {
     height: 100%;
     .box-sizing();
+    // Column group header should be visible
+    overflow: hidden;
   }
 }
 
@@ -321,6 +323,24 @@
     .ui-resizable-handle {
       background-color: #eaeaea;
     }
+  }
+
+  // Keep last header cell on same line when resizing to right,
+  // otherwise last header cell will flashing while resizing
+  .ember-table-multi-inner-block {
+    .ember-table-header-row {
+      > div {
+        white-space: nowrap!important;
+        text-align: left!important;
+        overflow: hidden;
+
+        .ember-table-header-cell {
+          display: inline-block!important;
+          float: none;
+        }
+      }
+    }
+
   }
 }
 
