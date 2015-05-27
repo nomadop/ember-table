@@ -179,15 +179,24 @@ test('Should resize group width when inner column size changed', function(assert
   assert.ok(getGroupColumnWidth(this) === 650, 'Should be width after change');
 });
 
+function getInnerColumn(table, columnIndex){
+  return table.$('.ember-table-header-container ' +
+    '.ember-table-header-block:nth-child(2) ' +
+    '.ember-table-header-row:nth-child(2) ' +
+    '.ember-table-header-cell:nth-child('+(1+columnIndex)+') ' +
+    '.ember-table-content');
+}
 
-test('Should reorder inner column when dragging inner column', function(assert) {
-  setEmberTableWithGroup(this);
-  let firstCol = firstGroup.innerColumns[0];
-  let secondCol = firstGroup.innerColumns[1];
+test('Should reorder inner columns when dragging the inner column', function(assert) {
+  var component = setEmberTableWithGroup(this);
+  var firstCol = component.columns[1].innerColumns[0];
 
   Ember.run(function () {
-    firstGroup.reorder(1, firstCol);
+    component.onColumnSort(firstCol, 1);
   });
-  assert.equal(firstGroup.innerColumns[1], firstCol);
-  assert.equal(firstGroup.innerColumns[0], secondCol);
+
+  var col = getInnerColumn(this, 1);
+  console.log(col.text().trim());
+  console.log(firstCol.headerCellName);
+  assert.ok(col.text().trim() === firstCol.headerCellName, "Should be header cell name of first column");
 });

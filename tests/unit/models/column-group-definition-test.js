@@ -80,3 +80,15 @@ test('should resize last inner column when group size become smaller', function(
 
   assert.ok(thirdColumn.get('savedWidth') === widthBefore + widthAdd);
 });
+
+test('Should change inner columns when reorder inner column', function(assert) {
+  let firstCol = group.innerColumns[0];
+  let secondCol = group.innerColumns[1];
+
+  Ember.run(function () {
+    group.reorder(1, firstCol);
+  });
+
+  assert.equal(group.innerColumns[0], secondCol);
+  assert.equal(group.innerColumns[1], firstCol);
+});
