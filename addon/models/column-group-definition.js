@@ -8,6 +8,16 @@ export default ColumnDefinition.extend({
 
   innerColumns:[],
 
+  minWidth: Ember.computed(function() {
+    var innerColumns = this.get('innerColumns');
+    var result = 0;
+    for (var i=0; i<innerColumns.length -1 ; i++) {
+      result += innerColumns[i].get('width');
+    }
+    result += innerColumns[innerColumns.length - 1].get('minWidth');
+    return result;
+  }).property('innerColumns.@each.width', 'innerColumns.@each.minWidth'),
+
   savedWidth: Ember.computed(function() {
     return this.get('innerColumns').getEach('savedWidth').reduce(function (res, width) {
       return res + width;
