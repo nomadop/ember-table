@@ -67,8 +67,8 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
 });
 
 test('should call set sort function with clicked column when sort partial data', function (assert) {
+  assert.expect(1);
   var done = assert.async();
-
   var component = this.subject({
     columns: [firstColumn, secondColumn],
     hasFooter: false,
@@ -76,8 +76,7 @@ test('should call set sort function with clicked column when sort partial data',
     content: []
   });
   this.$();
-
-  component.set('setSortFn', 'setSort');
+  component.set('setSortConditionBy', 'setSort');
   component.set('targetObject', Ember.Object.create({
     setSort: function (column) {
       assert.equal(column, firstColumn);

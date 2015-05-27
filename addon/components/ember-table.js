@@ -76,7 +76,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
-  setSortFn: null,
+  setSortConditionBy: null,
 
   // ---------------------------------------------------------------------------
   // API - Outputs
@@ -141,7 +141,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       var sortFn = column.sortFn();
       if(sortFn){
         var content = this.get('content');
-        this.sendAction('setSortFn', column);
+        this.sendAction('setSortConditionBy', column);
         content.sort(sortFn);
         this.set('_reloadBody', !this.get('_reloadBody'));
         Ember.run.next(this, this.updateLayout);
