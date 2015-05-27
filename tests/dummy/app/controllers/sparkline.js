@@ -57,16 +57,19 @@ export default Ember.Controller.extend({
       }
       return walk;
     };
-    return Array.apply(null, new Array(100)).map(function(_, index) {
-      var data = randomWalk(100);
-      return {
-        name: index,
+    var content = [];
+    var data;
+    for (var i = 0; i < 100; i++) {
+      data = randomWalk(100);
+      content.pushObject({
+        name: i,
         timeseries: data,
         open: data[0],
         close: data[99],
         low: Math.min.apply(null, data),
         high: Math.max.apply(null, data)
-      };
-    });
+      });
+    }
+    return content;
   })
 });

@@ -22,15 +22,17 @@ export default Ember.Controller.extend({
   }),
 
   tableContent: Ember.computed(function() {
-    return Array.apply(null, new Array(100)).map(function(_, index) {
-      return {
-        key: index,
+    var content = [];
+    for (var i = 0; i < 100; i++) {
+      content.pushObject({
+        key: i,
         value1: Math.random() * 80 + 10,
         value2: Math.random() * 80 + 10,
         value3: Math.random() * 80 + 10,
         value4: Math.random() * 80 + 10,
         value5: Math.random() * 80 + 10
-      };
-    });
+      });
+    }
+    return content;
   })
 });
