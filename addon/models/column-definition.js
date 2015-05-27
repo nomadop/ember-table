@@ -11,6 +11,25 @@ export default Ember.Object.extend({
 
   cellStyle: undefined,
 
+  allCellStyles: Ember.computed(function() {
+    var classes = [];
+    var triangleClassMap = {
+      true: 'triangle-icon-up',
+      false: 'triangle-icon-down',
+      undefined: ''
+    };
+
+    var cellStyle = this.get('cellStyle');
+    if (!!cellStyle){
+      classes.push(cellStyle);
+    }
+
+    classes.push(triangleClassMap[this.get('_asc')]);
+    classes.push('triangle-icon');
+
+    return classes.join(' ');
+  }).property('cellStyle', '_asc'),
+
   sortBy: undefined,
 
   // Path of the content for this cell. If the row object is a hash of keys
@@ -19,7 +38,11 @@ export default Ember.Object.extend({
   contentPath: undefined,
 
   // Minimum column width. Affects both manual resizing and automatic resizing.
-  minWidth: 25,
+  minWidth: Ember.computed(function(){
+    var defaultWidth = 25;
+    var triangleWidth = this.get('_asc') === undefined ? 0 : 15;
+    return defaultWidth + triangleWidth;
+  }).property('_asc'),
 
   // Maximum column width. Affects both manual resizing and automatic resizing.
   maxWidth: undefined,
