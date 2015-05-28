@@ -7,13 +7,11 @@
     }}
   {{/if}}
   {{#if hasColumnGroup}}
-    {{#each group in columnGroups}}
-      {{view "header-group" classNames="ember-table-right-table-block"
-      columnGroup=group
-      scrollLeft=_tableScrollLeft
-      height=headerHeight
-      }}
-    {{/each}}
+    {{view "header-groups-block" classNames="ember-table-header-groups-block"
+    columnGroups=columnGroups
+    scrollLeft=_tableScrollLeft
+    headerHeight=headerHeight
+    }}
   {{else}}
     {{view "header-block" classNames="ember-table-right-table-block"
     columns=tableColumns

@@ -66,6 +66,7 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     'view:table-cell',
     'view:table-row',
     'view:header-group',
+    'view:header-groups-block',
     'template:body-table-container',
     'template:footer-table-container',
     'template:header-cell',
@@ -73,7 +74,8 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     'template:header-table-container',
     'template:scroll-container',
     'template:table-cell',
-    'template:table-row'
+    'template:table-row',
+    'template:header-groups-block'
   ]
 });
 
@@ -164,7 +166,7 @@ test('it should set the last column class in group', function(assert) {
 });
 
 function getGroupColumnWidth(table) {
-  return table.$('.ember-table-header-container ' +
+  return table.$('.ember-table-header-container .ember-table-header-groups-block ' +
     '.ember-table-header-block:nth-child(2) ' +
     '.ember-table-header-row:nth-child(1)').width();
 }

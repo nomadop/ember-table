@@ -55,6 +55,7 @@ moduleForComponent('ember-table', 'EmberTableComponent', {
     'view:table-cell',
     'view:table-row',
     'view:header-group',
+    'view:header-groups-block',
     'template:body-table-container',
     'template:footer-table-container',
     'template:header-cell',
