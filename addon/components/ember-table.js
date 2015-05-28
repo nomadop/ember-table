@@ -116,6 +116,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // nearestWithProperty()
   isEmberTable: true,
 
+  _sortedColumn: undefined,
+
   columnsFillTable: true,
 
   init: function() {
@@ -140,6 +142,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     sortByColumn: function(column){
       var sortFn = column.sortFn();
       if(sortFn){
+        this.set('_sortedColumn', column);
         var content = this.get('content');
         this.sendAction('setSortConditionBy', column);
         content.sort(sortFn);

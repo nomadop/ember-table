@@ -196,7 +196,5 @@ test('Should reorder inner columns when dragging the inner column', function(ass
   });
 
   var col = getInnerColumn(this, 1);
-  console.log(col.text().trim());
-  console.log(firstCol.headerCellName);
   assert.ok(col.text().trim() === firstCol.headerCellName, "Should be header cell name of first column");
 });

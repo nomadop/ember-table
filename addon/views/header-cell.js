@@ -11,9 +11,23 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   // TODO: Doc
   templateName: 'header-cell',
   classNames: ['ember-table-cell', 'ember-table-header-cell'],
-  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'column.allCellStyles'],
+  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'columnCellStyle'],
+
   styleBindings: ['width', 'height'],
 
+  columnCellStyle: Ember.computed(function(){
+    var sortedColumn = this.get('tableComponent._sortedColumn');
+    var columnClasses = [];
+    var cellStyle = this.get('column.cellStyle');
+    if (!!cellStyle){
+      columnClasses.push(cellStyle);
+    }
+    if (sortedColumn === this.get('column')) {
+      columnClasses = columnClasses.concat(this.get('column.sortIndicatorStyles'));
+    }
+
+    return columnClasses.join(' ');
+  }).property('column.cellStyle', 'column.sortIndicatorStyles', 'tableComponent._sortedColumn'),
   // ---------------------------------------------------------------------------
   // Internal properties
   // ---------------------------------------------------------------------------

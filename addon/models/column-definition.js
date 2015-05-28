@@ -11,26 +11,18 @@ export default Ember.Object.extend({
 
   cellStyle: undefined,
 
-  allCellStyles: Ember.computed(function() {
-    var classes = [];
-    var triangleClassMap = {
+  sortBy: undefined,
+
+  sortIndicatorStyles: Ember.computed(function() {
+    var sortIndicatorStyles = ['sort-indicator-icon'];
+    var sortIndicatorClassMap = {
       true: 'sort-indicator-icon-up',
       false: 'sort-indicator-icon-down',
       undefined: ''
     };
-
-    var cellStyle = this.get('cellStyle');
-    if (!!cellStyle){
-      classes.push(cellStyle);
-    }
-
-    classes.push(triangleClassMap[this.get('_asc')]);
-    classes.push('sort-indicator-icon');
-
-    return classes.join(' ');
-  }).property('cellStyle', '_asc'),
-
-  sortBy: undefined,
+    sortIndicatorStyles.push(sortIndicatorClassMap[this.get('_asc')]);
+    return sortIndicatorStyles;
+  }).property('_asc'),
 
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
