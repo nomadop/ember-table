@@ -330,11 +330,12 @@
   .ember-table-multi-inner-block {
     .ember-table-header-row {
       > div {
-        white-space: nowrap!important;
-        text-align: left!important;
+        white-space: nowrap;
+        text-align: left;
         overflow: hidden;
 
         .ember-table-header-cell {
+          //use important as .ember-table-header-cell has already used important for display
           display: inline-block!important;
           float: none;
         }
