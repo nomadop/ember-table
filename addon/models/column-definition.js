@@ -14,8 +14,8 @@ export default Ember.Object.extend({
   allCellStyles: Ember.computed(function() {
     var classes = [];
     var triangleClassMap = {
-      true: 'triangle-icon-up',
-      false: 'triangle-icon-down',
+      true: 'sort-indicator-icon-up',
+      false: 'sort-indicator-icon-down',
       undefined: ''
     };
 
@@ -25,7 +25,7 @@ export default Ember.Object.extend({
     }
 
     classes.push(triangleClassMap[this.get('_asc')]);
-    classes.push('triangle-icon');
+    classes.push('sort-indicator-icon');
 
     return classes.join(' ');
   }).property('cellStyle', '_asc'),
