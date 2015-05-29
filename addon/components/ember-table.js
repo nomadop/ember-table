@@ -164,7 +164,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var numFixedColumns = this.get('fixedColumns.length');
     var columns = this.get('columns');
 
-    if (columns.indexOf(column) != -1) {
+    if (columns.indexOf(column) !== -1) {
       columns.removeObject(column);
       columns.insertAt(numFixedColumns + newIndex, column);
     }
@@ -173,12 +173,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         .filterBy('isGroup', true)
         .invoke('reorder', newIndex, column);
       this.set("_innerColumnReordered", !this.get('_innerColumnReordered'));
-      //for (let i = 0; i < columns.length; i++) {
-      //  if (columns[i].get('isGroup')) {
-      //    columns[i].reorder(newIndex, column);
-      //  }
-      //}
-      //this.set("_innerColumnReordered", column);
     }
 
     return this.prepareTableColumns();
