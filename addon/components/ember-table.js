@@ -121,6 +121,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   columnsFillTable: true,
 
   init: function() {
+    if (this.get('hasColumnGroup')) {
+      this.set('columnGroups', this.get('columns'));
+    }
+
     this._super();
     if (!Ember.$.ui) {
       throw 'Missing dependency: jquery-ui';
@@ -237,8 +241,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var columns;
     if (this.get('hasColumnGroup')) {
       columns = this.get('columns') || Ember.A();
-      this.set('columnGroups', columns);
-      return columns.reduce(function (result, col) {
+      return columns.reduce(function(result, col) {
         var innerColumns = col.get('innerColumns');
         if (innerColumns) {
           return result.concat(innerColumns);
