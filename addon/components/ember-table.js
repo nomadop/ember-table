@@ -118,6 +118,11 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _sortedColumn: undefined,
 
+  // true if is dragging an inner column of group
+  // otherwise is false
+  // the value is set when reordering starts
+  _isReorderInnerColumns: undefined,
+
   columnsFillTable: true,
 
   init: function() {
