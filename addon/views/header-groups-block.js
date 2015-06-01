@@ -55,17 +55,23 @@ export default Ember.CollectionView.extend(
         axis: 'x',
         containment: 'parent',
         cursor: 'move',
-        helper: 'original',
+        helper: 'clone',
         items: ".ember-table-header-block.sortable",
         opacity: 0.9,
         placeholder: 'ui-state-highlight',
         scroll: true,
-        tolerance: 'intersect',
+        tolerance: 'pointer',
         update: Ember.$.proxy(this.onColumnSortDone, this),
         stop: Ember.$.proxy(this.onColumnSortStop, this),
-        sort: Ember.$.proxy(this.onColumnSortChange, this)
+        sort: Ember.$.proxy(this.onColumnSortChange, this),
+        start: Ember.$.proxy(this.onColumnSortStart, this)
       };
     }),
+
+    onColumnSortStart: function(event, ui) {
+      // show the dragging element
+      ui.item.show();
+    },
 
     didInsertElement: function () {
       this._super();
@@ -90,7 +96,7 @@ export default Ember.CollectionView.extend(
     },
 
     onColumnSortChange: function () {
-      var left = this.$('.ui-state-highlight').offset().left -
+      var left = this.$('> .ui-state-highlight').offset().left -
         this.$().closest('.ember-table-tables-container').offset().left;
       this.set('tableComponent._isShowingSortableIndicator', true);
       this.set('tableComponent._sortableIndicatorLeft', left);
