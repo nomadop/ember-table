@@ -9,6 +9,17 @@ ShowHorizontalScrollMixin, RegisterTableComponentMixin, {
   classNames: ['ember-table-table-container',
       'ember-table-fixed-table-container',
       'ember-table-header-container'],
-  height: Ember.computed.alias('tableComponent._headerHeight'),
-  width: Ember.computed.alias('tableComponent._tableContainerWidth')
+  height: Ember.computed(function() {
+    var oldHeight = this.get('tableComponent._headerHeight');
+    if (this.get('hasColumnGroup')) {
+      return oldHeight * 2;
+    } else {
+      return oldHeight;
+    }
+  }).property('tableComponent._headerHeight'),
+
+  width: Ember.computed.alias('tableComponent._tableContainerWidth'),
+  hasColumnGroup: Ember.computed(function() {
+    return this.get('tableComponent.hasColumnGroup');
+  })
 });

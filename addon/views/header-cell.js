@@ -11,9 +11,23 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   // TODO: Doc
   templateName: 'header-cell',
   classNames: ['ember-table-cell', 'ember-table-header-cell'],
-  classNameBindings: ['column.isSortable:sortable', 'column.textAlign'],
+  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'columnCellStyle'],
+
   styleBindings: ['width', 'height'],
 
+  columnCellStyle: Ember.computed(function(){
+    var sortedColumn = this.get('tableComponent._sortedColumn');
+    var columnClasses = [];
+    var cellStyle = this.get('column.cellStyle');
+    if (!!cellStyle){
+      columnClasses.push(cellStyle);
+    }
+    if (sortedColumn === this.get('column')) {
+      columnClasses = columnClasses.concat(this.get('column.sortIndicatorStyles'));
+    }
+
+    return columnClasses.join(' ');
+  }).property('column.cellStyle', 'column.sortIndicatorStyles', 'tableComponent._sortedColumn'),
   // ---------------------------------------------------------------------------
   // Internal properties
   // ---------------------------------------------------------------------------
@@ -23,7 +37,9 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   minWidth: Ember.computed.alias('column.minWidth'),
   maxWidth: Ember.computed.alias('column.maxWidth'),
   nextResizableColumn: Ember.computed.alias('column.nextResizableColumn'),
-  height: Ember.computed.alias('tableComponent._headerHeight'),
+  height: Ember.computed(function(){
+    return this.get('column.headerCellHeight') || this.get('tableComponent._headerHeight');
+  }).property('column.headerCellHeight'),
 
   effectiveMinWidth: Ember.computed(function() {
     if (this.get('tableComponent.columnMode') === 'standard') {

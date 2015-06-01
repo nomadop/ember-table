@@ -28,6 +28,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // TODO(new-api): Rename to `data`
   columns: null,
 
+  columnGroups: null,
   // The number of fixed columns on the left side of the table. Fixed columns
   // are always visible, even when the table is scrolled horizontally.
   numFixedColumns: 0,
@@ -75,6 +76,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
+  setSortConditionBy: null,
+
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------
@@ -113,9 +116,15 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // nearestWithProperty()
   isEmberTable: true,
 
+  _sortedColumn: undefined,
+
   columnsFillTable: true,
 
   init: function() {
+    if (this.get('hasColumnGroup')) {
+      this.set('columnGroups', this.get('columns'));
+    }
+
     this._super();
     if (!Ember.$.ui) {
       throw 'Missing dependency: jquery-ui';
@@ -126,7 +135,25 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     if (!Ember.$().antiscroll) {
       throw 'Missing dependency: antiscroll.js';
     }
-    this.prepareTableColumns();
+    return this.prepareTableColumns();
+  },
+
+  _reloadBody: false,
+
+  // TODO(azirbel): Document
+  actions: {
+    addColumn: Ember.K,
+    sortByColumn: function(column){
+      var sortFn = column.sortFn();
+      if(sortFn){
+        this.set('_sortedColumn', column);
+        var content = this.get('content');
+        this.sendAction('setSortConditionBy', column);
+        content.sort(sortFn);
+        this.set('_reloadBody', !this.get('_reloadBody'));
+        Ember.run.next(this, this.updateLayout);
+      }
+    }
   },
 
   height: Ember.computed.alias('_tablesContainerHeight'),
@@ -140,9 +167,19 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     // Fixed columns are not affected by column reordering
     var numFixedColumns = this.get('fixedColumns.length');
     var columns = this.get('columns');
-    columns.removeObject(column);
-    columns.insertAt(numFixedColumns + newIndex, column);
-    this.prepareTableColumns();
+
+    if (columns.indexOf(column) !== -1) {
+      columns.removeObject(column);
+      columns.insertAt(numFixedColumns + newIndex, column);
+    }
+    else {
+      Ember.A(columns)
+        .filterBy('isGroup', true)
+        .invoke('reorder', newIndex, column);
+      this.set("_innerColumnReordered", !this.get('_innerColumnReordered'));
+    }
+
+    return this.prepareTableColumns();
   },
 
   // An array of Ember.Table.Row computed based on `content`
@@ -154,7 +191,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       itemController: Row,
       content: this.get('content')
     });
-  }).property('content.[]'),
+  }).property('content.[]', '_reloadBody'),
 
   // An array of Ember.Table.Row
   footerContent: Ember.computed(function(key, value) {
@@ -175,13 +212,13 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('columns.[]', 'numFixedColumns'),
 
   tableColumns: Ember.computed(function() {
-    var columns = this.get('columns');
+    var columns = this.get('_flattenedColumns') || this.get('columns');
     if (!columns) {
       return Ember.A();
     }
     var numFixedColumns = this.get('numFixedColumns') || 0;
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('columns.[]', 'numFixedColumns'),
+  }).property('columns.@each', 'numFixedColumns', "_innerColumnReordered"),
 
   prepareTableColumns: function() {
     var _this = this;
@@ -191,6 +228,30 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));
     });
   },
+
+  hasColumnGroup: function () {
+    return this.get('columns')
+      .getEach('innerColumns')
+      .any(function (i) {
+        return !!i;
+      });
+  }.property(),
+
+  _flattenedColumns: function() {
+    var columns;
+    if (this.get('hasColumnGroup')) {
+      columns = this.get('columns') || Ember.A();
+      return columns.reduce(function(result, col) {
+        var innerColumns = col.get('innerColumns');
+        if (innerColumns) {
+          return result.concat(innerColumns);
+        } else {
+          result.push(col);
+          return result;
+        }
+      }, []);
+    }
+  }.property('columns.@each', '_innerColumnReordered'),
 
   getNextResizableColumn: function(columns, index) {
     var column;
@@ -266,10 +327,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     if ((this.get('_state') || this.get('state')) !== 'inDOM') {
       return;
     }
-    // updating antiscroll
+    // update antiscroll
     this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
     if (this.get('columnsFillTable')) {
-      this.doForceFillColumns();
+      return this.doForceFillColumns();
     }
   },
 
@@ -309,7 +370,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
           column.set('width', newWidth);
           nextColumnsToResize.pushObject(column);
         }
-        columnsToResize = nextColumnsToResize;
       });
     }
   },
@@ -326,6 +386,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _tableScrollTop: 0,
   _tableScrollLeft: 0,
+  _innerColumnReordered: false,
 
   _width: null,
   _height: null,
@@ -568,11 +629,5 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       return view.get('row');
     }
     return null;
-  },
-
-  // TODO(azirbel): Document
-  actions: {
-    addColumn: Ember.K,
-    sortByColumn: Ember.K
   }
 });

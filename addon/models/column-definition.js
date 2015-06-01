@@ -9,13 +9,32 @@ export default Ember.Object.extend({
   // TODO(new-api): Change to `columnName`
   headerCellName: undefined,
 
+  cellStyle: undefined,
+
+  sortBy: undefined,
+
+  sortIndicatorStyles: Ember.computed(function() {
+    var sortIndicatorStyles = ['sort-indicator-icon'];
+    var sortIndicatorClassMap = {
+      true: 'sort-indicator-icon-up',
+      false: 'sort-indicator-icon-down',
+      undefined: ''
+    };
+    sortIndicatorStyles.push(sortIndicatorClassMap[this.get('_asc')]);
+    return sortIndicatorStyles;
+  }).property('_asc'),
+
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
   // the key.
   contentPath: undefined,
 
   // Minimum column width. Affects both manual resizing and automatic resizing.
-  minWidth: 25,
+  minWidth: Ember.computed(function(){
+    var defaultWidth = 25;
+    var triangleWidth = this.get('_asc') === undefined ? 0 : 15;
+    return defaultWidth + triangleWidth;
+  }).property('_asc'),
 
   // Maximum column width. Affects both manual resizing and automatic resizing.
   maxWidth: undefined,
@@ -90,5 +109,23 @@ export default Ember.Object.extend({
 
   isAtMaxWidth: Ember.computed(function() {
     return this.get('width') === this.get('maxWidth');
-  }).property('width', 'maxWidth')
+  }).property('width', 'maxWidth'),
+
+  sortFn: function(){
+    if(!this.sortBy){
+      return;
+    }
+    this.set('_asc', !this.get('_asc'));
+    var sortDirect = this.get('_asc') ? 1 : -1;
+    var _column = this;
+    return function(prev, next){
+      return sortDirect * _column.sortBy(prev, next);
+    };
+  },
+
+  _asc: undefined,
+
+  currentDirect: Ember.computed(function(){
+    return this.get('_asc') ? 'asc' : 'desc';
+  }).property('_asc')
 });

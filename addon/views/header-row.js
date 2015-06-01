@@ -8,10 +8,15 @@ export default Ember.View.extend(
 StyleBindingsMixin, RegisterTableComponentMixin, {
   templateName: 'header-row',
   classNames: ['ember-table-table-row', 'ember-table-header-row'],
-  styleBindings: ['width'],
+  styleBindings: ['top', 'height'],
   columns: Ember.computed.alias('content'),
   width: Ember.computed.alias('tableComponent._rowWidth'),
   scrollLeft: Ember.computed.alias('tableComponent._tableScrollLeft'),
+
+  rowWidth: Ember.computed(function() {
+    var hasColumnGroup = this.get('tableComponent.hasGroupColumn');
+    return this.get(hasColumnGroup ? 'width' : 'controller._tableColumnsWidth');
+  }),
 
   // Options for jQuery UI sortable
   sortableOption: Ember.computed(function() {
@@ -37,13 +42,13 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
 
   didInsertElement: function() {
     this._super();
-    if (this.get('tableComponent.enableColumnReorder')) {
+    if (this.get('tableComponent.enableColumnReorder') && !this.get('isTopRow')) {
       this.$('> div').sortable(this.get('sortableOption'));
     }
   },
 
   willDestroyElement: function() {
-    if (this.get('tableComponent.enableColumnReorder')) {
+    if (this.get('tableComponent.enableColumnReorder') && !this.get('isTopRow')) {
       // TODO(azirbel): Get rid of this check, as in onColumnSortDone?
       var $divs = this.$('> div');
       if ($divs) {

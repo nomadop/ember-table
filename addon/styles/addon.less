@@ -195,6 +195,8 @@
   > div {
     height: 100%;
     .box-sizing();
+    // Column group header should be visible
+    overflow: hidden;
   }
 }
 
@@ -321,6 +323,29 @@
     .ui-resizable-handle {
       background-color: #eaeaea;
     }
+  }
+
+  // Keep last header cell on same line when resizing to right,
+  // otherwise last header cell will flashing while resizing
+  .ember-table-multi-inner-block {
+    .ember-table-header-row {
+      > div {
+        white-space: nowrap;
+        text-align: left;
+        overflow: hidden;
+
+        .ember-table-header-cell {
+          //use important as .ember-table-header-cell has already used important for display
+          display: inline-block!important;
+          float: none;
+        }
+      }
+    }
+
+  }
+
+  .ember-table-header-groups-block {
+    height: 100%
   }
 }
 
@@ -614,6 +639,31 @@
       border-right: 1px solid darken(@table-row-selected-color, 7%);
     }
   }
+}
+
+.sort-indicator-icon.ember-table-header-cell > .ember-table-content-container > span{
+  padding-right: 5px;
+}
+
+.sort-indicator-icon > .ember-table-content-container > span:after {
+  display: none;
+  width: 0px;
+  height: 0px;
+  float: right;
+  overflow: hidden;
+  content: '\f0d7';
+  border-style: solid;
+  border-width: 5px;
+  margin-left: 10px;
+}
+.sort-indicator-icon-up.sort-indicator-icon > .ember-table-content-container > span:after {
+  display:block;
+  border-color: transparent transparent #000 transparent;
+}
+
+.sort-indicator-icon-down.sort-indicator-icon > .ember-table-content-container > span:after {
+  display: block;
+  border-color: #000 transparent transparent transparent;
 }
 
 //
