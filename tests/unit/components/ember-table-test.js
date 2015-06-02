@@ -116,3 +116,27 @@ test('Should reorder inner columns when dragging the inner column', function (as
   var col = getInnerColumn(this, 1);
   assert.ok(col.text().trim() === firstCol.headerCellName, "Should be header cell name of first column");
 });
+
+moduleForComponent('ember-table', 'Given a group table And the height is 150 And the table row height is 30', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return Ember.Component.extend({
+      template: Ember.Handlebars.compile(
+        '<div style="height:150px"> ' +
+        '{{ember-table ' +
+        ' columns=fixture.columns ' +
+        ' hasFooter=fixture.hasFooter ' +
+        ' content=fixture.content' +
+        ' enableContentSelection=true' +
+        '}} ' +
+        '</div>'),
+      fixture: tableFixture.groupTableFixture([{'id':1},{'id':2},{'id':3},{'id':4}])
+    }).create();
+  }
+});
+
+test('Should show 3 rows in table body ', function(assert) {
+  var component = this.subject();
+
+  assert.ok(this.$('.ember-table-body-container .ember-table-table-row').length === 5, 'should render 3 body row and 2 hidden row');
+});

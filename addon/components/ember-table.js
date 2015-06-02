@@ -457,7 +457,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   _bodyHeight: Ember.computed(function() {
     var bodyHeight = this.get('_tablesContainerHeight');
     if (this.get('hasHeader')) {
-      bodyHeight -= this.get('_headerHeight');
+      bodyHeight -= this.get('_headerContainerHeight');
     }
     if (this.get('hasFooter')) {
       bodyHeight -= this.get('footerHeight');
@@ -465,6 +465,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return bodyHeight;
   }).property('_tablesContainerHeight', '_hasHorizontalScrollbar',
       '_headerHeight', 'footerHeight', 'hasHeader', 'hasFooter'),
+
+  _headerContainerHeight: Ember.computed(function() {
+    return this.get('hasColumnGroup') ? this.get('_headerHeight') * 2 : this.get('_headerHeight');
+  }).property('hasColumnGroup','_headerHeight'),
 
   _tableBlockWidth: Ember.computed(function() {
     return this.get('_width') - this.get('_fixedColumnsWidth');
