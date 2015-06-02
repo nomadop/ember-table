@@ -281,6 +281,13 @@
     z-index: 100;
     position: relative;
     height: 100%;
+
+    // set ui-state-highlight without floating so that it will be in right position,
+    // used when reordering and the table has column group
+    &.group-column-reorder-indicator {
+      float: none;
+      display: inline-block;
+    }
   }
 
   .ui-resizable-handle {

@@ -23,7 +23,8 @@ export default HeaderBlock.extend({
       //whether this row is top one of a column group header
       // If the group header has only one row, it is top row
       // If the group header has two rows, the first row is top row.
-      isTopRow: attrs.contentIndex === 0
+      isTopRow: attrs.contentIndex === 0,
+      reorderPlaceHolderClass: 'group-column-reorder-indicator'
     });
     return this._super(vc, attrs);
   }

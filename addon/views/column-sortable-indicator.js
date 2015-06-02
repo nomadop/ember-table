@@ -6,7 +6,24 @@ export default Ember.View.extend(
 StyleBindingsMixin, RegisterTableComponentMixin, {
   classNames: 'ember-table-column-sortable-indicator',
   classNameBindings: 'tableComponent._isShowingSortableIndicator:active',
-  styleBindings: ['left', 'height'],
+  styleBindings: ['left', 'height', 'top'],
   left: Ember.computed.alias('tableComponent._sortableIndicatorLeft'),
-  height: Ember.computed.alias('tableComponent._height')
+
+  height: Ember.computed(function() {
+    var isReorderInnerColumns = this.get('tableComponent._isReorderInnerColumns');
+    var indicatorHeight = this.get('tableComponent._height');
+
+    // change the indicator height and top
+    // so that indicator will not cover group name cell
+    if (isReorderInnerColumns) {
+      var headerHeight = this.get('tableComponent._headerHeight');
+      indicatorHeight = indicatorHeight  - headerHeight;
+      this.set('top', headerHeight);
+    } else {
+      this.set('top', 0);
+    }
+    return indicatorHeight;
+  }).property('tableComponent._isReorderInnerColumns')
+
 });
+

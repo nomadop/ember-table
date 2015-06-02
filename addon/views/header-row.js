@@ -27,14 +27,24 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
       helper: 'clone',
       items: ".ember-table-header-cell.sortable",
       opacity: 0.9,
-      placeholder: 'ui-state-highlight',
+      placeholder: 'ui-state-highlight ' + this.get('reorderPlaceHolderClass'),
       scroll: true,
       tolerance: 'pointer',
       update: Ember.$.proxy(this.onColumnSortDone, this),
       stop: Ember.$.proxy(this.onColumnSortStop, this),
-      sort: Ember.$.proxy(this.onColumnSortChange, this)
+      sort: Ember.$.proxy(this.onColumnSortChange, this),
+      start: Ember.$.proxy(this.onColumnSortStart, this)
     };
   }),
+
+  onColumnSortStart: function(event, ui) {
+    // show the dragging element
+    ui.item.show();
+
+    if (this.get('tableComponent.hasColumnGroup')) {
+      this.set('tableComponent._isReorderInnerColumns', true);
+    }
+  },
 
   onScrollLeftDidChange: Ember.observer(function() {
     this.$().scrollLeft(this.get('scrollLeft'));
