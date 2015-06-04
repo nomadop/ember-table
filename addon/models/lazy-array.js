@@ -39,7 +39,7 @@ export default Ember.ArrayProxy.extend({
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
-      lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false});
+      lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
     }
 
     this.callback(chunkIndex).then(function (chunk) {
@@ -47,6 +47,11 @@ export default Ember.ArrayProxy.extend({
         .forEach(function (row, x) {
           row.set('isLoaded', true);
           row.set('content', chunk[x]);
+        });
+    }, function () {
+      lazyContent.slice(chunkStart, chunkStart + chunkSize)
+        .forEach(function (row) {
+          row.set('isError', true);
         });
     });
   },

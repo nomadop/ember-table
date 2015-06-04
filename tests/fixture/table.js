@@ -55,17 +55,5 @@ export default Ember.Object.extend({
       content: []
     });
     return result;
-  },
-
-  groupTableFixture: function(content) {
-    var columnFixture = ColumnFixture.create();
-    return {
-      columns: [
-        columnFixture.get('firstColumn'),
-        columnFixture.get('firstGroup')],
-      hasFooter: false,
-      enableContentSelection: true,
-      content: content || []
-    };
   }
 });

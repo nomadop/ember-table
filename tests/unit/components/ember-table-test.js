@@ -8,6 +8,9 @@ import {
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
 import TableFixture from '../../fixture/table';
+import LazyArrayFixture from '../../fixture/lazy-array';
+import EmberTableFixture from '../../fixture/ember-table';
+import EmberTableGroupFixture from '../../fixture/ember-table-with-group';
 
 var tableFixture = TableFixture.create();
 moduleForComponent('ember-table', 'EmberTableComponent', {
@@ -120,23 +123,40 @@ test('Should reorder inner columns when dragging the inner column', function (as
 moduleForComponent('ember-table', 'Given a group table And the height is 150 And the table row height is 30', {
   needs: tableFixture.get('needs'),
   subject: function() {
-    return Ember.Component.extend({
-      template: Ember.Handlebars.compile(
-        '<div style="height:150px"> ' +
-        '{{ember-table ' +
-        ' columns=fixture.columns ' +
-        ' hasFooter=fixture.hasFooter ' +
-        ' content=fixture.content' +
-        ' enableContentSelection=true' +
-        '}} ' +
-        '</div>'),
-      fixture: tableFixture.groupTableFixture([{'id':1},{'id':2},{'id':3},{'id':4}])
-    }).create();
+    return EmberTableGroupFixture.create({content: LazyArrayFixture.create().normalFixture(),
+      height: 150});
   }
 });
 
 test('Should show 3 rows in table body ', function(assert) {
-  var component = this.subject();
-
+  this.subject();
   assert.ok(this.$('.ember-table-body-container .ember-table-table-row').length === 5, 'should render 3 body row and 2 hidden row');
+});
+
+moduleForComponent('ember-table', 'Given a table And the height is 330 And the table row height is 30 And callback return normal data', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableFixture.create({content: LazyArrayFixture.create().normalFixture(),
+      height: 330});
+  }
+});
+
+test('lazy array has no error handling', function(assert) {
+  this.subject();
+  var firstRow = this.$('.ember-table-body-container .ember-table-table-row').first();
+  assert.ok(firstRow.hasClass('ember-table-load-error') === false, 'all row should not has class ember-table-load-error');
+});
+
+moduleForComponent('ember-table', 'Given a table And the height is 330 And the table row height is 30 And callback return error', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableFixture.create({content: LazyArrayFixture.create().errorFixture(),
+      height: 330});
+  }
+});
+
+test('lazy array error handling', function(assert) {
+  this.subject();
+  var firstRow = this.$('.ember-table-body-container .ember-table-table-row').first();
+  assert.ok(firstRow.hasClass('ember-table-load-error'), 'first row should has class ember-table-load-error');
 });
