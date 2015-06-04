@@ -28,7 +28,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // TODO(new-api): Rename to `data`
   columns: null,
 
-  columnGroups: null,
   // The number of fixed columns on the left side of the table. Fixed columns
   // are always visible, even when the table is scrolled horizontally.
   numFixedColumns: 0,
@@ -128,9 +127,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   columnsFillTable: true,
 
   init: function() {
-    if (this.get('hasColumnGroup')) {
-      this.set('columnGroups', this.get('columns'));
-    }
 
     this._super();
     if (!Ember.$.ui) {

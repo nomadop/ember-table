@@ -39,7 +39,7 @@ export default Ember.CollectionView.extend(
     }).property('columnGroups.@each'),
 
     createChildView: function (view, attrs) {
-      var columnGroups = this.get('tableComponent.columnGroups');
+      var columnGroups = this.get('tableComponent.columns');
       var childView = view.extend({
         scrollLeft: this.get('scrollLeft'),
         height: this.get('height'),
