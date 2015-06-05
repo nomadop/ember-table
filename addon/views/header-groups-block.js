@@ -4,6 +4,7 @@ import RegisterTableComponentMixin from 'ember-table/mixins/register-table-compo
 
 export default Ember.CollectionView.extend(
   StyleBindingsMixin, RegisterTableComponentMixin, {
+    classNames: ['ember-table-table-block', 'ember-table-header-groups-block'],
     styleBindings: ['width'],
     columnGroups: undefined,
     headerHeight: undefined,
@@ -27,12 +28,10 @@ export default Ember.CollectionView.extend(
 
     content: Ember.computed(function () {
       var columnGroups = this.get('columnGroups');
-      var self = this;
       return columnGroups.map(function (columnGroup) {
         if (!!columnGroup.get('innerColumns')) {
           return [[columnGroup], columnGroup.get('columns')];
         } else {
-          columnGroup.set('headerCellHeight', self.get('height'));
           return [[columnGroup]];
         }
       });

@@ -10,6 +10,7 @@ export default Ember.Component.extend({
     ' hasFooter=hasFooter ' +
     ' content=content' +
     ' enableContentSelection=true' +
+    ' numFixedColumns=numFixedColumns' +
     '}} '),
   columns: Ember.computed(function () {
     var columnFixture = ColumnFixture.create();
@@ -25,5 +26,6 @@ export default Ember.Component.extend({
   }.property('height'),
   hasFooter: false,
   enableContentSelection: true,
-  content: []
+  content: [],
+  numFixedColumns: 0
 });
