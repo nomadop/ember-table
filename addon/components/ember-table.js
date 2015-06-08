@@ -3,6 +3,7 @@ import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 import ResizeHandlerMixin from 'ember-table/mixins/resize-handler';
 import RowArrayController from 'ember-table/controllers/row-array';
 import Row from 'ember-table/controllers/row';
+import ColumnDefinition from 'ember-table/models/column-definition';
 
 export default Ember.Component.extend(
 StyleBindingsMixin, ResizeHandlerMixin, {
@@ -28,9 +29,31 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // TODO(new-api): Rename to `data`
   columns: null,
 
+  _columns: Ember.computed(function () {
+    var columns = this.get('columns').copy();
+    if (this.get('_hasGroupingColumn')) {
+      columns.unshiftObject(this.get('_groupingColumn'));
+    }
+    return columns;
+  }).property('_hasGroupingColumn', 'columns'),
+
   // The number of fixed columns on the left side of the table. Fixed columns
   // are always visible, even when the table is scrolled horizontally.
   numFixedColumns: 0,
+
+  // fixed columns count in real.
+  // a grouping column will be added as fixed column if has grouping column
+  _numFixedColumns: Ember.computed(function() {
+    var numFixedColumns = this.get('numFixedColumns');
+    if (this.get('_hasGroupingColumn')) {
+      numFixedColumns++;
+    }
+    return numFixedColumns;
+  }).property('numFixedColumns', 'hasGroupingColumn'),
+
+
+  // TODO: Currently set by user, will be replaced by grouped data provider
+  hasGroupingColumn: false,
 
   // The number of footer rows in the table. Footer rows appear at the bottom of
   // the table and are always visible.
@@ -127,8 +150,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   columnsFillTable: true,
 
   init: function() {
-
     this._super();
+    if (this.get('hasColumnGroup')) {
+      this.set('columnGroups', this.get('_columns'));
+    }
     if (!Ember.$.ui) {
       throw 'Missing dependency: jquery-ui';
     }
@@ -169,8 +194,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   onColumnSort: function(column, newIndex) {
     // Fixed columns are not affected by column reordering
     var numFixedColumns = this.get('fixedColumns.length');
-    var columns = this.get('columns');
-
+    var columns = this.get('_columns');
     if (columns.indexOf(column) !== -1) {
       columns.removeObject(column);
       columns.insertAt(numFixedColumns + newIndex, column);
@@ -206,26 +230,26 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   }).property(),
 
   fixedColumns: Ember.computed(function() {
-    var columns = this.get('columns');
+    var columns = this.get('_columns');
     if (!columns) {
       return Ember.A();
     }
-    var numFixedColumns = this.get('numFixedColumns') || 0;
+    var numFixedColumns = this.get('_numFixedColumns') || 0;
     return columns.slice(0, numFixedColumns) || [];
-  }).property('columns.[]', 'numFixedColumns'),
+  }).property('_columns.[]', '_numFixedColumns'),
 
   tableColumns: Ember.computed(function() {
-    var columns = this.get('_flattenedColumns') || this.get('columns');
+    var columns = this.get('_flattenedColumns') || this.get('_columns');
     if (!columns) {
       return Ember.A();
     }
-    var numFixedColumns = this.get('numFixedColumns') || 0;
+    var numFixedColumns = this.get('_numFixedColumns') || 0;
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('columns.@each', 'numFixedColumns', "_innerColumnReordered"),
+  }).property('_columns.@each', '_numFixedColumns', "_innerColumnReordered"),
 
   prepareTableColumns: function() {
     var _this = this;
-    var columns = this.get('columns') || Ember.A();
+    var columns = this.get('_columns') || Ember.A();
     columns.setEach('controller', this);
     columns.forEach(function(col, i) {
       col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));
@@ -233,7 +257,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   },
 
   hasColumnGroup: function () {
-    return this.get('columns')
+    return this.get('_columns')
       .getEach('innerColumns')
       .any(function (i) {
         return !!i;
@@ -243,7 +267,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   _flattenedColumns: function() {
     var columns;
     if (this.get('hasColumnGroup')) {
-      columns = this.get('columns') || Ember.A();
+      columns = this.get('_columns') || Ember.A();
       return columns.reduce(function(result, col) {
         var innerColumns = col.get('innerColumns');
         if (innerColumns) {
@@ -254,7 +278,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         }
       }, []);
     }
-  }.property('columns.@each', '_innerColumnReordered'),
+  }.property('_columns.@each', '_innerColumnReordered'),
 
   getNextResizableColumn: function(columns, index) {
     var column;
@@ -267,6 +291,21 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     }
     return null;
   },
+
+  //encapsulate input, will be used inside only
+  _hasGroupingColumn: Ember.computed.alias('hasGroupingColumn'),
+
+  _groupingColumn: Ember.computed(function () {
+    return ColumnDefinition.create({
+      headerCellName: 'GroupingColumn', //Todo: Fix grouping header name
+      isResizable: false,
+      isSortable: false,
+      getCellContent: function () {
+        //Todo: Use group name
+        return null;
+      }
+    });
+  }),
 
   // ---------------------------------------------------------------------------
   // View concerns
@@ -344,7 +383,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // they can be. Note that this may fail to arrive at the table width if the
   // resizable columns are all restricted by min/max widths.
   doForceFillColumns: function() {
-    var allColumns = this.get('columns');
+    var allColumns = this.get('_columns');
     var columnsToResize = allColumns.filterProperty('canAutoResize');
     var unresizableColumns = allColumns.filterProperty('canAutoResize', false);
     var availableWidth = this.get('_width') - this._getTotalWidth(unresizableColumns);
