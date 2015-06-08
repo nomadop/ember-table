@@ -12,6 +12,7 @@ import LazyArrayFixture from '../../fixture/lazy-array';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableGroupFixture from '../../fixture/ember-table-with-group';
 import EmberTableGroupAndFixedFixture from '../../fixture/ember-table-with-group-and-fixed';
+import EmberTableHelper from '../../helpers/ember-table-helper';
 
 var tableFixture = TableFixture.create();
 moduleForComponent('ember-table', 'EmberTableComponent', {
@@ -124,8 +125,10 @@ test('Should reorder inner columns when dragging the inner column', function (as
 moduleForComponent('ember-table', 'Given a group table And the height is 150 And the table row height is 30', {
   needs: tableFixture.get('needs'),
   subject: function() {
-    return EmberTableGroupFixture.create({content: LazyArrayFixture.create().normalFixture(),
-      height: 150});
+    return EmberTableGroupFixture.create({
+      content: LazyArrayFixture.create().normalFixture(),
+      height: 157 //seems in Chrome row height is 32px
+    });
   }
 });
 
@@ -166,8 +169,10 @@ test('lazy array error handling', function(assert) {
 moduleForComponent('ember-table', 'Given a table And has 1 fixed column And has 1 group column', {
   needs: tableFixture.get('needs'),
   subject: function() {
-    return EmberTableGroupAndFixedFixture.create({content: LazyArrayFixture.create().normalFixture(),
-      height: 330});
+    return EmberTableGroupAndFixedFixture.create({
+      content: LazyArrayFixture.create().normalFixture(),
+      height: 330,
+      groupNames: ['firstGroup']});
   }
 });
 
@@ -189,3 +194,36 @@ test('render group and fixed columns together', function(assert) {
   assert.ok(groupHeader.find('span').text().trim() === 'Group1', 'Header name should be Group1');
 });
 
+moduleForComponent('ember-table', 'Given a table with 1 fixed column and 2 column groups', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableGroupAndFixedFixture.create({
+      content: LazyArrayFixture.create().normalFixture(),
+      numOfColumnGroups: 2,
+      height: 330,
+      groupNames: ['firstGroup', 'secondGroup']
+    });
+  }
+});
+
+test('render fix column with two column groups', function (assert) {
+  var helper = EmberTableHelper.create({_assert: assert, _component: this});
+  this.subject();
+
+  helper.assertGroupColumnHeader(2, 'Group2', 'Header name should be Group2');
+});
+
+test('reorder two column groups', function (assert) {
+  var helper = EmberTableHelper.create({_assert: assert, _component: this});
+  this.subject();
+
+  helper.assertGroupColumnHeader(1, 'Group1', 'Header name should be Group1');
+
+  Ember.run(function () {
+    helper.dragToRight(1, 300);
+  });
+
+  helper.assertFixedColumnHeader('Column1', 'Column1 should be fixed');
+  helper.assertGroupColumnHeader(1, 'Group2', 'Header name should be Group2');
+  helper.assertGroupColumnHeader(2, 'Group1', 'Header name should be Group1');
+});

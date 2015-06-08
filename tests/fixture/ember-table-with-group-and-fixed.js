@@ -5,9 +5,13 @@ import EmberTableFixture from './ember-table';
 export default EmberTableFixture.extend({
   columns: Ember.computed(function () {
     var columnFixture = ColumnFixture.create();
-    return [
-      columnFixture.get('firstColumn'),
-      columnFixture.get('firstGroup')];
-  }),
-  numFixedColumns: 1
+    var columnGroups = this.get('groupNames').map(function (c) {
+      return columnFixture.get(c);
+    });
+    return [columnFixture.get('firstColumn')].concat(columnGroups);
+  }).property('groupNames'),
+
+  numFixedColumns: 1,
+
+  groupNames: ['firstGroup']
 });

@@ -107,7 +107,7 @@ export default Ember.CollectionView.extend(
       var newIndex = ui.item.index();
       this.$().sortable('cancel');
       var view = Ember.View.views[ui.item.attr('id')];
-      var column = view.get('group');
+      var column = view.get('columnGroup');
       this.get('tableComponent').onColumnSort(column, newIndex);
       this.set('tableComponent._isShowingSortableIndicator', false);
     }

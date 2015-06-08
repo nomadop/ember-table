@@ -248,10 +248,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('_columns.@each', '_numFixedColumns', "_innerColumnReordered"),
 
   tableColumnGroups: Ember.computed(function() {
-    var columns = this.get('columns');
+    var columns = this.get('_columns');
     var numFixedColumns = this.get('numFixedColumns') || 0;
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('columns.@each', 'numFixedColumns'),
+  }).property('_columns.@each', 'numFixedColumns'),
 
   prepareTableColumns: function() {
     var _this = this;

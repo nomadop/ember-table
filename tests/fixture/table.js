@@ -27,8 +27,7 @@ export default Ember.Object.extend({
     'template:header-table-container',
     'template:scroll-container',
     'template:table-cell',
-    'template:table-row',
-    'template:header-groups-block'
+    'template:table-row'
   ],
 
   table: function (obj) {

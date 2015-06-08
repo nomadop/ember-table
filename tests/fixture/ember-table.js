@@ -4,7 +4,7 @@ import ColumnFixture from './columns';
 export default Ember.Component.extend({
   height: 330,
 
-  template: Ember.Handlebars.compile(
+  layout: Ember.Handlebars.compile(
     '{{ember-table ' +
     ' columns=columns ' +
     ' hasFooter=hasFooter ' +
@@ -22,7 +22,7 @@ export default Ember.Component.extend({
   }),
   attributeBindings: ['style'],
   style: function() {
-    return 'height: ' + this.get('height') + 'px;';
+    return 'height: ' + this.get('height') + 'px;position:relative;';
   }.property('height'),
   hasFooter: false,
   enableContentSelection: true,

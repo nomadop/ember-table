@@ -39,6 +39,24 @@ export default Ember.Object.extend({
     });
   }),
 
+  fourthColumn: Ember.computed(function () {
+    return ColumnDefinition.create({
+      headerCellName: 'Column4',
+      getCellContent: function (row) {
+        return row.get('d');
+      }
+    });
+  }),
+
+  fifthColumn: Ember.computed(function () {
+    return ColumnDefinition.create({
+      headerCellName: 'Column5',
+      getCellContent: function (row) {
+        return row.get('e');
+      }
+    });
+  }),
+
   firstGroup: Ember.computed(function () {
     return ColumnGroupDefinition.create({
       headerCellName: 'Group1',
@@ -48,6 +66,18 @@ export default Ember.Object.extend({
       firstColumnStyle: 'group-1-first-column',
       lastColumnStyle: 'group-1-last-column',
       innerColumns: [this.get('secondColumn'), this.get('thirdColumn')]
+    });
+  }),
+
+  secondGroup: Ember.computed(function () {
+    return ColumnGroupDefinition.create({
+      headerCellName: 'Group2',
+      cellStyle: 'group-2-cell-class',
+      groupStyle: 'group-2-class',
+      innerColumnStyle: 'group-2-inner-column',
+      firstColumnStyle: 'group-2-first-column',
+      lastColumnStyle: 'group-2-last-column',
+      innerColumns: [this.get('fourthColumn'), this.get('fifthColumn')]
     });
   })
 });

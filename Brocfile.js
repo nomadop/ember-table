@@ -39,9 +39,20 @@ var app = new EmberAddon({
         return escapeHtml(fileContents).replace(/\n/g, '\\n');
       }
     }]
+  },
+  /*
+   * Disable style of #ember-testing { zoom 50% }
+   * If this style is turned on, Chrome will not return correct outerHeight.
+   */
+  'ember-cli-qunit': {
+    disableContainerStyles: true
   }
 });
 
 app.import(app.bowerDirectory + '/d3/d3.js');
+/*
+ * Support test of jquery-ui-sortable
+ */
+app.import(app.bowerDirectory + '/jquery-simulate/jquery.simulate.js');
 
 module.exports = app.toTree();
