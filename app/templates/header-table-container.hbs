@@ -1,14 +1,22 @@
 <div class="ember-table-table-fixed-wrapper">
   {{#if _numFixedColumns}}
-    {{view "header-block" classNames="ember-table-left-table-block"
+    {{#if hasColumnGroup}}
+      {{view "header-groups-block" classNames="ember-table-left-table-block"
+      columnGroups=fixedColumnGroups
+      width=_fixedBlockWidth
+      }}
+    {{else}}
+      {{view "header-block" classNames="ember-table-left-table-block"
       columns=fixedColumns
       width=_fixedBlockWidth
       height=headerHeight
-    }}
+      }}
+    {{/if}}
   {{/if}}
   {{#if hasColumnGroup}}
     {{view "header-groups-block" classNames="ember-table-right-table-block"
     columnGroups=tableColumnGroups
+    width=_tableBlockWidth
     scrollLeft=_tableScrollLeft
     }}
   {{else}}

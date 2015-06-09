@@ -238,13 +238,27 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return columns.slice(0, numFixedColumns) || [];
   }).property('_columns.[]', '_numFixedColumns'),
 
-  tableColumns: Ember.computed(function() {
-    var columns = this.get('_flattenedColumns') || this.get('_columns');
+  flattenedFixedColumns: Ember.computed(function() {
+    return this.flattenColumnOrColumnGroups(this.get('fixedColumnGroups'));
+  }).property('fixedColumnGroups'),
+
+  fixedColumnGroups: Ember.computed(function() {
+    var columns = this.get('_columns');
     if (!columns) {
       return Ember.A();
     }
     var numFixedColumns = this.get('_numFixedColumns') || 0;
-    return columns.slice(numFixedColumns, columns.get('length')) || [];
+    return columns.slice(0, numFixedColumns) || [];
+  }).property('_columns.[]', '_numFixedColumns'),
+
+  tableColumns: Ember.computed(function() {
+    var columns = this.get('_columns');
+    if (!columns) {
+      return Ember.A();
+    }
+    var numFixedColumns = this.get('_numFixedColumns') || 0;
+    var noneFixedColumns = columns.slice(numFixedColumns, columns.get('length')) || [];
+    return this.flattenColumnOrColumnGroups(noneFixedColumns);
   }).property('_columns.@each', '_numFixedColumns', "_innerColumnReordered"),
 
   tableColumnGroups: Ember.computed(function() {
@@ -279,17 +293,21 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var columns;
     if (this.get('hasColumnGroup')) {
       columns = this.get('_columns') || Ember.A();
-      return columns.reduce(function(result, col) {
-        var innerColumns = col.get('innerColumns');
-        if (innerColumns) {
-          return result.concat(innerColumns);
-        } else {
-          result.push(col);
-          return result;
-        }
-      }, []);
+      return this.flattenColumnOrColumnGroups(columns);
     }
   }.property('_columns.@each', '_innerColumnReordered'),
+
+  flattenColumnOrColumnGroups: function(columnOrColumnGroups) {
+    return columnOrColumnGroups.reduce(function(result, col) {
+      var innerColumns = col.get('innerColumns');
+      if (innerColumns) {
+        return result.concat(innerColumns);
+      } else {
+        result.push(col);
+        return result;
+      }
+    }, []);
+  },
 
   getNextResizableColumn: function(columns, index) {
     var column;

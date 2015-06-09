@@ -16,7 +16,7 @@ ShowHorizontalScrollMixin, RegisterTableComponentMixin, {
     } else {
       return oldHeight;
     }
-  }).property('tableComponent._headerHeight'),
+  }).property('tableComponent._headerHeight', 'hasColumnGroup'),
 
   width: Ember.computed.alias('tableComponent._tableContainerWidth'),
 

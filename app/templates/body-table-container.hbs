@@ -4,7 +4,7 @@
       {{#if _numFixedColumns }}
         {{view "lazy-table-block" classNames="ember-table-left-table-block"
           content=bodyContent
-          columns=fixedColumns
+          columns=flattenedFixedColumns
           width=_fixedBlockWidth
           numItemsShowing=_numItemsShowing
           scrollTop=_scrollTop
