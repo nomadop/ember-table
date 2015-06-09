@@ -37,9 +37,12 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   minWidth: Ember.computed.alias('column.minWidth'),
   maxWidth: Ember.computed.alias('column.maxWidth'),
   nextResizableColumn: Ember.computed.alias('column.nextResizableColumn'),
-  height: Ember.computed(function(){
-    return this.get('column.headerCellHeight') || this.get('tableComponent._headerHeight');
-  }).property('column.headerCellHeight'),
+  height: Ember.computed(function() {
+    if (this.get('column.isInner') || this.get('column.isGroup')) {
+      return this.get('tableComponent._headerHeight');
+    }
+    return this.get('tableComponent._headerContainerHeight');
+  }).property('column.isInner', 'column.isGroup', 'tableComponent._headerHeight', 'tableComponent._headerContainerHeight' ),
 
   effectiveMinWidth: Ember.computed(function() {
     if (this.get('tableComponent.columnMode') === 'standard') {

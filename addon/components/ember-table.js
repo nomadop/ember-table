@@ -247,12 +247,23 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return columns.slice(numFixedColumns, columns.get('length')) || [];
   }).property('_columns.@each', '_numFixedColumns', "_innerColumnReordered"),
 
+  tableColumnGroups: Ember.computed(function() {
+    var columns = this.get('_columns');
+    var numFixedColumns = this.get('numFixedColumns') || 0;
+    return columns.slice(numFixedColumns, columns.get('length')) || [];
+  }).property('_columns.@each', 'numFixedColumns'),
+
   prepareTableColumns: function() {
     var _this = this;
     var columns = this.get('_columns') || Ember.A();
     columns.setEach('controller', this);
     columns.forEach(function(col, i) {
       col.set('nextResizableColumn', _this.getNextResizableColumn(columns, i));
+      if (col.get('isGroup')) {
+        col.get('innerColumns').forEach(function(innerCol) {
+          innerCol.set('isInner', true);
+        });
+      }
     });
   },
 
