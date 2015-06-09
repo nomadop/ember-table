@@ -237,6 +237,13 @@
     padding: 0 5px;
     .box-sizing();
   }
+
+  &.grouping-column-cell {
+    .ember-table-content {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
 }
 
 .ember-table-cell-container {
@@ -676,6 +683,42 @@
 .sort-indicator-icon-down.sort-indicator-icon > .ember-table-content-container > span:after {
   display: block;
   border-color: #000 transparent transparent transparent;
+}
+
+.grouping-column-indicator {
+  display: inline-block;
+  position: relative;
+  width: 10px;
+  height: 10px;
+  margin-left: 5px;
+
+  .hor {
+    position: absolute;
+    top: 4px;
+    width: 10px;
+    height: 2px;
+    background: black;
+    transition: all .3s linear;
+  }
+
+  .ver {
+    position: absolute;
+    left: 4px;
+    width: 2px;
+    height: 10px;
+    background: black;
+    transition: all .3s linear;
+  }
+
+  &.unfold {
+    .hor {
+      transform: rotate(180deg);
+    } 
+
+    .ver {
+      transform: rotate(270deg);
+    }
+  }
 }
 
 //

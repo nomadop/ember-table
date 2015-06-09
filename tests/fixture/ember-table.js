@@ -8,6 +8,7 @@ export default Ember.Component.extend({
     '{{ember-table ' +
     ' columns=columns ' +
     ' hasFooter=hasFooter ' +
+    ' hasGroupingColumn=hasGroupingColumn ' +
     ' content=content' +
     ' enableContentSelection=true' +
     ' numFixedColumns=numFixedColumns' +
@@ -27,5 +28,6 @@ export default Ember.Component.extend({
   hasFooter: false,
   enableContentSelection: true,
   content: [],
-  numFixedColumns: 0
+  numFixedColumns: 0,
+  hasGroupingColumn: false
 });

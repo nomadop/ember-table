@@ -1,0 +1,9 @@
+{{#if view.isGroupRow}}
+  <div class={{view.indicatorClass}} {{action 'toggleExpansionState' target=view}}>
+    <div class="hor"></div>
+    <div class="ver"></div>
+  </div>
+{{/if}}
+<span class="ember-table-content">
+  {{view.cellContent}}
+</span>
