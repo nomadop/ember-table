@@ -11,7 +11,7 @@ export default Ember.Object.extend({
         return prev.get('id') - next.get('id');
       },
       getCellContent: function (row) {
-        return row.get('a');
+        return row.get('id');
       }
     });
   }),
@@ -24,7 +24,7 @@ export default Ember.Object.extend({
         return prev.get('id') - next.get('id');
       },
       getCellContent: function (row) {
-        return row.get('b');
+        return row.get('activity');
       }
     });
   }),
@@ -34,7 +34,7 @@ export default Ember.Object.extend({
       textAlign: 'text-align-left',
       headerCellName: 'Column3',
       getCellContent: function (row) {
-        return row.get('c');
+        return row.get('state');
       }
     });
   }),

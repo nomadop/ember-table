@@ -20,6 +20,7 @@ export default Ember.Object.extend({
     'view:table-row',
     'view:header-group',
     'view:header-groups-block',
+    'view:grouping-column-cell',
     'template:body-table-container',
     'template:footer-table-container',
     'template:header-cell',
@@ -27,7 +28,8 @@ export default Ember.Object.extend({
     'template:header-table-container',
     'template:scroll-container',
     'template:table-cell',
-    'template:table-row'
+    'template:table-row',
+    'template:grouping-column-cell'
   ],
 
   table: function (obj) {

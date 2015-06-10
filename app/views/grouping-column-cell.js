@@ -1,0 +1,1 @@
+export { default } from 'ember-table/views/grouping-column-cell';

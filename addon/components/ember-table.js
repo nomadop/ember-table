@@ -51,7 +51,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return numFixedColumns;
   }).property('numFixedColumns', 'hasGroupingColumn'),
 
-
   // TODO: Currently set by user, will be replaced by grouped data provider
   hasGroupingColumn: false,
 
@@ -178,7 +177,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         var content = this.get('content');
         this.sendAction('setSortConditionBy', column);
         content.sort(sortFn);
-        this.set('_reloadBody', !this.get('_reloadBody'));
+        this.toggleProperty('_reloadBody');
         Ember.run.next(this, this.updateLayout);
       }
     }
@@ -309,11 +308,12 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   _groupingColumn: Ember.computed(function () {
     return ColumnDefinition.create({
       headerCellName: 'GroupingColumn', //Todo: Fix grouping header name
+      textAlign: 'text-align-left',
       isResizable: false,
       isSortable: false,
-      getCellContent: function () {
-        //Todo: Use group name
-        return null;
+      tableCellView: 'grouping-column-cell',
+      getCellContent: function (row) {
+        return row.get('groupName');
       }
     });
   }),
