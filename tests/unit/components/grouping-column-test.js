@@ -7,6 +7,7 @@ from 'ember-qunit';
 import EmberTableFixture from '../../fixture/ember-table';
 import LazyArray from 'ember-table/models/lazy-array';
 import TableFixture from '../../fixture/table';
+import EmberTableHelper from '../../helpers/ember-table-helper';
 
 var tableFixture = TableFixture.create();
 var content = [{
@@ -83,3 +84,64 @@ function findCellText(object, blockPosition, rowIndex, cellIndex) {
     '.ember-table-cell:eq(' + cellIndex + ') ' +
     '.ember-table-content').text().trim();
 }
+
+
+moduleForComponent('ember-table', 'Given a table with group row data', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 600,
+      content: content,
+      hasGroupingColumn: true,
+      numFixedColumns: 0
+    });
+  }
+});
+
+test('lock grouping column', function(assert) {
+  var helper = EmberTableHelper.create({_assert: assert, _component: this});
+  this.subject();
+
+  var offsetBefore = [helper.nthColumnHeader(1).offset()];
+  Ember.run(function() {
+    helper.resizeColumn('Column1', 100);
+    helper.scrollBodyLeft(10);
+  });
+  assert.equal(helper.nthColumnHeader(1).find('span').text().trim(), 'GroupingColumn', 'first column should be grouping column');
+
+  var offsetAfter = [helper.nthColumnHeader(1).offset()];
+  assert.deepEqual(offsetAfter, offsetBefore, 'grouping column 1 should not be scrolled left');
+});
+
+moduleForComponent('ember-table', 'Given a table with group row data and two fixed columns', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 700,
+      content: content,
+      hasGroupingColumn: true,
+      numFixedColumns: 0
+    });
+  }
+});
+
+test('lock grouping column in addition', function(assert) {
+  var helper = EmberTableHelper.create({_assert: assert, _component: this});
+  this.subject();
+
+  var offsetBefore = [1,2,3].map(function(x){ return helper.nthColumnHeader(x).offset();});
+  var nonFixedOffsetBefore = [helper.nthColumnHeader(4).offset()];
+  Ember.run(function() {
+    helper.resizeColumn('Column2', 200);
+    helper.scrollBodyLeft(50);
+  });
+
+  var offsetAfter = [1,2,3].map(function(x){ return helper.nthColumnHeader(x).offset();});
+  var nonFixedOffsetAfter = [helper.nthColumnHeader(4).offset()];
+
+  assert.deepEqual(helper.nthColumnHeader(1).find('span').text().trim(), 'GroupingColumn', 'first column should be grouping column');
+  assert.deepEqual(offsetBefore, offsetAfter, 'grouping column and fixed columns should not be scrolled left');
+  assert.notDeepEqual(nonFixedOffsetAfter, nonFixedOffsetBefore, 'non-fixed columns should be scrolled left');
+});
