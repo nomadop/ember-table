@@ -14,16 +14,13 @@ export default Ember.CollectionView.extend(
       return this.get('tableComponent._headerHeight') * 2;
     }).property('tableComponent._headerHeight'),
 
-    //table row width will change with each column width so we bind with it
-    width: Ember.computed.alias('tableComponent._rowWidth'),
-
     //will bind to a property passed in from template, we expect that property reflect scroll position
     scrollLeft: null,
 
-    //use JQuery scrollLeft, which needs inner element has a larger width than outter element,
-    //header-groups-block acts as the inner element in scrolling
+    //use JQuery scrollLeft, which needs inner element has a larger width than outer element,
+    //header-groups-block acts as the outer element in scrolling
     onScrollLeftDidChange: Ember.observer(function () {
-      return this.$().parent().scrollLeft(this.get('scrollLeft'));
+      return this.$().scrollLeft(this.get('scrollLeft'));
     }, 'scrollLeft'),
 
     content: Ember.computed(function () {

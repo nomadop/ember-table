@@ -172,7 +172,7 @@ moduleForComponent('ember-table', 'Given a table And has 1 fixed column And has 
     return EmberTableGroupAndFixedFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
       height: 330,
-      groupNames: ['firstGroup']});
+      columnNames: ['firstColumn', 'firstGroup']});
   }
 });
 
@@ -199,9 +199,8 @@ moduleForComponent('ember-table', 'Given a table with 1 fixed column and 2 colum
   subject: function() {
     return EmberTableGroupAndFixedFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
-      numOfColumnGroups: 2,
       height: 330,
-      groupNames: ['firstGroup', 'secondGroup']
+      columnNames: ['firstColumn', 'firstGroup', 'secondGroup']
     });
   }
 });
@@ -226,4 +225,23 @@ test('reorder two column groups', function (assert) {
   helper.assertFixedColumnHeader('Column1', 'Column1 should be fixed');
   helper.assertGroupColumnHeader(1, 'Group2', 'Header name should be Group2');
   helper.assertGroupColumnHeader(2, 'Group1', 'Header name should be Group1');
+});
+
+moduleForComponent('ember-table', 'Given a table with 1 fixed column group and 1 column', {
+  needs: tableFixture.get('needs'),
+  subject: function() {
+    return EmberTableGroupAndFixedFixture.create({
+      content: LazyArrayFixture.create().normalFixture(),
+      height: 330,
+      columnNames: ['firstGroup', 'firstColumn']
+    });
+  }
+});
+
+test('render fixed group column', function(assert) {
+  var helper = EmberTableHelper.create({_assert: assert, _component: this});
+  this.subject();
+
+  helper.assertFixedColumnGroupHeader('Group1', 'Group1 should be fixed');
+  helper.assertBodyContentCellCountInRow(1, 'Non-fixed cell count should be 1 for first row');
 });
