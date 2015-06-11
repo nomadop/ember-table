@@ -1,9 +1,6 @@
 import Ember from 'ember';
-import {
-  moduleForComponent,
-  test
-  }
-  from 'ember-qunit';
+import { test } from 'ember-qunit';
+import moduleForEmberTable from '../../helpers/module-for-ember-table';
 
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
@@ -11,9 +8,7 @@ import LazyArray from 'ember-table/models/lazy-array';
 import TableFixture from '../../fixture/table';
 
 var tableFixture = TableFixture.create();
-moduleForComponent('ember-table', 'sortIndicator', {
-  needs: tableFixture.get('needs')
-});
+moduleForEmberTable('sortIndicator');
 
 test('should show indicator when sort by column', function (assert) {
   tableFixture.table(this);

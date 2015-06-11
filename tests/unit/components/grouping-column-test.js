@@ -1,9 +1,6 @@
 import Ember from 'ember';
-import {
-  moduleForComponent,
-  test
-}
-from 'ember-qunit';
+import { test } from 'ember-qunit';
+import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import LazyArray from 'ember-table/models/lazy-array';
 import TableFixture from '../../fixture/table';
@@ -26,17 +23,14 @@ var content = [{
   state: 'down'
 }];
 
-moduleForComponent('ember-table', 'render grouping column', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('render grouping column',
+  function() {
     return EmberTableFixture.create({
       content: content,
       hasGroupingColumn: true,
       height: 300
     });
-  }
 });
-
 
 test('it should has a grouping column at most left position', function(assert) {
   var component = this.subject();
@@ -85,10 +79,8 @@ function findCellText(object, blockPosition, rowIndex, cellIndex) {
     '.ember-table-content').text().trim();
 }
 
-
-moduleForComponent('ember-table', 'Given a table with group row data', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a table with group row data',
+  function() {
     return EmberTableFixture.create({
       height: 330,
       width: 600,
@@ -96,7 +88,6 @@ moduleForComponent('ember-table', 'Given a table with group row data', {
       hasGroupingColumn: true,
       numFixedColumns: 0
     });
-  }
 });
 
 test('lock grouping column', function(assert) {
@@ -114,17 +105,15 @@ test('lock grouping column', function(assert) {
   assert.deepEqual(offsetAfter, offsetBefore, 'grouping column 1 should not be scrolled left');
 });
 
-moduleForComponent('ember-table', 'Given a table with group row data and two fixed columns', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a table with group row data and two fixed columns',
+  function() {
     return EmberTableFixture.create({
       height: 330,
       width: 700,
       content: content,
       hasGroupingColumn: true,
-      numFixedColumns: 0
+      numFixedColumns: 2
     });
-  }
 });
 
 test('lock grouping column in addition', function(assert) {

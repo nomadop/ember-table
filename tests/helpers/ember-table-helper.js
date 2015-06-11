@@ -39,7 +39,7 @@ export default Ember.Object.extend({
     assert.equal(row.find('.ember-table-cell').length, cellCount, message);
   },
 
-  dragToRight: function dragToRight(colIndex, offset) {
+  reorderColumn: function dragToRight(colIndex, offset) {
     var groupHeaderCell = this.getGroupHeaderCell(colIndex);
     groupHeaderCell.simulate('drag', {dx: offset});
   },
