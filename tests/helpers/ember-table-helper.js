@@ -74,5 +74,35 @@ export default Ember.Object.extend({
       return nonFixedHeaders.eq(colIndex - fixedHeaders.length - 1);
     }
     return null;
+  },
+
+  /**
+   *
+   * @param rowIndex start from 0
+   * @returns {*|jQuery}
+   */
+  rowGroupingIndicator: function rowGroupingIndicator(rowIndex) {
+    var component = this.get('_component');
+    return component.$('.ember-table-body-container ' +
+      '.ember-table-left-table-block ' +
+      ('.ember-table-table-row:eq(%@) '.fmt(rowIndex)) +
+      '.ember-table-cell:eq(0) ' +
+      '.grouping-column-indicator');
+  },
+
+  fixedBodyCell: function fixedBodyCell(rowIndex, colIndex) {
+    var component = this.get('_component');
+    return component.$('.ember-table-body-container ' +
+      '.ember-table-left-table-block ' +
+      ('.ember-table-table-row:eq(%@) '.fmt(rowIndex)) +
+      ('.ember-table-cell:eq(%@) '.fmt(colIndex)) +
+      '.ember-table-content');
+  },
+
+  fixedBodyRows: function fixedBodyRows() {
+    var component = this.get('_component');
+    return component.$('.ember-table-body-container ' +
+      '.ember-table-left-table-block ' +
+      '.ember-table-table-row');
   }
 });

@@ -9,7 +9,6 @@ import EmberTableHelper from '../../helpers/ember-table-helper';
 var tableFixture = TableFixture.create();
 var content = [{
   groupName: 'firstRootGroupName',
-  isGroupRow: true,
   id: 100,
   state: 'up'
 }, {
@@ -18,9 +17,18 @@ var content = [{
   state: 'up'
 }, {
   groupName: 'thirdRootGroupName',
-  isGroupRow: false,
+  isGroupRow: true,
   id: 10000,
-  state: 'down'
+  state: 'down',
+  children: [{
+    groupName: 'secondRootGroupName',
+    id: 10007,
+    state: 'up'
+  }, {
+    groupName: 'secondRootGroupName',
+    id: 10002,
+    state: 'down'
+  }]
 }];
 
 moduleForEmberTable('render grouping column',
@@ -44,19 +52,28 @@ test('it should has a grouping column at most left position', function(assert) {
 
 test('it should render group name in grouping column', function(assert) {
   var component = this.subject();
+
   var firstRowGroupColumnName = findCellText(this, 'left', 0, 0);
 
   assert.equal(firstRowGroupColumnName, 'firstRootGroupName');
 });
 
+test('it should render group indicator in grouping column when the loan is grouping row', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  var indicator = helper.rowGroupingIndicator(2);
+
+  assert.equal(indicator.length, 1);
+});
+
 test('it should not render group indicator in grouping column when the loan is not grouped data', function(assert) {
   var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
-  var indicator = this.$('.ember-table-body-container ' +
-    '.ember-table-left-table-block ' +
-    '.ember-table-table-row:eq(1) ' +
-    '.ember-table-cell:eq(0) ' +
-    '.grouping-column-indicator');
+  var indicator = helper.rowGroupingIndicator(1);
 
   assert.equal(indicator.length, 0);
 });
@@ -65,7 +82,7 @@ test('it should render columns data in columns', function(assert) {
   var component = this.subject();
 
   var firstRowId = findCellText(this, 'right', 0, 0);
-  var firstRowState =findCellText(this, 'right', 0, 2);
+  var firstRowState = findCellText(this, 'right', 0, 2);
 
   assert.equal(firstRowId, '100');
   assert.equal(firstRowState, 'up');
@@ -91,8 +108,9 @@ moduleForEmberTable('Given a table with group row data',
 });
 
 test('lock grouping column', function(assert) {
-  var helper = EmberTableHelper.create({_assert: assert, _component: this});
-  this.subject();
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   var offsetBefore = [helper.nthColumnHeader(1).offset()];
   Ember.run(function() {
@@ -118,19 +136,104 @@ moduleForEmberTable('Given a table with group row data and two fixed columns',
 
 test('lock grouping column in addition', function(assert) {
   var helper = EmberTableHelper.create({_assert: assert, _component: this});
-  this.subject();
-
-  var offsetBefore = [1,2,3].map(function(x){ return helper.nthColumnHeader(x).offset();});
+  var offsetBefore = [1, 2, 3].map(function (x) {
+    return helper.nthColumnHeader(x).offset();
+  });
   var nonFixedOffsetBefore = [helper.nthColumnHeader(4).offset()];
-  Ember.run(function() {
+  Ember.run(function () {
     helper.resizeColumn('Column2', 200);
     helper.scrollBodyLeft(50);
   });
 
-  var offsetAfter = [1,2,3].map(function(x){ return helper.nthColumnHeader(x).offset();});
+  var offsetAfter = [1, 2, 3].map(function (x) {
+    return helper.nthColumnHeader(x).offset();
+  });
   var nonFixedOffsetAfter = [helper.nthColumnHeader(4).offset()];
 
   assert.deepEqual(helper.nthColumnHeader(1).find('span').text().trim(), 'GroupingColumn', 'first column should be grouping column');
   assert.deepEqual(offsetBefore, offsetAfter, 'grouping column and fixed columns should not be scrolled left');
   assert.notDeepEqual(nonFixedOffsetAfter, nonFixedOffsetBefore, 'non-fixed columns should be scrolled left');
+
+});
+
+test('it should display group row children when group row has children ', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(2);
+
+  indicator.click();
+
+  assert.ok(indicator.hasClass('unfold'), 'should show collapse icon');
+  var firstChildId = helper.fixedBodyCell(3, 1).text().trim();
+
+  assert.equal(firstChildId, '10007', 'children row should be displayed');
+});
+
+test('collapse children ', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(2);
+
+  indicator.click();
+  indicator.click();
+
+  assert.ok(!!!indicator.hasClass('unfold'), 'should show expand icon');
+  var firstChildId = helper.fixedBodyCell(2, 1).text().trim();
+
+  assert.equal(firstChildId, '10000', 'group row should be displayed');
+});
+
+
+moduleForEmberTable('table with two group rows',
+  function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 700,
+      content: [{
+        groupName: 'firstRootGroupName',
+        id: 100,
+        state: 'up'
+      }, {
+        groupName: 'secondRootGroupName',
+        isGroupRow: true,
+        id: 10000,
+        state: 'down',
+        children: [{
+          id: 10007,
+          state: 'up'
+        }, {
+          id: 10002,
+          state: 'down'
+        }]
+      }, {
+        groupName: 'thirdRootGroupName',
+        isGroupRow: true,
+        id: 20000,
+        state: 'down',
+        children: [{
+          id: 20007,
+          state: 'up'
+        }, {
+          id: 20002,
+          state: 'down'
+        }]
+      }],
+      hasGroupingColumn: true,
+      numFixedColumns: 2
+    });
+});
+
+test('toggle expand indicator', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(1);
+
+  indicator.click();
+
+  assert.ok(indicator.hasClass('unfold'), 'should show collapse icon');
+  var secondGroupingIndicator = helper.rowGroupingIndicator(4);
+  assert.ok(!!!secondGroupingIndicator.hasClass('unfold'), 'second grouping row indicator should not be changed');
 });

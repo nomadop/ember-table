@@ -1,5 +1,5 @@
 {{#if view.isGroupRow}}
-  <div class={{view.indicatorClass}} {{action 'toggleExpansionState' target=view}}>
+  <div {{bind-attr class="view.indicatorClass"}} {{action 'toggleExpansionState' target=view}}>
     <div class="hor"></div>
     <div class="ver"></div>
   </div>

@@ -1,12 +1,9 @@
 import Ember from 'ember';
 import { moduleForComponent} from 'ember-qunit';
-import TableFixture from '../fixture/table';
-
 
 export default function moduleForEmberTable(description, subject) {
-  var tableFixture = TableFixture.create();
 
-  moduleForComponent('ember-table', 'EmberTableComponent', {
+  moduleForComponent('ember-table', description, {
     needs: [
       'view:body-table-container',
       'view:column-sortable-indicator',

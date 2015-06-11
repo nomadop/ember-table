@@ -1,25 +1,36 @@
 import Ember from 'ember';
 import TableCell from './table-cell';
-export default TableCell.extend({
+import RegisterTableComponentMixin from 'ember-table/mixins/register-table-component';
+
+export default TableCell.extend(
+  RegisterTableComponentMixin, {
+
   templateName: 'grouping-column-cell',
 
   classNames: ['grouping-column-cell'],
 
-  expanded: false,
-
   indicatorClass: Ember.computed(function() {
     var classNames = ['grouping-column-indicator'];
-    if (this.get('expanded')) {
+    if (this.get('_isExpanded')) {
       classNames.push('unfold');
     }
     return classNames.join(' ');
-  }).property('expanded'),
+  }).property('_isExpanded'),
 
   isGroupRow: Ember.computed.oneWay('row.isGroupRow'),
 
   actions: {
     toggleExpansionState: function() {
-      this.toggleProperty('expanded');
+      var row = this.get('row');
+      var target = row.get('target');
+      if (this.get('_isExpanded')) {
+        target.collapseChildren(row);
+      } else {
+        target.expandChildren(row);
+      }
     }
-  }
+  },
+
+  _isExpanded: Ember.computed.oneWay('row.isExpanded')
+
 });
