@@ -42,7 +42,37 @@ export default Ember.Object.extend({
   dragToRight: function dragToRight(colIndex, offset) {
     var groupHeaderCell = this.getGroupHeaderCell(colIndex);
     groupHeaderCell.simulate('drag', {dx: offset});
+  },
+
+  resizeHandle: function resizeHandle(headerName) {
+    var component = this.get('_component');
+    return component.$(".ember-table-header-container span:contains('%@')".fmt(headerName)).parent().next();
+  },
+
+  resizeColumn: function resizeColumn(headerName, dx) {
+    this.resizeHandle(headerName).simulate('mouseover').simulate('drag', {dx: dx});
+  },
+
+  scrollBodyLeft: function scrollBodyLeft(dx) {
+    var component = this.get('_component');
+    component.$('.antiscroll-scrollbar-horizontal').simulate('mouseover').simulate('drag', {dx: dx});
+  },
+
+  /**
+   * the nth column header, regardless of fixed or non-fixed
+   * @param colIndex  start from 1
+   */
+  nthColumnHeader: function nthColumnHeader(colIndex) {
+    var component = this.get('_component');
+    var headerContainer = component.$('.ember-table-header-container');
+    var fixedHeaders = headerContainer.find('.ember-table-left-table-block .ember-table-header-cell');
+    if (fixedHeaders.length >= colIndex) {
+      return fixedHeaders.eq(colIndex - 1);
+    }
+    var nonFixedHeaders = headerContainer.find('.ember-table-right-table-block .ember-table-header-cell');
+    if (nonFixedHeaders.length + fixedHeaders.length >= colIndex) {
+      return nonFixedHeaders.eq(colIndex - fixedHeaders.length - 1);
+    }
+    return null;
   }
-
-
 });
