@@ -1,9 +1,6 @@
 import Ember from 'ember';
-import {
-  moduleForComponent,
-  test
-  }
-  from 'ember-qunit';
+import { test } from 'ember-qunit';
+import moduleForEmberTable from '../../helpers/module-for-ember-table';
 
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
@@ -15,21 +12,6 @@ import EmberTableGroupAndFixedFixture from '../../fixture/ember-table-with-group
 import EmberTableHelper from '../../helpers/ember-table-helper';
 
 var tableFixture = TableFixture.create();
-moduleForComponent('ember-table', 'EmberTableComponent', {
-  needs: tableFixture.get('needs')
-});
-
-test('it should has column group', function (assert) {
-  var component = tableFixture.groupTable(this);
-
-  assert.ok(component.get('hasColumnGroup'));
-});
-
-test('it should not has column group', function (assert) {
-  var component = tableFixture.table(this);
-
-  assert.ok(!component.get('hasColumnGroup'));
-});
 
 var validateColumnNames = function (assert, obj) {
   assert.equal(obj.$('span:contains(Column1)').length, 1);
@@ -37,12 +19,26 @@ var validateColumnNames = function (assert, obj) {
   assert.equal(obj.$('span:contains(Column3)').length, 1);
 };
 
-test('it should render all columns in two blocks', function (assert) {
-  tableFixture.groupTable(this);
+function getGroupColumnWidth(table) {
+  return table.$('.ember-table-header-container .ember-table-header-groups-block ' +
+    '.ember-table-header-block:nth-child(2) ' +
+    '.ember-table-header-row:nth-child(1)').width();
+}
 
-  validateColumnNames(assert, this);
-  assert.equal(this.$('.ember-table-header-block').length, 2);
-  assert.equal(this.$('span:contains(Group1)').length, 1);
+function getInnerColumn(table, columnIndex) {
+  return table.$('.ember-table-header-container ' +
+    '.ember-table-header-block:nth-child(2) ' +
+    '.ember-table-header-row:nth-child(2) ' +
+    '.ember-table-header-cell:nth-child(' + (1 + columnIndex) + ') ' +
+    '.ember-table-content');
+}
+
+moduleForEmberTable('EmberTableComponent');
+
+test('it should not has column group', function (assert) {
+  var component = tableFixture.table(this);
+
+  assert.ok(!component.get('hasColumnGroup'));
 });
 
 test('it should render all columns in one block', function (assert) {
@@ -50,6 +46,21 @@ test('it should render all columns in one block', function (assert) {
 
   validateColumnNames(assert, this);
   assert.equal(this.$('.ember-table-header-block').length, 1);
+});
+
+moduleForEmberTable('column group');
+test('it should has column group', function (assert) {
+  var component = tableFixture.groupTable(this);
+
+  assert.ok(component.get('hasColumnGroup'));
+});
+
+test('it should render all columns in two blocks', function (assert) {
+  tableFixture.groupTable(this);
+
+  validateColumnNames(assert, this);
+  assert.equal(this.$('.ember-table-header-block').length, 2);
+  assert.equal(this.$('span:contains(Group1)').length, 1);
 });
 
 test('it should render the group with group class', function (assert) {
@@ -85,12 +96,6 @@ test('it should set the last column class in group', function (assert) {
   assert.equal(this.$('.group-1-last-column').text().trim(), 'Column3');
 });
 
-function getGroupColumnWidth(table) {
-  return table.$('.ember-table-header-container .ember-table-header-groups-block ' +
-    '.ember-table-header-block:nth-child(2) ' +
-    '.ember-table-header-row:nth-child(1)').width();
-}
-
 test('Should resize group width when inner column size changed', function (assert) {
   var component = tableFixture.groupTable(this);
   assert.ok(getGroupColumnWidth(this) === 300, 'Should be width before change');
@@ -101,14 +106,6 @@ test('Should resize group width when inner column size changed', function (asser
   });
   assert.ok(getGroupColumnWidth(this) === 650, 'Should be width after change');
 });
-
-function getInnerColumn(table, columnIndex) {
-  return table.$('.ember-table-header-container ' +
-    '.ember-table-header-block:nth-child(2) ' +
-    '.ember-table-header-row:nth-child(2) ' +
-    '.ember-table-header-cell:nth-child(' + (1 + columnIndex) + ') ' +
-    '.ember-table-content');
-}
 
 test('Should reorder inner columns when dragging the inner column', function (assert) {
   var component = tableFixture.groupTable(this);
@@ -122,14 +119,12 @@ test('Should reorder inner columns when dragging the inner column', function (as
   assert.ok(col.text().trim() === firstCol.headerCellName, "Should be header cell name of first column");
 });
 
-moduleForComponent('ember-table', 'Given a group table And the height is 150 And the table row height is 30', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a group table And the height is 150 And the table row height is 30',
+  function() {
     return EmberTableGroupFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
       height: 157 //seems in Chrome row height is 32px
     });
-  }
 });
 
 test('Should show 3 rows in table body ', function(assert) {
@@ -137,12 +132,11 @@ test('Should show 3 rows in table body ', function(assert) {
   assert.ok(this.$('.ember-table-body-container .ember-table-table-row').length === 5, 'should render 3 body row and 2 hidden row');
 });
 
-moduleForComponent('ember-table', 'Given a table And the height is 330 And the table row height is 30 And callback return normal data', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
-    return EmberTableFixture.create({content: LazyArrayFixture.create().normalFixture(),
+moduleForEmberTable('Given a table And the height is 330 And the table row height is 30 And callback return normal data',
+  function() {
+    return EmberTableFixture.create({
+      content: LazyArrayFixture.create().normalFixture(),
       height: 330});
-  }
 });
 
 test('lazy array has no error handling', function(assert) {
@@ -151,12 +145,11 @@ test('lazy array has no error handling', function(assert) {
   assert.ok(firstRow.hasClass('ember-table-load-error') === false, 'all row should not has class ember-table-load-error');
 });
 
-moduleForComponent('ember-table', 'Given a table And the height is 330 And the table row height is 30 And callback return error', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
-    return EmberTableFixture.create({content: LazyArrayFixture.create().errorFixture(),
+moduleForEmberTable('Given a table And the height is 330 And the table row height is 30 And callback return error',
+  function() {
+    return EmberTableFixture.create({
+      content: LazyArrayFixture.create().errorFixture(),
       height: 330});
-  }
 });
 
 test('lazy array error handling', function(assert) {
@@ -166,14 +159,12 @@ test('lazy array error handling', function(assert) {
 });
 
 
-moduleForComponent('ember-table', 'Given a table And has 1 fixed column And has 1 group column', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a table And has 1 fixed column And has 1 group column',
+  function() {
     return EmberTableGroupAndFixedFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
       height: 330,
       columnNames: ['firstColumn', 'firstGroup']});
-  }
 });
 
 test('render group and fixed columns together', function(assert) {
@@ -194,15 +185,13 @@ test('render group and fixed columns together', function(assert) {
   assert.ok(groupHeader.find('span').text().trim() === 'Group1', 'Header name should be Group1');
 });
 
-moduleForComponent('ember-table', 'Given a table with 1 fixed column and 2 column groups', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a table with 1 fixed column and 2 column groups',
+  function() {
     return EmberTableGroupAndFixedFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
       height: 330,
       columnNames: ['firstColumn', 'firstGroup', 'secondGroup']
     });
-  }
 });
 
 test('render fix column with two column groups', function (assert) {
@@ -219,7 +208,7 @@ test('reorder two column groups', function (assert) {
   helper.assertGroupColumnHeader(1, 'Group1', 'Header name should be Group1');
 
   Ember.run(function () {
-    helper.dragToRight(1, 300);
+    helper.reorderColumn(1, 300);
   });
 
   helper.assertFixedColumnHeader('Column1', 'Column1 should be fixed');
@@ -227,15 +216,13 @@ test('reorder two column groups', function (assert) {
   helper.assertGroupColumnHeader(2, 'Group1', 'Header name should be Group1');
 });
 
-moduleForComponent('ember-table', 'Given a table with 1 fixed column group and 1 column', {
-  needs: tableFixture.get('needs'),
-  subject: function() {
+moduleForEmberTable('Given a table with 1 fixed column group and 1 column',
+  function() {
     return EmberTableGroupAndFixedFixture.create({
       content: LazyArrayFixture.create().normalFixture(),
       height: 330,
       columnNames: ['firstGroup', 'firstColumn']
     });
-  }
 });
 
 test('render fixed group column', function(assert) {
