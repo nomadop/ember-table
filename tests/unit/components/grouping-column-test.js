@@ -276,9 +276,9 @@ test('expand first level row', function (assert) {
   var component = this.subject();
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
-  var firstLevelRow = helper.rowGroupingIndicator(0);
+  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
 
-  firstLevelRow.click();
+  firstLevelRowIndicator.click();
 
   var secondLevelRow1 = helper.rowGroupingIndicator(1);
   assert.equal(secondLevelRow1.length, 0, "second-level-row1 should have no indicator");
@@ -292,13 +292,46 @@ test('expand second level row', function (assert) {
   var component = this.subject();
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
-  var firstLevelRow = helper.rowGroupingIndicator(0);
-  firstLevelRow.click();
+  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
+  firstLevelRowIndicator.click();
   var secondLevelRowIndicator = helper.rowGroupingIndicator(2);
 
   secondLevelRowIndicator.click();
 
   assert.ok(secondLevelRowIndicator.hasClass('unfold'), 'second level row should have collapse indicator');
   var secondLevelRowChildId = helper.bodyCell(3, 0).text().trim();
-  assert.equal(secondLevelRowChildId, 10021, 'the id of second level row child should equal to 10021');
+  assert.equal(secondLevelRowChildId, 10021, "the id of second level row child should equal to 10021");
 });
+
+test('collapse second level row', function (assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
+  firstLevelRowIndicator.click();
+  var secondLevelRowIndicator = helper.rowGroupingIndicator(2);
+  secondLevelRowIndicator.click();
+
+  secondLevelRowIndicator.click();
+
+  assert.ok(!secondLevelRowIndicator.hasClass('unfold'), "second-level-row2 should show expanded indicator");
+  var secondLevelRowChildId = helper.bodyCell(3, 0).text().trim();
+  assert.ok(!secondLevelRowChildId, "should hide second level children row");
+});
+
+test('collapse first level row', function (assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
+  firstLevelRowIndicator.click();
+  var secondLevelRowIndicator = helper.rowGroupingIndicator(2);
+  secondLevelRowIndicator.click();
+
+  firstLevelRowIndicator.click();
+
+  assert.ok(!firstLevelRowIndicator.hasClass('unfold'), "first-level-row should show expanded indicator");
+  var rowCount = helper.fixedBodyRows().length - 2; // there are two hidden rows in ember table.
+  assert.equal(rowCount, 1, "ember table should show one row");
+});
+
