@@ -33,6 +33,7 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.set(row.get('content'), childrenRow);
     this.toggleProperty('_resetLength');
+    this.incrementProperty('_expandedDepth', 1);
   },
 
   collapseChildren: function(row) {
@@ -40,6 +41,7 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.delete(row.get('content'));
     this.toggleProperty('_resetLength');
+    this.decrementProperty('_expandedDepth', 1);
   },
 
   length: Ember.computed(function() {
@@ -90,6 +92,8 @@ export default RowArrayController.extend({
 
   _childrenRows: null,
 
-  _controllersMap: null
+  _controllersMap: null,
+
+  _expandedDepth: 0
 
 });
