@@ -30,6 +30,7 @@ export default TableCell.extend(
       } else {
         target.expandChildren(row);
       }
+      this.get('column').expandedDepthChanged();
     }
   },
 

@@ -438,10 +438,10 @@ test('collapse unlimited grouped data', function(assert){
   assert.ok(!firstLevelRowIndicator.hasClass('unfold'), "first-level-row should show expand indicator");
 });
 
-test('collapse unlimited grouped data', function(assert){
+test('collapse unlimited grouped data', function(assert) {
   var component = this.subject();
   this.render();
-  var helper = EmberTableHelper.create({_assert: assert,_component: component});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
   var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
   firstLevelRowIndicator.click();
   var secondLevelRowIndicator = helper.rowGroupingIndicator(1);
@@ -456,4 +456,17 @@ test('collapse unlimited grouped data', function(assert){
   assert.equal(rowCount, 1, "body should show first level row and hidden others");
   var firstLevelRowId = helper.bodyCell(0, 0).text().trim();
   assert.equal(firstLevelRowId, 100, "first level row id should be equal to 100");
+});
+
+test('expand grouping column width', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(1);
+  var columnWidthBefore = helper.nthColumnHeader(1).width();
+
+  indicator.click();
+
+  var columnWidthAfter = helper.nthColumnHeader(1).width();
+  assert.equal(columnWidthAfter, columnWidthBefore + 10, 'should expand width 10px when expanded one level');
 });
