@@ -2,6 +2,7 @@ import Ember from 'ember';
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 import ResizeHandlerMixin from 'ember-table/mixins/resize-handler';
 import RowArrayController from 'ember-table/controllers/row-array';
+import GroupedRowArrayController from 'ember-table/controllers/grouped-row-array';
 import Row from 'ember-table/controllers/row';
 import ColumnDefinition from 'ember-table/models/column-definition';
 
@@ -210,6 +211,15 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   // An array of Ember.Table.Row computed based on `content`
   bodyContent: Ember.computed(function() {
+    if (this.get('_hasGroupingColumn')) {
+      return GroupedRowArrayController.create({
+        target: this,
+        parentController: this,
+        container: this.get('container'),
+        itemController: Row,
+        content: this.get('content')
+      });
+    }
     return RowArrayController.create({
       target: this,
       parentController: this,
@@ -217,7 +227,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       itemController: Row,
       content: this.get('content')
     });
-  }).property('content.[]', '_reloadBody'),
+  }).property('content.[]', '_reloadBody', '_hasGroupingColumn'),
 
   // An array of Ember.Table.Row
   footerContent: Ember.computed(function(key, value) {
