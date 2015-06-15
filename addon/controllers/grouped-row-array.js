@@ -40,33 +40,43 @@ export default RowArrayController.extend({
   },
 
   length: Ember.computed(function() {
-    var length = 0;
     var content = this.get('content');
-    var childrenRows = this.get('_childrenRows');
-    content.forEach(function(item) {
-      length++;
-      if (childrenRows.get(item)) {
-        length += childrenRows.get(item).length;
-      }
-    });
-    return length;
+    return this.lengthOf(content);
   }).property('content.[]', '_resetLength'),
+
+  lengthOf: function(objects) {
+    var self = this;
+    var childrenRows = this.get('_childrenRows');
+    return objects.reduce(function (res, object) {
+      var length = 1;
+      var children = childrenRows.get(object);
+      if(!!children){
+        length += self.lengthOf(children);
+      }
+      return length + res;
+    }, 0);
+  },
 
   _findObject: function(idx) {
     var content = this.get('content');
     var childrenRows = this.get('_childrenRows');
+    return this._lookUpObject(content, childrenRows, idx);
+  },
+
+  _lookUpObject: function(content, childrenRows, idx){
     var childrenCount = 0;
     for(var i=0; i<content.get('length'); i++) {
       var ithObject = content.objectAt(i);
       if (idx === i + childrenCount) {
-          return ithObject;
+        return ithObject;
       }
       if (childrenRows.has(ithObject)) {
         var theChildren = childrenRows.get(ithObject);
-        if (idx <= i + childrenCount + theChildren.length) {
-          return theChildren.objectAt(idx - i - childrenCount - 1);
+        var object = this._lookUpObject(theChildren, childrenRows, idx-childrenCount-i-1);
+        if(!!object){
+          return object;
         }
-        childrenCount += theChildren.length;
+        childrenCount += this.lengthOf(theChildren);
       }
     }
     return null;

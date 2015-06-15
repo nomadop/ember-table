@@ -237,3 +237,68 @@ test('toggle expand indicator', function(assert) {
   var secondGroupingIndicator = helper.rowGroupingIndicator(4);
   assert.ok(!!!secondGroupingIndicator.hasClass('unfold'), 'second grouping row indicator should not be changed');
 });
+
+
+moduleForEmberTable('table with two level of grouped rows',
+  function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 700,
+      content: [{
+        groupName: 'first-level',
+        isGroupRow: true,
+        id: 100,
+        state: 'up',
+        children: [{
+          groupName: 'second-level-row1',
+          id: 1001,
+          state: 'up'
+          },{
+          groupName: 'second-level-row2',
+          isGroupRow: true,
+          id: 1002,
+          state: 'down',
+          children: [{
+            id: 10021,
+            state: 'up'
+          },{
+            id: 10022,
+            state: 'down'
+          }]
+        }]
+      }],
+      hasGroupingColumn: true
+    });
+  }
+);
+
+test('expand first level row', function (assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var firstLevelRow = helper.rowGroupingIndicator(0);
+
+  firstLevelRow.click();
+
+  var secondLevelRow1 = helper.rowGroupingIndicator(1);
+  assert.equal(secondLevelRow1.length, 0, "second-level-row1 should have no indicator");
+
+  var secondLevelRow2Indicator = helper.rowGroupingIndicator(2);
+  assert.equal(secondLevelRow2Indicator.length, 1,"second-level-row2 should show indicator");
+  assert.ok(!secondLevelRow2Indicator.hasClass('unfold'), "second-level-row2 should have expand indicator");
+});
+
+test('expand second level row', function (assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var firstLevelRow = helper.rowGroupingIndicator(0);
+  firstLevelRow.click();
+  var secondLevelRowIndicator = helper.rowGroupingIndicator(2);
+
+  secondLevelRowIndicator.click();
+
+  assert.ok(secondLevelRowIndicator.hasClass('unfold'), 'second level row should have collapse indicator');
+  var secondLevelRowChildId = helper.bodyCell(3, 0).text().trim();
+  assert.equal(secondLevelRowChildId, 10021, 'the id of second level row child should equal to 10021');
+});
