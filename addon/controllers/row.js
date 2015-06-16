@@ -5,10 +5,12 @@ export default Ember.ObjectProxy.extend({
   isShowing: true,
   isHovered: false,
   isExpanded: false,
+  expandLevel: null,
   isSelected: Ember.computed(function(key, val) {
     if (arguments.length > 1) {
       this.get('parentController').setSelected(this, val);
     }
     return this.get('parentController').isSelected(this);
   }).property('parentController.selection.[]')
+
 });
