@@ -402,9 +402,6 @@ test('expand unlimited grouped data', function(assert){
   this.render();
   var helper = EmberTableHelper.create({_assert: assert,_component: component});
 
-  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
-  firstLevelRowIndicator.click();
-
   var groupedRows = [0, 1, 2, 3];
   groupedRows.forEach(function(groupRow) {
     var indicator = helper.rowGroupingIndicator(groupRow);
