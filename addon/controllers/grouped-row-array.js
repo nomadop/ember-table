@@ -10,48 +10,22 @@ export default RowArrayController.extend({
   },
 
   objectAtContent: function(idx) {
-    var object = this._findObject(idx);
+    var objectAndLevel = this._findObject(idx);
+    var object = objectAndLevel[0];
+    var expandLevel = objectAndLevel[1];
     var controllersMap = this.get('_controllersMap');
     var controller = controllersMap.get(object);
     if (!controller) {
       controller = this.get('itemController').create({
-        target: this,
-        parentController: this.get('parentController') || this,
-        content: object,
-        expandLevel: this.findLevel(object)
+      target: this,
+      parentController: this.get('parentController') || this,
+      content: object,
+      expandLevel: expandLevel
       });
       controllersMap.set(object, controller);
     }
     return controller;
   },
-
-  findLevel: function (object) {
-    var levels = this.get('_levels');
-    var result = null;
-
-    levels.find(function (objects, idx) {
-      var hasObject = objects.some(function (item) {
-        return item === object;
-      });
-      if (hasObject) {
-        result = idx;
-        return true;
-      }
-    });
-    return result;
-  },
-
-  _levels: Ember.computed(function() {
-    var content = this.get('content');
-    var result = Ember.A();
-    do {
-      result.pushObject(content);
-      content = content.reduce(function (res, item) {
-        return res.concat(item.children || []);
-      }, []);
-    } while (content.length > 0);
-    return result;
-  }),
 
   expandChildren: function(row) {
     row.set('isExpanded', true);
@@ -89,21 +63,22 @@ export default RowArrayController.extend({
   _findObject: function(idx) {
     var content = this.get('content');
     var childrenRows = this.get('_childrenRows');
-    return this._lookUpObject(content, childrenRows, idx);
+    var objectAndLevel = this._lookUpObject(content, childrenRows, idx, 0);
+    return objectAndLevel;
   },
 
-  _lookUpObject: function(content, childrenRows, idx){
+  _lookUpObject: function(content, childrenRows, idx, level){
     var childrenCount = 0;
     for(var i=0; i<content.get('length'); i++) {
       var ithObject = content.objectAt(i);
       if (idx === i + childrenCount) {
-        return ithObject;
+        return [ithObject, level];
       }
       if (childrenRows.has(ithObject)) {
         var theChildren = childrenRows.get(ithObject);
-        var object = this._lookUpObject(theChildren, childrenRows, idx-childrenCount-i-1);
-        if(!!object){
-          return object;
+        var objectAndLevel = this._lookUpObject(theChildren, childrenRows, idx-childrenCount-i-1, level + 1);
+        if(!!objectAndLevel){
+          return objectAndLevel;
         }
         childrenCount += this.lengthOf(theChildren);
       }
