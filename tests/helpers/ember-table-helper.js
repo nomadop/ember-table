@@ -110,7 +110,6 @@ export default Ember.Object.extend({
     return component.$('.ember-table-body-container ' +
       '.ember-table-%@-table-block '.fmt(blockPosition) +
       ('.ember-table-table-row:eq(%@) '.fmt(rowIndex)) +
-      ('.ember-table-cell:eq(%@) '.fmt(colIndex)) +
-      '.ember-table-content');
+      ('.ember-table-cell:eq(%@) '.fmt(colIndex)));
   }
 });

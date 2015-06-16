@@ -17,12 +17,41 @@ export default RowArrayController.extend({
       controller = this.get('itemController').create({
         target: this,
         parentController: this.get('parentController') || this,
-        content: object
+        content: object,
+        expandLevel: this.findLevel(object)
       });
       controllersMap.set(object, controller);
     }
     return controller;
   },
+
+  findLevel: function (object) {
+    var levels = this.get('_levels');
+    var result = null;
+
+    levels.find(function (objects, idx) {
+      var hasObject = objects.some(function (item) {
+        return item === object;
+      });
+      if (hasObject) {
+        result = idx;
+        return true;
+      }
+    });
+    return result;
+  },
+
+  _levels: Ember.computed(function() {
+    var content = this.get('content');
+    var result = Ember.A();
+    do {
+      result.pushObject(content);
+      content = content.reduce(function (res, item) {
+        return res.concat(item.children || []);
+      }, []);
+    } while (content.length > 0);
+    return result;
+  }),
 
   expandChildren: function(row) {
     row.set('isExpanded', true);
