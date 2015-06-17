@@ -102,6 +102,13 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   setSortConditionBy: null,
 
+  // Must be the same as the outer width of grouping indicator.
+  // Grouping column width will be calculated as:
+  // groupingColumnWidth + groupingIndicatorWidth * expandedDepth
+  groupingIndicatorWidth: 10,
+
+  groupingColumnWidth: 150,
+
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------
@@ -334,17 +341,20 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   _hasGroupingColumn: Ember.computed.alias('hasGroupingColumn'),
 
   _groupingColumn: Ember.computed(function () {
+    var groupingColumnWidth = this.get('groupingColumnWidth');
+    var groupingIndicatorWidth = this.get('groupingIndicatorWidth');
     return ColumnDefinition.create({
       headerCellName: 'GroupingColumn', //Todo: Fix grouping header name
       textAlign: 'text-align-left',
       isResizable: false,
       isSortable: false,
+      savedWidth: groupingColumnWidth,
       tableCellView: 'grouping-column-cell',
       getCellContent: function (row) {
         return row.get('groupName');
       },
       expandedDepthChanged: function(expandedDepth) {
-        this.resize(150 + 10 * expandedDepth);
+        this.resize(groupingColumnWidth + groupingIndicatorWidth * expandedDepth);
       }
     });
   }),
