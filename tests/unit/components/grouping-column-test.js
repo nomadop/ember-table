@@ -2,12 +2,9 @@ import Ember from 'ember';
 import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
-import LazyArray from 'ember-table/models/lazy-array';
-import TableFixture from '../../fixture/table';
 import GroupedRowIndicator from 'ember-table/views/grouped-row-indicator';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 
-var tableFixture = TableFixture.create();
 var content = [{
   groupName: 'firstRootGroupName',
   id: 100,
@@ -579,7 +576,7 @@ test('display custom grouped row indicator', function(assert){
   });
 
   var secondLevelRowCell = helper.fixedBodyCell(1, 0);
-  assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view"); 
+  assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view");
 });
 
 
