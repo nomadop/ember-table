@@ -120,8 +120,9 @@ export default RowArrayController.extend({
 
   depthFirstTravers: function(content, callback) {
     var _this = this;
-    if (content.children && content.children.length > 0) {
-      content.children.forEach(function (child) {
+    var children = content.get && content.get('children') || content.children;
+    if (children && children.length > 0) {
+      children.forEach(function (child) {
         var needGoDeeper = callback(child);
         if (needGoDeeper) {
           _this.depthFirstTravers(child, callback);
