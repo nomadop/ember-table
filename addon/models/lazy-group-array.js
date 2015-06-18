@@ -18,7 +18,8 @@ var LazyGroupArray = Ember.ArrayProxy.extend({
       totalCount: this.get('_topLevelCount'),
       chunkSize: this.get('chunkSize'),
       callback: this.get('callback'),
-      initContent: this.get('initContent')
+      initContent: this.get('initContent'),
+      _preloadGate: -1
     });
 
     this.set('_lazyContent', lazyContent);
