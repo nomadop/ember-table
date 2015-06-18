@@ -108,6 +108,11 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   groupingIndicatorWidth: 10,
 
   groupingColumnWidth: 150,
+  
+  // By default the indicator view should be supported by ember-table. 
+  // if you want to custom grouped row view should set a custom view which inherit
+  // from 'grouped-row-indicator'.
+  groupedRowIndicatorView: null,
 
   // ---------------------------------------------------------------------------
   // API - Outputs
@@ -344,7 +349,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var groupingColumnWidth = this.get('groupingColumnWidth');
     var groupingIndicatorWidth = this.get('groupingIndicatorWidth');
     return ColumnDefinition.create({
-      headerCellName: 'GroupingColumn', //Todo: Fix grouping header name
+      headerCellName: '', //Todo: Fix grouping header name
       textAlign: 'text-align-left',
       isResizable: false,
       isSortable: false,
