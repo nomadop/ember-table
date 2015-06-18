@@ -90,6 +90,13 @@ export default Ember.Object.extend({
       '.grouping-column-indicator:has(div)');
   },
 
+  expandGroupingRows: function expandGroupingRows(rowIndexes) {
+    var self = this;
+    rowIndexes.forEach(function(idx) {
+      self.rowGroupingIndicator(idx).click();
+    });
+  },
+
   fixedBodyCell: function fixedBodyCell(rowIndex, colIndex) {
     return this.findCell('left', rowIndex, colIndex);
   },

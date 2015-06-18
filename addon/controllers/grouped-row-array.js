@@ -34,10 +34,26 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.set(row.get('content'), childrenRow);
     this.toggleProperty('_resetLength');
-    var expandLevelAfterExpand = row.get('expandLevel') + 1;
+    var expandLevelAfterExpand = this.maxExpandedDepthAfterExpand(row);
     if (expandLevelAfterExpand > this.get('_expandedDepth')) {
       this.set('_expandedDepth', expandLevelAfterExpand);
     }
+  },
+
+  maxExpandedDepthAfterExpand: function maxExpandedDepthAfterExpand(row) {
+    var childrenRow = row.get('children') || [];
+    var expandedChildrenLevel = row.get('expandLevel') + 1;
+    var root = {children: childrenRow};
+    var controllersMap = this.get('_controllersMap');
+    this.depthFirstTravers(root, function(child) {
+      var controller = controllersMap.get(child);
+      if (controller && controller.get('isExpanded')) {
+        expandedChildrenLevel = Math.max(expandedChildrenLevel, controller.get('expandLevel') + 1);
+        return {needGoDeeper: true, stop: false};
+      }
+      return {needGoDeeper: false, stop: false};
+    }, 1);
+    return expandedChildrenLevel;
   },
 
   collapseChildren: function(row) {
