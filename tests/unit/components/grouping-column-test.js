@@ -238,6 +238,62 @@ test('toggle expand indicator', function(assert) {
   assert.ok(!!!secondGroupingIndicator.hasClass('unfold'), 'second grouping row indicator should not be changed');
 });
 
+test('expand grouping column width', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(1);
+  var columnWidthBefore = helper.nthColumnHeader(1).width();
+
+  indicator.click();
+
+  var columnWidthAfter = helper.nthColumnHeader(1).width();
+  assert.equal(columnWidthAfter, columnWidthBefore + 10, 'should expand width 10px when expanded one level');
+});
+
+test('keep grouping column width on expanding', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  helper.rowGroupingIndicator(1).click();
+
+  var columnWidthBefore = helper.nthColumnHeader(1).width();
+
+  helper.rowGroupingIndicator(4).click();
+
+  var columnWidthAfter = helper.nthColumnHeader(1).width();
+  assert.equal(columnWidthAfter, columnWidthBefore, 'should not increase width when expanding does not increase total depth');
+});
+
+test('decrease grouping column width', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var indicator = helper.rowGroupingIndicator(1);
+  var columnWidthBefore = helper.nthColumnHeader(1).width();
+
+  indicator.click();
+  indicator.click();
+
+  var columnWidthAfter = helper.nthColumnHeader(1).width();
+  assert.equal(columnWidthAfter, columnWidthBefore, 'should decrease width expanded row is collapsed');
+});
+
+test('keep grouping column width on collapse', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  helper.rowGroupingIndicator(1).click();
+  helper.rowGroupingIndicator(4).click();
+
+  var columnWidthBefore = helper.nthColumnHeader(1).width();
+
+  helper.rowGroupingIndicator(4).click();
+
+  var columnWidthAfter = helper.nthColumnHeader(1).width();
+  assert.equal(columnWidthAfter, columnWidthBefore, 'should not decrease width when collapse does not decrease total depth');
+});
+
 moduleForEmberTable('table with two level of grouped rows',
   function() {
     return EmberTableFixture.create({
@@ -438,10 +494,10 @@ test('collapse unlimited grouped data', function(assert){
   assert.ok(!firstLevelRowIndicator.hasClass('unfold'), "first-level-row should show expand indicator");
 });
 
-test('collapse unlimited grouped data', function(assert){
+test('collapse unlimited grouped data', function(assert) {
   var component = this.subject();
   this.render();
-  var helper = EmberTableHelper.create({_assert: assert,_component: component});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
   var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
   firstLevelRowIndicator.click();
   var secondLevelRowIndicator = helper.rowGroupingIndicator(1);

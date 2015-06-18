@@ -33,6 +33,10 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.set(row.get('content'), childrenRow);
     this.toggleProperty('_resetLength');
+    var expandLevelAfterExpand = row.get('expandLevel') + 1;
+    if (expandLevelAfterExpand > this.get('_expandedDepth')) {
+      this.set('_expandedDepth', expandLevelAfterExpand);
+    }
   },
 
   collapseChildren: function(row) {
@@ -40,6 +44,7 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.delete(row.get('content'));
     this.toggleProperty('_resetLength');
+    this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse(row));
   },
 
   length: Ember.computed(function() {
@@ -86,10 +91,50 @@ export default RowArrayController.extend({
     return null;
   },
 
+  maxExpandedDepthAfterCollapse: function(row) {
+    var controllersMap = this.get('_controllersMap');
+    var maxLevel = 0;
+    var rowContent = row.get('content');
+    var toBeCollapsedRows = this.extractAllChildren(rowContent);
+    controllersMap.forEach(function(value) {
+      var isNotCollapsingRow = value !== row;
+      var isExpanded = value.get('isExpanded') && toBeCollapsedRows.indexOf(value) === -1;
+      if (isNotCollapsingRow && isExpanded && value.get('expandLevel') + 1 > maxLevel) {
+        maxLevel = value.get('expandLevel') + 1;
+      }
+    });
+    return maxLevel;
+  },
+
+  extractAllChildren: function extractAllChildren(rowContent) {
+    var controllersMap = this.get('_controllersMap');
+    var allChildren = [];
+    this.depthFirstTravers(rowContent, function(child) {
+      if (controllersMap.has(child)) {
+        allChildren.push(controllersMap.get(child));
+      }
+      return true;
+    });
+    return allChildren;
+  },
+
+  depthFirstTravers: function(content, callback) {
+    var _this = this;
+    if (content.children && content.children.length > 0) {
+      content.children.forEach(function (child) {
+        var needGoDeeper = callback(child);
+        if (needGoDeeper) {
+          _this.depthFirstTravers(child, callback);
+        }
+      });
+    }
+  },
+
   _resetLength: false,
 
   _childrenRows: null,
 
-  _controllersMap: null
+  _controllersMap: null,
 
+  _expandedDepth: 0
 });
