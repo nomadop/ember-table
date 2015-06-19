@@ -75,7 +75,7 @@ export default RowArrayController.extend({
       }
     });
 
-    return (content.length || content.get('length')) + expandedChildrenCount;
+    return this.get('content.length') + expandedChildrenCount;
   }).property('content.[]', '_resetLength'),
 
   isParentControllerExpanded: function isParentControllerExpanded(controller) {
@@ -187,7 +187,11 @@ export default RowArrayController.extend({
 
   arrayLength: function(array) {
     if (array) {
-      return array.length || array.get('length');
+      if (array.get) {
+        return array.get('length');
+      } else {
+        return array.length;
+      }
     }
     return 0;
   },
