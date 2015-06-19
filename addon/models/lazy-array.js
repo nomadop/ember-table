@@ -12,13 +12,25 @@ export default Ember.ArrayProxy.extend({
 
   chunkSize: undefined,
 
+  initContent: undefined,
+
   content: Ember.computed.alias('_lazyContent'),
 
   init: function () {
     var totalCount = this.get('_totalCount');
     var lazyContent = new Array(totalCount);
-
+    var initContent = this.get('initContent');
     this.set('_lazyContent', lazyContent);
+    if (initContent) {
+      this.fillInitContent(initContent);
+    }
+  },
+
+  fillInitContent: function fillInitContent(initContent) {
+    var content = this.get('_lazyContent');
+    initContent.forEach(function(x, idx) {
+        content[idx] =  Ember.ObjectProxy.create({"isLoaded": true, "isError": false, "content": x});
+    });
   },
 
   objectAt: function (index) {

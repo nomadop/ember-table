@@ -2,12 +2,9 @@ import Ember from 'ember';
 import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
-import LazyArray from 'ember-table/models/lazy-array';
-import TableFixture from '../../fixture/table';
 import GroupedRowIndicator from 'ember-table/views/grouped-row-indicator';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 
-var tableFixture = TableFixture.create();
 var content = [{
   groupName: 'firstRootGroupName',
   id: 100,
@@ -464,47 +461,45 @@ test('collapse unlimited grouped data', function(assert){
   var component = this.subject();
   this.render();
   var helper = EmberTableHelper.create({_assert: assert,_component: component});
-  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
-  firstLevelRowIndicator.click();
-  var secondLevelRowIndicator = helper.rowGroupingIndicator(1);
-  secondLevelRowIndicator.click();
-  var thirdLevelRowIndicator = helper.rowGroupingIndicator(2);
-  thirdLevelRowIndicator.click();
-  var fourthLevelRowIndicator = helper.rowGroupingIndicator(3);
-  fourthLevelRowIndicator.click();
+  helper.expandGroupingRows([0,1,2,3]);
 
-  fourthLevelRowIndicator.click();
-  assert.ok(!fourthLevelRowIndicator.hasClass('unfold'), "fourth-level-row should show expand indicator");
-
-  thirdLevelRowIndicator.click();
-  assert.ok(!thirdLevelRowIndicator.hasClass('unfold'), "third-level-row should show expand indicator");
-
-  secondLevelRowIndicator.click();
-  assert.ok(!secondLevelRowIndicator.hasClass('unfold'), "second-level-row should show expand indicator");
-
-  firstLevelRowIndicator.click();
-  assert.ok(!firstLevelRowIndicator.hasClass('unfold'), "first-level-row should show expand indicator");
+  [3, 2, 1, 0].forEach(function(index) {
+    var indicator = helper.rowGroupingIndicator(index);
+    indicator.click();
+    assert.ok(!indicator.hasClass('unfold'), (index + 1) + "th-level-row should show expand indicator");
+  });
 });
 
 test('collapse unlimited grouped data', function(assert) {
   var component = this.subject();
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  helper.expandGroupingRows([0,1,2,3]);
+
   var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
   firstLevelRowIndicator.click();
-  var secondLevelRowIndicator = helper.rowGroupingIndicator(1);
-  secondLevelRowIndicator.click();
-  var thirdLevelRowIndicator = helper.rowGroupingIndicator(2);
-  thirdLevelRowIndicator.click();
-  var fourthLevelRowIndicator = helper.rowGroupingIndicator(3);
-  fourthLevelRowIndicator.click();
 
-  firstLevelRowIndicator.click();
   var rowCount = helper.fixedBodyRows().length - 2; // there are two hidden rows in ember table.
   assert.equal(rowCount, 1, "body should show first level row and hidden others");
   var firstLevelRowId = helper.bodyCell(0, 0).text().trim();
   assert.equal(firstLevelRowId, 100, "first level row id should be equal to 100");
+  assert.equal(helper.nthColumnHeader(0).outerWidth(), 150, "should collapse all children rows");
 });
+
+
+test('re-expand unlimited grouped data', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  helper.expandGroupingRows([0,1,2,3]);
+
+  var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
+  firstLevelRowIndicator.click();
+  firstLevelRowIndicator.click();
+
+  assert.equal(helper.nthColumnHeader(0).outerWidth(), 190, "should re-expand all children rows");
+});
+
 
 moduleForEmberTable('table with two levels of grouped rows', function() {
   return EmberTableFixture.create({
@@ -579,8 +574,5 @@ test('display custom grouped row indicator', function(assert){
   });
 
   var secondLevelRowCell = helper.fixedBodyCell(1, 0);
-  assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view"); 
+  assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view");
 });
-
-
-
