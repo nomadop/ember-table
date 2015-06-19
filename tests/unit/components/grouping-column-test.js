@@ -576,3 +576,62 @@ test('display custom grouped row indicator', function(assert){
   var secondLevelRowCell = helper.fixedBodyCell(1, 0);
   assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view");
 });
+
+
+
+moduleForEmberTable('table with two grouping rows which has three levels', function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 700,
+      hasGroupingColumn: true,
+      content: [
+        {
+          groupName: 'root',
+          id: 0,
+          children: [
+            {
+              groupName: 'first level row 1',
+              id: 1,
+              children: [
+                {
+                  groupName: 'second level row 1',
+                  id: 10,
+                  children: [
+                    {groupName: 'third level row 1', id: 100},
+                    {groupName: 'third level row 2', id: 101}
+                  ]
+                }
+              ]
+            },
+            {
+              groupName: 'first level row 2',
+              id: 2,
+              children: [
+                {
+                  groupName: 'second level row 1',
+                  id: 20,
+                  children: [
+                    {groupName: 'third level row 1', id: 200},
+                    {groupName: 'third level row 2', id: 201}
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+  }
+);
+
+test('auto expanding grouping column width', function(assert) {
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({ _assert: assert, _component: component});
+
+  helper.expandGroupingRows([0, 1, 3, 4]);
+  helper.rowGroupingIndicator(3).click();
+  helper.rowGroupingIndicator(1).click();
+
+  assert.equal(helper.nthColumnHeader(0).outerWidth(), 160, 'grouping column should be width of expand depth 1');
+});
