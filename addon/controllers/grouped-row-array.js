@@ -61,22 +61,32 @@ export default RowArrayController.extend({
     var childrenRows = this.get('_childrenRows');
     childrenRows.delete(row.get('content'));
     this.toggleProperty('_resetLength');
-    this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse(row));
+    this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse());
+  },
+
+  maxExpandedDepthAfterCollapse: function() {
+    return this.traversExpandedControllers(function (prev, value) {
+      return Math.max(prev, value.get('expandLevel') + 1);
+    }, 0);
   },
 
   length: Ember.computed(function() {
-    var content = this.get('content');
+    return this.traversExpandedControllers(function (prev, value) {
+        return prev + value.get('children.length');
+      }, 0) + this.get('content.length');
+  }).property('content.[]', '_resetLength'),
+
+  traversExpandedControllers: function traversExpandedControllers(visit, init) {
     var controllersMap = this.get('_controllersMap');
-    var expandedChildrenCount = 0;
     var self = this;
-    controllersMap.forEach(function(value) {
+    var result = init;
+    controllersMap.forEach(function (value) {
       if (value.get('isExpanded') && self.isParentControllerExpanded(value)) {
-        expandedChildrenCount += value.get('children.length');
+        result = visit(result, value);
       }
     });
-
-    return this.get('content.length') + expandedChildrenCount;
-  }).property('content.[]', '_resetLength'),
+    return result;
+  },
 
   isParentControllerExpanded: function isParentControllerExpanded(controller) {
     var controllersMap = this.get('_controllersMap');
@@ -140,21 +150,6 @@ export default RowArrayController.extend({
       theLevel ++;
     }
     return {object: theObject, level: theLevel, parent: theParent};
-  },
-
-  maxExpandedDepthAfterCollapse: function(row) {
-    var controllersMap = this.get('_controllersMap');
-    var maxLevel = 0;
-    var rowContent = row.get('content');
-    var toBeCollapsedRows = this.extractAllChildren(rowContent);
-    controllersMap.forEach(function(value) {
-      var isNotCollapsingRow = value !== row;
-      var isExpanded = value.get('isExpanded') && toBeCollapsedRows.indexOf(value) === -1;
-      if (isNotCollapsingRow && isExpanded && value.get('expandLevel') + 1 > maxLevel) {
-        maxLevel = value.get('expandLevel') + 1;
-      }
-    });
-    return maxLevel;
   },
 
   extractAllChildren: function extractAllChildren(rowContent) {
