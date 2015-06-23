@@ -32,7 +32,7 @@ moduleForEmberTable('Given a table with chunked group row data',
             });
           }
         }),
-      hasGroupingColumn: true
+      groupingMetaData: ["", ""]
     });
   });
 
@@ -74,7 +74,7 @@ moduleForEmberTable('Given a table with 3 chunked group row data',
       height: 90,
       width: 700,
       content: content,
-      hasGroupingColumn: true
+      groupingMetaData: ["", ""]
     });
   });
 

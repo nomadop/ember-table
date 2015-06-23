@@ -32,7 +32,7 @@ moduleForEmberTable('render grouping column',
   function() {
     return EmberTableFixture.create({
       content: content,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       height: 300
     });
 });
@@ -99,7 +99,7 @@ moduleForEmberTable('Given a table with group row data',
       height: 330,
       width: 600,
       content: content,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       numFixedColumns: 0
     });
 });
@@ -126,7 +126,7 @@ moduleForEmberTable('Given a table with group row data and two fixed columns',
       height: 330,
       width: 700,
       content: content,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       numFixedColumns: 2
     });
 });
@@ -215,7 +215,7 @@ moduleForEmberTable('table with two group rows',
           state: 'down'
         }]
       }],
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       numFixedColumns: 2
     });
 });
@@ -315,7 +315,7 @@ moduleForEmberTable('table with two level of grouped rows',
           }]
         }]
       }],
-      hasGroupingColumn: true
+      groupingMetaData: ["", ""]
     });
   }
 );
@@ -437,7 +437,7 @@ moduleForEmberTable('table with five level of grouped rows',
           }]
         }]
       }],
-      hasGroupingColumn: true
+      groupingMetaData: ["", "", "", "", ""]
     });
   }
 );
@@ -505,7 +505,7 @@ moduleForEmberTable('table with two levels of grouped rows', function() {
   return EmberTableFixture.create({
       height: 330,
       width: 700,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       content: [
         {
           groupName: 'first level row 1',
@@ -546,7 +546,7 @@ moduleForEmberTable('table with custom grouped row indicator view', function() {
     return EmberTableFixture.create({
       height: 330,
       width: 700,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       groupedRowIndicatorView: indicatorView,
       content: [
         {
@@ -583,7 +583,7 @@ moduleForEmberTable('table with two grouping rows which has three levels', funct
     return EmberTableFixture.create({
       height: 330,
       width: 700,
-      hasGroupingColumn: true,
+      groupingMetaData: ["", ""],
       content: [
         {
           groupName: 'root',
