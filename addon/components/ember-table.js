@@ -52,8 +52,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return numFixedColumns;
   }).property('numFixedColumns', 'hasGroupingColumn'),
 
-  // TODO: Currently set by user, will be replaced by grouped data provider
-  hasGroupingColumn: false,
+  groupingMetadata: [],
 
   // The number of footer rows in the table. Footer rows appear at the bottom of
   // the table and are always visible.
@@ -108,8 +107,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   groupingIndicatorWidth: 10,
 
   groupingColumnWidth: 150,
-  
-  // By default the indicator view should be supported by ember-table. 
+
+  // By default the indicator view should be supported by ember-table.
   // if you want to custom grouped row view should set a custom view which inherit
   // from 'grouped-row-indicator'.
   groupedRowIndicatorView: null,
@@ -343,7 +342,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   },
 
   //encapsulate input, will be used inside only
-  _hasGroupingColumn: Ember.computed.alias('hasGroupingColumn'),
+  _hasGroupingColumn: Ember.computed(function() {
+    return this.get('groupingMetadata.length') > 0;
+  }).property('groupingMetadata.@each'),
 
   _groupingColumn: Ember.computed(function () {
     var groupingColumnWidth = this.get('groupingColumnWidth');

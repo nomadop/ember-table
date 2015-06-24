@@ -31,12 +31,14 @@ export default RowArrayController.extend({
   expandChildren: function(row) {
     row.set('isExpanded', true);
     var childrenRow = row.get('children') || [];
-    var childrenRows = this.get('_childrenRows');
-    childrenRows.set(row.get('content'), childrenRow);
-    this.toggleProperty('_resetLength');
-    var expandLevelAfterExpand = this.maxExpandedDepthAfterExpand(row);
-    if (expandLevelAfterExpand > this.get('_expandedDepth')) {
-      this.set('_expandedDepth', expandLevelAfterExpand);
+    if (this.arrayLength(childrenRow) > 0) {
+      var childrenRows = this.get('_childrenRows');
+      childrenRows.set(row.get('content'), childrenRow);
+      this.toggleProperty('_resetLength');
+      var expandLevelAfterExpand = this.maxExpandedDepthAfterExpand(row);
+      if (expandLevelAfterExpand > this.get('_expandedDepth')) {
+        this.set('_expandedDepth', expandLevelAfterExpand);
+      }
     }
   },
 
@@ -58,10 +60,13 @@ export default RowArrayController.extend({
 
   collapseChildren: function(row) {
     row.set('isExpanded', false);
-    var childrenRows = this.get('_childrenRows');
-    childrenRows.delete(row.get('content'));
-    this.toggleProperty('_resetLength');
-    this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse());
+    var childrenRow = row.get('children') || [];
+    if (this.arrayLength(childrenRow) > 0) {
+      var childrenRows = this.get('_childrenRows');
+      childrenRows.delete(row.get('content'));
+      this.toggleProperty('_resetLength');
+      this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse());
+    }
   },
 
   maxExpandedDepthAfterCollapse: function() {
