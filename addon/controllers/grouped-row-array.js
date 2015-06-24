@@ -47,7 +47,7 @@ export default RowArrayController.extend({
     var expandedChildrenLevel = row.get('expandLevel') + 1;
     var root = {children: childrenRow};
     var controllersMap = this.get('_controllersMap');
-    this.depthFirstTravers(root, function(child) {
+    this.depthFirstTraverse(root, function(child) {
       var controller = controllersMap.get(child);
       if (controller && controller.get('isExpanded')) {
         expandedChildrenLevel = Math.max(expandedChildrenLevel, controller.get('expandLevel') + 1);
@@ -70,19 +70,19 @@ export default RowArrayController.extend({
   },
 
   maxExpandedDepthAfterCollapse: function() {
-    return this.traversExpandedControllers(function (prev, value) {
+    return this.traverseExpandedControllers(function (prev, value) {
       return Math.max(prev, value.get('expandLevel') + 1);
     }, 0);
   },
 
   length: Ember.computed(function() {
-    return this.traversExpandedControllers(function (prev, value) {
+    return this.traverseExpandedControllers(function (prev, value) {
         var childrenLength = value.get('children.length');
         return prev + childrenLength;
       }, 0) + this.get('content.length');
   }).property('content.[]', '_resetLength'),
 
-  traversExpandedControllers: function traversExpandedControllers(visit, init) {
+  traverseExpandedControllers: function traverseExpandedControllers(visit, init) {
     var controllersMap = this.get('_controllersMap');
     var self = this;
     var result = init;
@@ -115,7 +115,7 @@ export default RowArrayController.extend({
     var theParent;
     var visitCount = 0;
     var childrenRows = this.get('_childrenRows');
-    this.depthFirstTravers(root, function(child, parent, level) {
+    this.depthFirstTraverse(root, function(child, parent, level) {
       if (visitCount === idx) {
         theObject = child;
         theParent = parent;
@@ -161,7 +161,7 @@ export default RowArrayController.extend({
   extractAllChildren: function extractAllChildren(rowContent) {
     var controllersMap = this.get('_controllersMap');
     var allChildren = [];
-    this.depthFirstTravers(rowContent, function(child) {
+    this.depthFirstTraverse(rowContent, function(child) {
       if (controllersMap.has(child)) {
         allChildren.push(controllersMap.get(child));
       }
@@ -170,18 +170,18 @@ export default RowArrayController.extend({
     return allChildren;
   },
 
-  depthFirstTravers: function(content, callback, level) {
+  depthFirstTraverse: function(content, visitChild, level) {
     var _this = this;
     var children = content.get && content.get('children') || content.children;
     for (var i = 0; i < this.arrayLength(children); i++) {
       var child = children.objectAt(i);
-      var decision = callback(child, content, level || 0);
+      var decision = visitChild(child, content, level || 0);
       if (decision.stop) {
         break;
       }
       var needGoDeeper = decision.needGoDeeper;
       if (needGoDeeper) {
-        _this.depthFirstTravers(child, callback, (level || 0) + 1);
+        _this.depthFirstTraverse(child, visitChild, (level || 0) + 1);
       }
     }
   },
@@ -201,6 +201,7 @@ export default RowArrayController.extend({
 
   _childrenRows: null,
 
+  //map between row content and row controller
   _controllersMap: null,
 
   _expandedDepth: 0
