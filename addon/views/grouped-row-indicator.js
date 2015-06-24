@@ -13,7 +13,7 @@ export default Ember.View.extend({
 
   isShown: Ember.computed(function(){
     return this.get('hasChildren') || this.get('row.hasLoadedChildren') === false;
-  }),
+  }).property('hasChildren', 'row.hasLoadedChildren'),
 
   expandLevel: 0,
 
