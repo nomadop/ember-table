@@ -31,6 +31,8 @@ StyleBindingsMixin, {
     this.notifyPropertyChange('cellContent');
   },
 
+  isLoading: Ember.computed.oneWay('row.isLoading'),
+
   contentPathWillChange: Ember.beforeObserver(function() {
     var contentPath = this.get('column.contentPath');
     if (contentPath) {
