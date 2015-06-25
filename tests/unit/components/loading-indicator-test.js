@@ -30,11 +30,10 @@ test('render loading indicator', function(assert) {
   var component = this.subject([{id: 1, isLoading: true}]);
   this.render();
   var helper = EmberTableHelper.create({ _assert: assert, _component: component});
-
   var loadingRow = helper.bodyRows().eq(0);
+
   assert.equal(loadingRow.find('.loading-indicator').length, 3, 'should render loading indicator');
 });
-
 
 test('expand grouped rows', function(assert) {
   var component = this.subject([firstRowObject]);
@@ -55,5 +54,5 @@ test('expand grouped rows', function(assert) {
 
 	secondRow = helper.bodyRows().eq(1);
 	var firstChildrenId = secondRow.find('.ember-table-content:eq(0)').text().trim();
-	assert.equal(firstChildrenId, '11', 'it should render chidlren');
+	assert.equal(firstChildrenId, '11', 'it should render children');
 });

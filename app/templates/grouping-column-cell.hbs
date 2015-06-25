@@ -1,12 +1,14 @@
 {{#if view.isLoading}}
-	<img class="loading-indicator" src="/ember-table/images/loading.gif" width="75px" height="15px">
+    {{view "row-loading-indicator"
+    isLoading=view.isLoading
+    }}
 {{else}}
-	{{view view.indicatorView
-		hasChildren=view.hasChildren
-		isExpanded=view.isExpanded
-		expandLevel=view.expandLevel
-	}}
-	<span class="ember-table-content">
-	  {{view.cellContent}}
-	</span>
+  {{view view.indicatorView
+  hasChildren=view.hasChildren
+  isExpanded=view.isExpanded
+  expandLevel=view.expandLevel
+  }}
+  <span class="ember-table-content">
+    {{view.cellContent}}
+  </span>
 {{/if}}

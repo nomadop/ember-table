@@ -7,6 +7,7 @@ export default function moduleForEmberTable(description, subject) {
     needs: [
       'view:body-table-container',
       'view:column-sortable-indicator',
+      'view:row-loading-indicator',
       'view:footer-table-container',
       'view:header-cell',
       'view:header-row',
@@ -33,6 +34,7 @@ export default function moduleForEmberTable(description, subject) {
       'template:table-cell',
       'template:table-row',
       'template:grouping-column-cell',
+      'template:row-loading-indicator',
       'template:grouped-row-indicator'
     ],
     subject: subject
