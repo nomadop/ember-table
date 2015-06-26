@@ -12,7 +12,7 @@ export default TableCell.extend(
 
   styleBindings: ['padding-left'],
 
-  indicatorView: Ember.computed(function(){
+  groupedRowIndicatorView: Ember.computed(function(){
     var view =  this.get('tableComponent.groupedRowIndicatorView');
     return view || GroupedRowIndicator;
   }).property('tableComponent.groupedRowIndicatorView'),

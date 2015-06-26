@@ -7,6 +7,11 @@ export default Ember.View.extend({
 
   isLoading: false,
 
+  // the property of isVisible should not be undefined for Ember.View's binding
+  isVisible: Ember.computed(function(){
+    return !!this.get('isLoading');
+  }).property('isLoading'),
+
   indicatorClass: Ember.computed(function() {
     var classNames = ['row-loading-indicator'];
     if (this.get('isLoading')) {
