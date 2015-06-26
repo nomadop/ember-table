@@ -73,7 +73,7 @@ StyleBindingsMixin, {
       startIndex = 0;
     }
     // for all views that we are not using... just remove content
-    // this makes them invisble
+    // this makes them invisible
     childViews.forEach(function(childView, i) {
       if (i >= numShownViews) {
         childView.set('content', null);

@@ -82,7 +82,7 @@ export default RowArrayController.extend({
 
   length: Ember.computed(function() {
     return this.traverseExpandedControllers(function (prev, value) {
-        var childrenLength = value.get('children.length');
+        var childrenLength = value.get('children.length') || 0;
         return prev + childrenLength;
       }, 0) + this.get('content.length');
   }).property('content.[]', '_forceContentLengthRecalc'),
