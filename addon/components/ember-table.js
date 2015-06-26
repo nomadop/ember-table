@@ -113,6 +113,11 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // from 'grouped-row-indicator'.
   groupedRowIndicatorView: null,
 
+  // By default the indicator view should be supported by ember-table.
+  // if you want to custom grouped row view should set a custom view which inherit
+  // from 'row-loading-indicator'.
+  rowLoadingIndicatorView: null,
+
   // ---------------------------------------------------------------------------
   // API - Outputs
   // ---------------------------------------------------------------------------

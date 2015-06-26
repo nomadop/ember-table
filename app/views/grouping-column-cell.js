@@ -1,1 +1,3 @@
-export { default } from 'ember-table/views/grouping-column-cell';
+import GroupingColumnCell from 'ember-table/views/grouping-column-cell';
+
+export default GroupingColumnCell;

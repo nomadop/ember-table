@@ -1,8 +1,10 @@
 import Ember from 'ember';
+import RowLoadingIndicator from './row-loading-indicator';
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
+import RegisterTableComponentMixin from 'ember-table/mixins/register-table-component';
 
 export default Ember.View.extend(
-StyleBindingsMixin, {
+StyleBindingsMixin, RegisterTableComponentMixin, {
   // ---------------------------------------------------------------------------
   // API - Inputs
   // ---------------------------------------------------------------------------
@@ -22,6 +24,10 @@ StyleBindingsMixin, {
     this.contentPathDidChange();
     this.contentDidChange();
   },
+
+  rowLoadingIndicatorView: Ember.computed(function () {
+    return this.get('tableComponent.rowLoadingIndicatorView') || RowLoadingIndicator;
+  }).property('tableComponent.rowLoadingIndicatorView'),
 
   row: Ember.computed.alias('parentView.row'),
   column: Ember.computed.alias('content'),

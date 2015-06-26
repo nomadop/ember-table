@@ -1,14 +1,11 @@
-{{#if view.isLoading}}
-    {{view "row-loading-indicator"
-    isLoading=view.isLoading
-    }}
-{{else}}
-  {{view view.indicatorView
+{{view view.rowLoadingIndicatorView
+  isLoading=view.isLoading
+}}
+{{view view.groupedRowIndicatorView
   hasChildren=view.hasChildren
   isExpanded=view.isExpanded
   expandLevel=view.expandLevel
-  }}
-  <span class="ember-table-content">
-    {{view.cellContent}}
-  </span>
-{{/if}}
+}}
+<span class="ember-table-content">
+  {{view.cellContent}}
+</span>

@@ -639,3 +639,67 @@ test('auto expanding grouping column width', function(assert) {
 
   assert.equal(helper.nthColumnHeader(0).outerWidth(), 160, 'grouping column should be width of expand depth 1');
 });
+
+moduleForEmberTable('table with three levels rows1', function() {
+    return EmberTableFixture.create({
+      height: 330,
+      width: 700,
+      groupingMetadata: ["", "", ""],
+      content: [
+        {
+          groupName: 'Row 1',
+          id: 1
+        },
+        {
+          groupName: 'Row 2',
+          id: 2,
+          children: [
+            {
+              groupName: 'Row 2-1',
+              id: 21,
+              children: [
+                {
+                  groupName: 'Row 2-1-1',
+                  id: 211
+                }
+              ]
+            }
+          ]
+        },
+        {
+          groupName: 'first level row 3',
+          id: 3
+        },
+        {
+          groupName: 'Row 4',
+          id: 4,
+          children: [
+            {
+              groupName: 'Row 4-1',
+              id: 41,
+              children: undefined
+            }
+          ]
+        },
+        {
+          groupName: 'Row 5',
+          id: 5
+        }
+      ]
+    });
+  }
+);
+
+test('expand and collapse grouped rows when row.children is null or undefined', function(assert){
+  var component = this.subject();
+  this.render();
+  var helper = EmberTableHelper.create({ _assert: assert, _component: component});
+
+  helper.rowGroupingIndicator(3).click();
+  helper.rowGroupingIndicator(4).click();
+  helper.rowGroupingIndicator(3).click();
+  helper.rowGroupingIndicator(3).click();
+
+  var bodyRows = helper.bodyRows();
+  assert.ok(bodyRows.length - 2 > 5, "body rows should be larger than 5");
+});

@@ -1,8 +1,7 @@
-{{#if view.isLoading}}
-	<img class="loading-indicator" src="/ember-table/images/loading.gif" width="75px" height="15px">
-{{else}}
-	<span class="ember-table-content">
-	  {{view.cellContent}}
-	</span>
-{{/if}}
+{{view view.rowLoadingIndicatorView
+  isLoading=view.isLoading
+}}
+<span class="ember-table-content">
+  {{view.cellContent}}
+</span>
 
