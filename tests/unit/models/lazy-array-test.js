@@ -23,7 +23,6 @@ function getChunk(chunkIndex) {
   });
   pendingPromises.push(promise);
   return promise;
-
 }
 
 function accessObject(idx) {
