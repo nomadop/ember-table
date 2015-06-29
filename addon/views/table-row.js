@@ -24,8 +24,8 @@ RegisterTableComponentMixin, {
 
   isLastRow: Ember.computed(function() {
     return this.get('row') ===
-        this.get('tableComponent.bodyContent.lastObject');
-  }).property('tableComponent.bodyContent.lastObject', 'row'),
+        this.get('tableComponent.bodyContent.lastItem');
+  }).property('tableComponent.bodyContent.lastItem', 'row'),
 
   // TODO(azirbel): Could simplify slightly via
   // this.set('row.isHovered', true) and remove the temp variable.

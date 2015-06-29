@@ -20,6 +20,13 @@ export default Ember.ArrayController.extend({
       content: object
     });
     subControllers[idx] = subController;
+    if (this._isLastItem(idx)) {
+      this.set('lastItem', subController);
+    }
     return subController;
+  },
+
+  _isLastItem: function(idx) {
+    return idx === this.get('length') - 1;
   }
 });

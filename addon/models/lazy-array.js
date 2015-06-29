@@ -92,8 +92,13 @@ export default Ember.ArrayProxy.extend({
     var content;
     if(this.get('isCompleted')){
       content = this.get('_lazyContent').sort(callback);
+      this.set('_lazyContent', content);
+    } else {
+      // Do not set `_lazyContent` to a new Array object, otherwise,
+      // the content did change event in RowArrayController will be triggered,
+      // and the last index will be accessed.
+      this.get('_lazyContent').clear();
     }
-    this.set('_lazyContent', content || []);
   },
 
   _lazyContent: null,
