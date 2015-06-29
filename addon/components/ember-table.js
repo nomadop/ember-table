@@ -225,16 +225,22 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.prepareTableColumns();
   },
 
+  //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
+  //If a new groupedRowController is created, the expanding state will be cleared.
+  _groupedRowController: Ember.computed(function(){
+    return GroupedRowArrayController.create({
+      target: this,
+      parentController: this,
+      container: this.get('container'),
+      itemController: Row,
+      content: this.get('content')
+    });
+  }).property('content'),
+
   // An array of Ember.Table.Row computed based on `content`
   bodyContent: Ember.computed(function() {
     if (this.get('_hasGroupingColumn')) {
-      return GroupedRowArrayController.create({
-        target: this,
-        parentController: this,
-        container: this.get('container'),
-        itemController: Row,
-        content: this.get('content')
-      });
+      return this.get('_groupedRowController');
     }
     return RowArrayController.create({
       target: this,
