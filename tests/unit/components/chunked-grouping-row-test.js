@@ -4,7 +4,7 @@ import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
-import DeferedPromises from '../../fixture/defered-promises';
+import DeferPromises from '../../fixture/defer-promises';
 
 
 moduleForEmberTable('Given a table with chunked group row data',
@@ -40,7 +40,7 @@ moduleForEmberTable('Given a table with chunked group row data',
   });
 
 test('top level grouping rows are in chunk', function (assert) {
-  var testEnv = DeferedPromises.create({defersCount: 2});
+  var testEnv = DeferPromises.create({defersCount: 2});
   var component = this.subject(testEnv);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -51,7 +51,7 @@ test('top level grouping rows are in chunk', function (assert) {
 });
 
 test('expand chunked top level rows', function (assert) {
-  var testEnv = DeferedPromises.create({defersCount: 2});
+  var testEnv = DeferPromises.create({defersCount: 2});
   var component = this.subject(testEnv);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -63,7 +63,7 @@ test('expand chunked top level rows', function (assert) {
 });
 
 test('collapse chunked top level rows', function (assert) {
-  var testEnv = DeferedPromises.create({defersCount: 2});
+  var testEnv = DeferPromises.create({defersCount: 2});
   var component = this.subject(testEnv);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -86,7 +86,7 @@ moduleForEmberTable('Given a table with 3 chunked group row data',  function sub
 });
 
 test('load top level chunk data in need', function(assert) {
-  var testEnv = DeferedPromises.create({defersCount: 1});
+  var testEnv = DeferPromises.create({defersCount: 1});
   var chunkSize = 5;
   var loadedChunkCount = 0;
   var component = this.subject(LazyGroupRowArray.create(

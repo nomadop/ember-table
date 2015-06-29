@@ -52,6 +52,8 @@ export default Ember.ArrayProxy.extend({
     this.loadOneChunk(chunkIndex).then(function (result) {
       self.onOneChunkLoaded(result);
       self.set('_hasInProgressLoading', false);
+    }).catch(function() {
+      self.set('_hasInProgressLoading', false);
     });
   },
 
