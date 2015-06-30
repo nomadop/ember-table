@@ -182,13 +182,17 @@ export default RowArrayController.extend({
       var child = children.objectAt(i);
       var decision = visitChild(child, content, level || 0);
       if (decision.stop) {
-        break;
+        return decision;
       }
       var needGoDeeper = decision.needGoDeeper;
       if (needGoDeeper) {
-        _this.depthFirstTraverse(child, visitChild, (level || 0) + 1);
+        var nextLevelDecision = _this.depthFirstTraverse(child, visitChild, (level || 0) + 1);
+        if (nextLevelDecision && nextLevelDecision.stop) {
+          return nextLevelDecision;
+        }
       }
     }
+    return {stop: false};
   },
 
   arrayLength: function(array) {

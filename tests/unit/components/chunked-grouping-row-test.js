@@ -117,3 +117,41 @@ test('load top level chunk data in need', function (assert) {
     assert.equal(loadedChunkCount, 1, 'should only load first chunk');
   });
 });
+
+test('show grouping name in grouping column', function (assert) {
+  var defers = DeferPromises.create({count: 2});
+  var chunkSize = 5;
+  var component = this.subject(LazyGroupRowArray.create(
+    {
+      loadChildren: function getChunk(pageIndex, parentQuery) {
+        var defer = defers.next();
+        var result = [];
+        for (var i = 0; i < chunkSize; i++) {
+          var childrenStart = 10 * (pageIndex + 1);
+          result.push({
+            id: i,
+            firstLevel: 'firstLevel-' + i,
+            secondLevel: 'secondLevel-' + i
+          });
+        }
+        defer.resolve({content: result, meta: {totalCount: 15, chunkSize: 5}});
+        return defer.promise;
+      },
+
+      groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
+    }));
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  this.render();
+
+  defers.ready(function () {
+    var firstRowGroupingName = helper.fixedBodyCell(0, 0).text().trim();
+    assert.equal(firstRowGroupingName, "firstLevel-0", 'it should show first level grouping name');
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  return defers.ready(function () {
+    var secondRowGroupingName = helper.fixedBodyCell(1, 0).text().trim();
+    assert.equal(secondRowGroupingName, "secondLevel-0", 'it should show second level grouping name');
+  });
+});
