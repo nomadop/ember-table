@@ -1,25 +1,42 @@
 import Ember from 'ember';
 
-export default Ember.Object.extend({
-  defersCount: 0,
+export default Ember.ArrayProxy.extend({
+  count: 0,
+
+  content: Ember.computed.alias('defers'),
 
   defers: Ember.computed(function () {
     var result = [];
-    for (var i = 0; i < this.get('defersCount'); i++) {
+    for (var i = 0; i < this.get('count'); i++) {
       result.push(Ember.RSVP.defer());
     }
     return result;
-  }).property('defersCount'),
+  }).property('count'),
 
-  promises: Ember.computed(function () {
-    return this.get('defers').map(function (defer) {
+  promises: function (deferIndexes) {
+    var defers = this.get('defers');
+    if(deferIndexes instanceof Array){
+      return deferIndexes.map(function(deferIndex) {
+        return defers[deferIndex].promise;
+      });
+    }
+    return defers.map(function(defer) {
       return defer.promise;
     });
-  }).property('defers'),
+  },
 
-  ready: function (callback) {
-    Ember.RSVP.all(this.get('promises')).then(function () {
-      Ember.run.later(callback);
+  next: function() {
+    var defer = this.objectAt(this.get('_index'));
+    this.incrementProperty('_index');
+    return defer;
+  },
+
+  _index: 0,
+
+  ready: function (callback, deferIndexes) {
+    var promises = this.promises(deferIndexes);
+    return Ember.RSVP.all(promises).then(function () {
+      return Ember.run.later(callback);
     });
   }
 });

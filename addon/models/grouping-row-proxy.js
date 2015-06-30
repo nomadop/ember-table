@@ -28,5 +28,13 @@ export default Ember.ObjectProxy.extend({
       parentQuery: this.get('selfQuery')
     });
     return lazyArray;
-  }).property()
+  }).property(),
+
+  groupName: Ember.computed(function() {
+    var groupingName = this.get('groupingName');
+    if (groupingName) {
+      return this.get(groupingName);
+    }
+    return "";
+  }).property('groupingName', 'content')
 });
