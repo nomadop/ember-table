@@ -26,6 +26,8 @@ export default Ember.View.extend({
   }).property('isExpanded'),
 
   click: function() {
-  	this.get('parentView').send('toggleExpansionState');
+    if(this.get('isShown')){
+      this.get('parentView').send('toggleExpansionState');
+    }
   }
 });
