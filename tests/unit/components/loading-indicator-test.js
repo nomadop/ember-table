@@ -20,8 +20,10 @@ var firstRowObject = {
 
 moduleForEmberTable('loading indicator', function(content) {
   return EmberTableFixture.create({
-    content: content,
-    groupingMetadata: ["", ""],
+    content: Ember.ArrayProxy.create({
+      content: content,
+      groupingMetadata: ["", ""]
+    }),
     height: 157
   });
 });

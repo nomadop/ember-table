@@ -52,7 +52,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return numFixedColumns;
   }).property('numFixedColumns', 'hasGroupingColumn'),
 
-  groupingMetadata: [],
+  groupingMetadata: Ember.computed(function() {
+    return this.get('content.groupingMetadata') || [];
+  }).property('content.groupingMetadata'),
 
   // The number of footer rows in the table. Footer rows appear at the bottom of
   // the table and are always visible.
