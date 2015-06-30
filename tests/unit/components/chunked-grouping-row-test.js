@@ -30,8 +30,7 @@ moduleForEmberTable('Given a table with chunked group row data',
             return defer.promise;
           },
           groupingMetadata: ["", ""]
-        }),
-      groupingMetadata: ["", ""]
+        })
     });
   });
 
@@ -137,7 +136,6 @@ test('show grouping name in grouping column', function (assert) {
         defer.resolve({content: result, meta: {totalCount: 15, chunkSize: 5}});
         return defer.promise;
       },
-
       groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
     }));
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
