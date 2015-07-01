@@ -24,7 +24,7 @@ export default RowArrayController.extend({
         parentContent: target.parent
       });
       if (idx === 0 && this.get('content.grandTotalTitle')) {
-        controller.set('groupName', this.get('content.grandTotalTitle'));
+        controller.set('grandTotalTitle', this.get('content.grandTotalTitle'));
       }
       controllersMap.set(object, controller);
     }

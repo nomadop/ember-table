@@ -10,13 +10,21 @@ export default Ember.ObjectProxy.extend({
   groupingLevel: 0,
 
   groupingName: Ember.computed(function () {
-    return Ember.get(this.get('groupingMetadata').objectAt(this.get('groupingLevel')), 'id');
+    var groupingLevel = this.get('groupingLevel');
+    var groupingMetadata = this.get('groupingMetadata');
+    if (groupingLevel >= 0 && groupingLevel < groupingMetadata.length) {
+      return Ember.get(this.get('groupingMetadata').objectAt(groupingLevel), 'id');
+    } else {
+      return null;
+    }
   }).property('groupingMetadata', 'groupingLevel'),
 
   selfQuery: Ember.computed(function () {
     var query = {};
     var groupingName = this.get('groupingName');
-    query[groupingName] = this.get('content.id');
+    if (groupingName) {
+      query[groupingName] = this.get('content.id');
+    }
     return Ember.setProperties(query, this.get('parentQuery') || {});
   }).property('content'),
 
