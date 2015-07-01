@@ -56,6 +56,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.get('content.groupingMetadata') || [];
   }).property('content.groupingMetadata'),
 
+  hasGrandTotalRow: Ember.computed(function() {
+    return !!this.get('content.grandTotalTitle');
+  }).property('content.grandTotalTitle'),
+
   // The number of footer rows in the table. Footer rows appear at the bottom of
   // the table and are always visible.
   // TODO(new-api): Rename to `numFooterRows`

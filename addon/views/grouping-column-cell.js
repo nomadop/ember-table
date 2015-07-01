@@ -18,10 +18,16 @@ export default TableCell.extend(
   }).property('tableComponent.groupedRowIndicatorView'),
 
   hasChildren: Ember.computed(function() {
-    return this.get('expandLevel') < this.get('tableComponent.groupingMetadata.length');
-  }).property('expandLevel', 'tableComponent.groupingMetadata.length'),
+    return this.get('groupingLevel') < this.get('tableComponent.groupingMetadata.length');
+  }).property('groupingLevel', 'tableComponent.groupingMetadata.length'),
 
   expandLevel: Ember.computed.oneWay('row.expandLevel'),
+
+  groupingLevel: Ember.computed(function() {
+    var hasGrandTotalRow = this.get('tableComponent.hasGrandTotalRow');
+    var expandLevel = this.get('expandLevel');
+    return hasGrandTotalRow? expandLevel - 1: expandLevel;
+  }).property('expandLevel', 'tableComponent.hasGrandTotalRow'),
 
   actions: {
     toggleExpansionState: function() {
