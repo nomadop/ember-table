@@ -61,30 +61,24 @@ var DataProvider = function() {
   };
 }();
 
-var provider = function () {
-  var loadChunkCount;
-  var chunkSize = 5;
-  return {
-    create: function (options) {
-      loadChunkCount = 0;
-      return LazyGroupRowArray.create({
-        loadChildren: function (chunkIndex, parentQuery) {
-          var defer = options.defers.next();
-          var result = {
-            content: DataProvider.sortData(chunkIndex, parentQuery),
-            meta: {totalCount: 10, chunkSize: chunkSize}
-          };
-          defer.resolve(result);
-          loadChunkCount++;
-          return defer.promise;
-        },
-        groupingMetadata: options.groupingMetadata
-      });
-    },
-    loadChunkCount: function () {
-      return loadChunkCount;
-    }
-  };
-}();
-
-export default provider;
+export default Ember.Object.extend({
+  loadChunkCount: 0,
+  groupingMetadata: null,
+  defers: null,
+  content: Ember.computed(function () {
+    var self = this;
+    return LazyGroupRowArray.create({
+      loadChildren: function (chunkIndex, parentQuery) {
+        var defer = self.get('defers').next();
+        var result = {
+          content: DataProvider.sortData(chunkIndex, parentQuery),
+          meta: {totalCount: 10, chunkSize: 5}
+        };
+        defer.resolve(result);
+        self.incrementProperty('loadChunkCount');
+        return defer.promise;
+      },
+      groupingMetadata: this.get('groupingMetadata')
+    });
+  })
+});
