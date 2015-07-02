@@ -1,9 +1,12 @@
 import Ember from 'ember';
+import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 
-export default Ember.View.extend({
+export default Ember.View.extend(StyleBindingsMixin, {
   templateName: 'grouped-row-indicator',
 
   classNameBindings: ['indicatorClass'],
+
+  styleBindings: ['left'],
 
   hasChildren: false,
 
@@ -16,6 +19,10 @@ export default Ember.View.extend({
   }).property('hasChildren'),
 
   expandLevel: 0,
+
+  left: Ember.computed(function() {
+    return this.get('expandLevel') * 10 + 5;
+  }).property('expandLevel'),
 
   indicatorClass: Ember.computed(function() {
     var classNames = ['grouping-column-indicator'];
