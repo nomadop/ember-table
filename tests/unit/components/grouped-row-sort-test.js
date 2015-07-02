@@ -108,7 +108,7 @@ test('sort completed data of grouped row', function (assert) {
   });
 });
 
-
+var chunkCount = 0;
 moduleForEmberTable("Given a table with chunked partial group row data", function (defers) {
   var chunkSize = 5;
   return EmberTableFixture.create({
@@ -117,6 +117,7 @@ moduleForEmberTable("Given a table with chunked partial group row data", functio
     content: LazyGroupRowArray.create(
       {
         loadChildren: function getChunk(chunkIndex, parentQuery) {
+          chunkCount++;
           var defer = defers.next();
           var result = {
             content: DataProvider.sortData(chunkIndex, parentQuery),
@@ -180,6 +181,23 @@ test('expand grouped row with leaf rows when sorted', function(assert){
   });
 });
 
+test('expand second level rows twice', function(assert) {
+  chunkCount = 0;
+  var defers = DeferPromises.create({count: 2});
+  var component = this.subject(defers);
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  return defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+    helper.rowGroupingIndicator(0).click();
+    assert.equal(chunkCount, 2, 'Loaded chunk count should be 2');
+  });
+});
+
 moduleForEmberTable("Given a table with three level chunked group row data", function (defers) {
   var chunkSize = 5;
   return EmberTableFixture.create({
@@ -232,4 +250,3 @@ test('sort leaf column with three levels', function (assert) {
     assert.equal(thirdRowId, '1010', 'it should render 1010 before sort');
   });
 });
-
