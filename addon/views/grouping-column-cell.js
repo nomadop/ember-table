@@ -18,7 +18,7 @@ export default TableCell.extend(
   }).property('tableComponent.groupedRowIndicatorView'),
 
   hasChildren: Ember.computed(function() {
-    return this.get('groupingLevel') < this.get('tableComponent.groupingMetadata.length');
+    return this.get('groupingLevel') < this.get('tableComponent.groupingMetadata.length') - 1;
   }).property('groupingLevel', 'tableComponent.groupingMetadata.length'),
 
   expandLevel: Ember.computed.oneWay('row.expandLevel'),
