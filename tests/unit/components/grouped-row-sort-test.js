@@ -3,93 +3,20 @@ import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableHelper from '../../helpers/ember-table-helper';
-import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
+import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 import DeferPromises from '../../fixture/defer-promises';
 
-var DataProvider = function() {
-  var toQuery = function(obj) {
-    var keys = Object.keys(obj).sort();
-    return keys.map(function (key) {
-      return key + '=' + obj[key];
-    }).join('&');
-  };
-
-  var makeJsonArray = function(arr, baseNum) {
-    baseNum = baseNum || 0;
-    return arr.map(function (i) {
-      return {
-        id: i + baseNum,
-        name: 'name-' + i,
-        accountType: i + baseNum,
-        accountCode: i + baseNum
-      };
-    });
-  };
-
-  var sortDataMap = {
-    'chunkIndex=0': function () {
-      return makeJsonArray([1, 2, 3, 4, 5]);
-    },
-    'chunkIndex=1': function () {
-      return makeJsonArray([6, 7, 8, 9, 10]);
-    },
-    'accountType=1&chunkIndex=0': function () {
-      return makeJsonArray([2, 1, 5, 4, 3], 100);
-    },
-    'accountType=1&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
-      return makeJsonArray([1, 2, 3, 4, 5], 100);
-    },
-    'accountType=1&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
-      return makeJsonArray([10, 9, 8, 7, 6], 100);
-    },
-    'accountCode=102&accountType=1&chunkIndex=0': function () {
-      return makeJsonArray([3, 5, 1, 2, 4], 1000);
-    },
-    'accountCode=102&accountType=1&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
-      return makeJsonArray([1, 2, 3, 4, 5], 1000);
-    },
-    'accountCode=102&accountType=1&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
-      return makeJsonArray([10, 9, 8, 7, 6], 1000);
-    },
-    'accountType=1&chunkIndex=1': function () {
-      return makeJsonArray([8, 7, 9, 10, 6], 100);
-    }
-  };
-
-  return {
-    sortData: function (chunkIndex, query) {
-      var queryObj = {};
-      Ember.setProperties(queryObj, query);
-      Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
-      return sortDataMap[toQuery(queryObj)]();
-    }
-  };
-}();
-
-moduleForEmberTable("Given a table with chunked completed group row data", function (defers) {
-  var chunkSize = 5;
+moduleForEmberTable("Given a table with chunked completed group row data", function (content) {
   return EmberTableFixture.create({
     height: 800,
-    width: 700,
-    content: LazyGroupRowArray.create(
-      {
-        loadChildren: function getChunk(chunkIndex, parentQuery) {
-          var defer = defers.next();
-          var result = {
-            content: DataProvider.sortData(chunkIndex, parentQuery),
-            meta: {totalCount: 10, chunkSize: chunkSize}
-          };
-          defer.resolve(result);
-          return defer.promise;
-        },
-        groupingMetadata: [{id: 'accountType'}]
-      })
+    content: content
   });
 });
 
 test('sort completed data of grouped row', function (assert) {
   var defers = DeferPromises.create({count: 4});
-  var component = this.subject(defers);
+  var content = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}]});
+  var component = this.subject(content);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -108,32 +35,17 @@ test('sort completed data of grouped row', function (assert) {
   });
 });
 
-var chunkCount = 0;
-moduleForEmberTable("Given a table with chunked partial group row data", function (defers) {
-  var chunkSize = 5;
+moduleForEmberTable("Given a table with chunked partial group row data", function (content) {
   return EmberTableFixture.create({
     height: 120,
-    width: 700,
-    content: LazyGroupRowArray.create(
-      {
-        loadChildren: function getChunk(chunkIndex, parentQuery) {
-          chunkCount++;
-          var defer = defers.next();
-          var result = {
-            content: DataProvider.sortData(chunkIndex, parentQuery),
-            meta: {totalCount: 10, chunkSize: chunkSize}
-          };
-          defer.resolve(result);
-          return defer.promise;
-        },
-        groupingMetadata: [{id: 'accountType'}]
-      })
+    content:content
   });
 });
 
 test('sort partial data of grouped row', function (assert) {
   var defers = DeferPromises.create({count: 4});
-  var component = this.subject(defers);
+  var content = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}]});
+  var component = this.subject(content);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -160,7 +72,8 @@ test('sort partial data of grouped row', function (assert) {
 
 test('expand grouped row with leaf rows when sorted', function(assert){
   var defers = DeferPromises.create({count: 3});
-  var component = this.subject(defers);
+  var content = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}]});
+  var component = this.subject(content);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
@@ -182,9 +95,9 @@ test('expand grouped row with leaf rows when sorted', function(assert){
 });
 
 test('expand second level rows twice', function(assert) {
-  chunkCount = 0;
   var defers = DeferPromises.create({count: 2});
-  var component = this.subject(defers);
+  var content = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}]});
+  var component = this.subject(content);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -194,34 +107,14 @@ test('expand second level rows twice', function(assert) {
   return defers.ready(function () {
     helper.rowGroupingIndicator(0).click();
     helper.rowGroupingIndicator(0).click();
-    assert.equal(chunkCount, 2, 'Loaded chunk count should be 2');
-  });
-});
-
-moduleForEmberTable("Given a table with three level chunked group row data", function (defers) {
-  var chunkSize = 5;
-  return EmberTableFixture.create({
-    height: 120,
-    width: 700,
-    content: LazyGroupRowArray.create(
-      {
-        loadChildren: function getChunk(chunkIndex, parentQuery) {
-          var defer = defers.next();
-          var result = {
-            content: DataProvider.sortData(chunkIndex, parentQuery),
-            meta: {totalCount: 10, chunkSize: chunkSize}
-          };
-          defer.resolve(result);
-          return defer.promise;
-        },
-        groupingMetadata: [{id: 'accountType'}, {id: 'accountCode'}]
-      })
+    assert.equal(GroupedRowDataProvider.loadChunkCount(), 2, 'Loaded chunk count should be 2');
   });
 });
 
 test('sort leaf column with three levels', function (assert) {
   var defers = DeferPromises.create({count: 5});
-  var component = this.subject(defers);
+  var content = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}, {id: 'accountCode'}]});
+  var component = this.subject(content);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
