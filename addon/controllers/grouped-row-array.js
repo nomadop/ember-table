@@ -23,6 +23,9 @@ export default RowArrayController.extend({
         expandLevel: expandLevel,
         parentContent: target.parent
       });
+      if (idx === 0 && this.get('content.grandTotalTitle')) {
+        controller.set('grandTotalTitle', this.get('content.grandTotalTitle'));
+      }
       controllersMap.set(object, controller);
     }
     return controller;

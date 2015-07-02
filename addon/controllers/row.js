@@ -6,6 +6,7 @@ export default Ember.ObjectProxy.extend({
   isHovered: false,
   isExpanded: false,
   expandLevel: null,
+  grandTotalTitle: null,
   isSelected: Ember.computed(function(key, val) {
     if (arguments.length > 1) {
       this.get('parentController').setSelected(this, val);
@@ -16,5 +17,14 @@ export default Ember.ObjectProxy.extend({
   hasChildren: Ember.computed(function(){
     var children = this.get('content.children');
     return (!!children) && children.length > 0;
-  }).property('content.children')
+  }).property('content.children'),
+
+  groupName: Ember.computed(function() {
+    var grandTotalTitle = this.get('grandTotalTitle');
+    if (grandTotalTitle) {
+      return grandTotalTitle;
+    }
+
+    return this.get('content.groupName');
+  }).property('content.groupName', 'grandTotalTitle')
 });
