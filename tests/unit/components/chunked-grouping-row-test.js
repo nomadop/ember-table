@@ -153,3 +153,49 @@ test('show grouping name in grouping column', function (assert) {
     assert.equal(secondRowGroupingName, "secondLevel-0", 'it should show second level grouping name');
   });
 });
+
+moduleForEmberTable('Given a table with 1 chunked data', function subject(content) {
+  return EmberTableFixture.create({
+    height: 90,
+    width: 700,
+    content: content,
+    groupingMetadata: ["", ""]
+  });
+});
+
+test('load chunked data', function (assert) {
+  var chunkCount = 0;
+  var defers = DeferPromises.create({count: 2});
+  var component = this.subject(LazyGroupRowArray.create(
+    {
+      loadChildren: function getChunk() {
+        var defer = defers.next();
+        var result = [];
+        for (var i = 0; i < 1; i++) {
+          result.push({
+            id: 'chunked-' + chunkCount,
+            firstLevel: 'firstLevel-' + i,
+            secondLevel: 'secondLevel-' + i
+          });
+        }
+        defer.resolve({content: result, meta: {totalCount: 1, chunkSize: 1}});
+        chunkCount++;
+        return defer.promise;
+      },
+      groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
+    }));
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  defers.ready(function () {
+   var firstLevelRowCell = helper.bodyCell(0,0).text().trim();
+   assert.equal(firstLevelRowCell, 'chunked-0', "should load chunked row");
+
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  return defers.ready(function () {
+    var secondLevelRowCell = helper.bodyCell(1,0).text().trim();
+    assert.equal(secondLevelRowCell, 'chunked-1', "should load chunked row when get only one chunked data");
+  });
+});
