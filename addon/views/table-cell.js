@@ -29,6 +29,10 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
     return this.get('tableComponent.rowLoadingIndicatorView') || RowLoadingIndicator;
   }).property('tableComponent.rowLoadingIndicatorView'),
 
+  hasCustomRowLoadingIndicatorView: Ember.computed(function() {
+    return this.get('rowLoadingIndicatorView') !== RowLoadingIndicator;
+  }).property('tableComponent.rowLoadingIndicatorView'),
+
   row: Ember.computed.alias('parentView.row'),
   column: Ember.computed.alias('content'),
   width: Ember.computed.alias('column.width'),
