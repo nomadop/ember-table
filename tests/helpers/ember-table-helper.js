@@ -49,6 +49,20 @@ export default Ember.Object.extend({
     assert.equal(row.find('.ember-table-cell').length, cellCount, message);
   },
 
+  assertCellContent: function(rowIndex, colIndex, value, message){
+    this._assertCellContent(rowIndex, colIndex, value, message, this.bodyCell);
+  },
+
+  assertFixedCellContent: function(rowIndex, colIndex, value, message){
+    this._assertCellContent(rowIndex, colIndex, value, message, this.fixedBodyCell);
+  },
+
+  _assertCellContent: function(rowIndex, colIndex, value, message, fetchCell){
+    var assert = this.get('_assert');
+    var cellContent = fetchCell.apply(this, [rowIndex, colIndex]).text().trim();
+    assert.equal(cellContent, value, message);
+  },
+
   reorderColumn: function dragToRight(colIndex, offset) {
     var groupHeaderCell = this.getGroupHeaderCell(colIndex);
     groupHeaderCell.simulate('drag', {dx: offset});

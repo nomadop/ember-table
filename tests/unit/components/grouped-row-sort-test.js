@@ -15,7 +15,7 @@ moduleForEmberTable("Given a table with chunked completed group row data", funct
 
 test('sort completed data of grouped row', function (assert) {
   var defers = DeferPromises.create({count: 4});
-  var provider = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}, {id: ''}]});
+  var provider = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}, {id: 'accountCode'}]});
   var component = this.subject(provider.get('content'));
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -24,14 +24,16 @@ test('sort completed data of grouped row', function (assert) {
   }, [0, 1]);
 
   return defers.ready(function () {
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '102', 'second row id should be equal to 102 before sort');
+    helper.assertCellContent(1, 0, '102', 'second row id should be equal to 102 before sort');
+    helper.assertFixedCellContent(1, 0, '102', 'second row group name should be equal to 102 before sort');
+    
     helper.getHeaderCell(0).click();
-    secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '101', 'second row id should be equal to 101 when sort asc');
+    helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
+    helper.assertFixedCellContent(1, 0, '101', 'second row groupName should be equal to 101 when sort asc');
+    
     helper.getHeaderCell(0).click();
-    secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '110', 'second row id should be equal to 110 when sort desc');
+    helper.assertCellContent(1, 0, '110', 'second row id should be equal to 110 when sort desc');
+    helper.assertFixedCellContent(1, 0, '110', 'second row group name should be equal to 101 when sort asc');
   });
 });
 
@@ -53,20 +55,17 @@ test('sort partial data of grouped row', function (assert) {
   }, [0]);
 
   defers.ready(function () {
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '102', 'second row id should be equal to 102 before sort');
+    helper.assertCellContent(1, 0, '102', 'second row id should be equal to 102 before sort');
     helper.getHeaderCell(0).click();
   }, [1]);
 
   defers.ready(function () {
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '101', 'second row id should be equal to 101 when sort asc');
+    helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
     helper.getHeaderCell(0).click();
   }, [2]);
 
   return defers.ready(function () {
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '110', 'second row id should be equal to 110 when sort desc');
+    helper.assertCellContent(1, 0, '110', 'second row id should be equal to 110 when sort desc');
   });
 });
 
@@ -80,8 +79,7 @@ test('expand grouped row with leaf rows when sorted', function(assert){
   defers.ready(function () {
     helper.getHeaderCell(0).click();
     helper.rowGroupingIndicator(0).click();
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '101', 'second row id should be equal to 101 when sort asc');
+    helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
   }, [0]);
 
   defers.ready(function () {
@@ -89,8 +87,7 @@ test('expand grouped row with leaf rows when sorted', function(assert){
   }, [1]);
 
   return defers.ready(function () {
-    var secondRowId = helper.bodyCell(1, 0).text().trim();
-    assert.equal(secondRowId, '110', 'second row id should be equal to 110 when sort desc');
+    helper.assertCellContent(1, 0, '110', 'second row id should be equal to 110 when sort desc');
   });
 });
 
@@ -127,19 +124,16 @@ test('sort leaf column with three levels', function (assert) {
   }, [1]);
 
   defers.ready(function () {
-    var thirdRowId = helper.bodyCell(2, 0).text().trim();
-    assert.equal(thirdRowId, '1003', 'it should render 1003 before sort');
+    helper.assertCellContent(2, 0, '1003', 'it should render 1003 before sort');
     helper.getHeaderCell(0).click();
   }, [2]);
 
   defers.ready(function () {
-    var thirdRowId = helper.bodyCell(2, 0).text().trim();
-    assert.equal(thirdRowId, '1001', 'it should render 1001 before sort');
+    helper.assertCellContent(2, 0, '1001', 'it should render 1001 before sort');
     helper.getHeaderCell(0).click();
   }, [3]);
 
   return defers.ready(function () {
-    var thirdRowId = helper.bodyCell(2, 0).text().trim();
-    assert.equal(thirdRowId, '1010', 'it should render 1010 before sort');
+    helper.assertCellContent(2, 0, '1010', 'it should render 1010 before sort');
   });
 });
