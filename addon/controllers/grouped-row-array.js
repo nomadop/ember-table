@@ -33,37 +33,30 @@ export default RowArrayController.extend({
 
   expandChildren: function(row) {
     var childrenRow = row.get('children');
-    row.addObserver('children.length', this, 'lengthDidChange');
+    row.addObserver('children.length', this, 'childrenLengthDidChange');
     row.set('isExpanded', true);
     if (this.arrayLength(childrenRow) > 0) {
       var childrenRows = this.get('_expandedGroupRowToChildrenMap');
       childrenRows.set(row.get('content'), childrenRow);
       this.toggleProperty('_forceContentLengthRecalc');
-      var expandLevelAfterExpand = this.maxExpandedDepthAfterExpand(row);
-      if (expandLevelAfterExpand > this.get('_expandedDepth')) {
-        this.set('_expandedDepth', expandLevelAfterExpand);
-      }
+      this.set('_expandedDepth', this.getMaxExpandedDepth());
     }
   },
 
-  lengthDidChange: function() {
-    this.toggleProperty('_forceContentLengthRecalc');
+  getMaxExpandedDepth: function() {
+    var controllersMap = this.get('_controllersMap');
+    var self = this;
+    var result = 0;
+    controllersMap.forEach(function (value) {
+      if (self.isParentControllerExpanded(value)) {
+        result = Math.max(result, value.get('expandLevel'));
+      }
+    });
+    return result;
   },
 
-  maxExpandedDepthAfterExpand: function maxExpandedDepthAfterExpand(row) {
-    var childrenRow = row.get('children') || [];
-    var expandedChildrenLevel = row.get('expandLevel') + 1;
-    var root = {children: childrenRow};
-    var controllersMap = this.get('_controllersMap');
-    this.depthFirstTraverse(root, function(child) {
-      var controller = controllersMap.get(child);
-      if (controller && controller.get('isExpanded')) {
-        expandedChildrenLevel = Math.max(expandedChildrenLevel, controller.get('expandLevel') + 1);
-        return {needGoDeeper: true, stop: false};
-      }
-      return {needGoDeeper: false, stop: false};
-    }, 1);
-    return expandedChildrenLevel;
+  childrenLengthDidChange: function() {
+    this.toggleProperty('_forceContentLengthRecalc');
   },
 
   collapseChildren: function(row) {
@@ -73,14 +66,8 @@ export default RowArrayController.extend({
       var childrenRows = this.get('_expandedGroupRowToChildrenMap');
       childrenRows.delete(row.get('content'));
       this.toggleProperty('_forceContentLengthRecalc');
-      this.set('_expandedDepth', this.maxExpandedDepthAfterCollapse());
+      this.set('_expandedDepth', this.getMaxExpandedDepth());
     }
-  },
-
-  maxExpandedDepthAfterCollapse: function() {
-    return this.traverseExpandedControllers(function (prev, value) {
-      return Math.max(prev, value.get('expandLevel') + 1);
-    }, 0);
   },
 
   length: Ember.computed(function() {
