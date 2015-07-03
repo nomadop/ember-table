@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
-import EmberTableFixture from '../../fixture/ember-table-with-GL-data';
+import EmberTableFixture from '../../fixture/ember-table-with-gl-data';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
 import DeferPromises from '../../fixture/defer-promises';
