@@ -239,9 +239,12 @@
   }
 
   &.grouping-column-cell {
+    position: relative;
+
     .ember-table-content {
       display: inline-block;
       vertical-align: middle;
+      width: 100%;
     }
   }
 }
@@ -689,10 +692,10 @@
 
 .grouping-column-indicator {
   display: inline-block;
-  position: relative;
+  position: absolute;
   width: 10px;
   height: 10px;
-  margin-left: 5px;
+  top: 7px;
 
   .hor {
     position: absolute;

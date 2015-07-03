@@ -394,20 +394,20 @@ test('Indent inner grouped row content', function(assert){
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   var firstLevelRowIndicator = helper.rowGroupingIndicator(0);
   var firstLevelCellPaddingLeft = helper.fixedBodyCell(0, 0).css('padding-left');
-  assert.equal(firstLevelCellPaddingLeft, '5px', "first level indicator should be default padding-left");
+  assert.equal(firstLevelCellPaddingLeft, '15px', "first level indicator should be default padding-left");
 
   firstLevelRowIndicator.click();
 
   var secondLevelBodyCell = helper.fixedBodyCell(1, 0);
   var secondLevelRowCellPaddingLeft = secondLevelBodyCell.css('padding-left');
-  assert.equal(secondLevelRowCellPaddingLeft, '15px', "second level Padding-left should be equal to 15px");
+  assert.equal(secondLevelRowCellPaddingLeft, '25px', "second level Padding-left should be equal to 15px");
 
   var secondLevelRowIndicator = helper.rowGroupingIndicator(2);
   secondLevelRowIndicator.click();
 
   var thirdLevelBodyCell = helper.fixedBodyCell(3,0);
   var thridLevelRowCellPaddingLeft = thirdLevelBodyCell.css("padding-left");
-  assert.equal(thridLevelRowCellPaddingLeft, '25px',"third level Padding-left should be equal to 25px");
+  assert.equal(thridLevelRowCellPaddingLeft, '35px',"third level Padding-left should be equal to 25px");
 });
 
 moduleForEmberTable('table with five level of grouped rows',

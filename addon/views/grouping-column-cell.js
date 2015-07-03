@@ -43,7 +43,7 @@ export default TableCell.extend(
   },
 
   "padding-left": Ember.computed(function() {
-    return this.get('expandLevel') * 10 + 5;
+    return this.get('expandLevel') * 10 + 15;
   }).property('expandLevel'),
 
   isExpanded: Ember.computed.alias('row.isExpanded')
