@@ -40,7 +40,7 @@ export default Ember.ArrayProxy.extend({
   },
 
   isLeafParent: Ember.computed(function(){
-    return this.get('groupingLevel') === this.get('groupingMetadata.length');
+    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 1;
   }).property('groupLevel', 'groupingMetadata.[]'),
 
   sort: function (callback){
