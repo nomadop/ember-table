@@ -11,7 +11,7 @@ moduleForEmberTable('grand total', function () {
     height: 330,
     width: 700,
     content: Ember.ArrayProxy.create({
-      groupingMetadata: [""],
+      groupingMetadata: [{id: "accountSection"}, {id: "accountType"}],
       content: [
         {
           id: 1,
@@ -74,7 +74,7 @@ moduleForEmberTable('grand total with lazy load',
             defer.resolve({id: 'grand total'});
             return defer.promise;
           },
-          groupingMetadata: [{id: 'accountSection'}],
+          groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
           grandTotalTitle: "Total"
         })
     });

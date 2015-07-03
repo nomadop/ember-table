@@ -593,7 +593,7 @@ moduleForEmberTable('table with two grouping rows which has three levels', funct
       height: 330,
       width: 700,
       content: Ember.ArrayProxy.create({
-        groupingMetadata: ["", ""],
+        groupingMetadata: [{id: "accountSection"}, {id: "accountType"}, {"id": "accountCode"}],
         content: [
           {
             groupName: 'root',
@@ -652,7 +652,7 @@ moduleForEmberTable('table with three levels rows1', function() {
       height: 330,
       width: 700,
       content: Ember.ArrayProxy.create({
-        groupingMetadata: ["", "", ""],
+        groupingMetadata: [{id: "accountSection"}, {id: "accountType"}, {"id": "accountCode"}, {"id": ""}],
         content: [
           {
             groupName: 'Row 1',
