@@ -16,12 +16,22 @@ export default RowArrayController.extend({
     var controllersMap = this.get('_controllersMap');
     var controller = controllersMap.get(object);
     if (!controller) {
+      var groupingKey;
+      var groupingLevel = expandLevel;
+      if (this.get('content.grandTotalTitle')) {
+        groupingLevel -= 1;
+      }
+      if (groupingLevel > -1) {
+        var groupingMetadata = this.get('content.groupingMetadata');
+        groupingKey = groupingMetadata[groupingLevel].id;
+      }
       controller = this.get('itemController').create({
         target: this,
         parentController: this.get('parentController') || this,
         content: object,
         expandLevel: expandLevel,
-        parentContent: target.parent
+        parentContent: target.parent,
+        groupingKey: groupingKey
       });
       if (idx === 0 && this.get('content.grandTotalTitle')) {
         controller.set('grandTotalTitle', this.get('content.grandTotalTitle'));
