@@ -1,6 +1,8 @@
-{{view view.rowLoadingIndicatorView
-  isLoading=view.isLoading
-}}
+{{#if view.hasCustomRowLoadingIndicatorView}}
+  {{view view.rowLoadingIndicatorView
+    isLoading=view.isLoading
+  }}
+{{/if}}
 <span class="ember-table-content">
   {{view.cellContent}}
 </span>
