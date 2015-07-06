@@ -46,12 +46,12 @@ moduleForEmberTable('render grouping column',
 
 test('it should has a grouping column at most left position', function(assert) {
   var component = this.subject();
-  Ember.run(function() {
-    component.set('hasGroupingColumn', true);
-  });
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
-  var fixedColumns = this.$('.ember-table-left-table-block > .ember-table-table-row > .ui-sortable > .ember-table-header-cell');
-  assert.equal(fixedColumns.length, 1);
+  this.render();
+
+  var fixedBodyCell = helper.fixedBodyCell(0, 0);
+  assert.equal(fixedBodyCell.length, 1);
 });
 
 test('it should render group name in grouping column', function(assert) {

@@ -9,7 +9,6 @@ export default Ember.Component.extend({
     '{{ember-table ' +
     ' columns=columns ' +
     ' hasFooter=hasFooter ' +
-    ' hasGroupingColumn=hasGroupingColumn ' +
     ' groupedRowIndicatorView=groupedRowIndicatorView ' +
     ' rowLoadingIndicatorView=rowLoadingIndicatorView ' +
     ' content=content' +
