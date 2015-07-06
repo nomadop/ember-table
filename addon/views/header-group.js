@@ -17,7 +17,6 @@ export default HeaderBlock.extend({
   createChildView: function(viewClass, attrs) {
     var vc = viewClass.extend({
       top: attrs.contentIndex * this.get('headerHeight'),
-      width: this.get('width'),
       height: this.get('headerHeight') * 2 / this.get('content').length,
 
       //whether this row is top one of a column group header
