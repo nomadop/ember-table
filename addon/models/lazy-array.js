@@ -36,7 +36,7 @@ export default Ember.ArrayProxy.extend({
   objectAt: function (index) {
     var lazyContent = this.get('_lazyContent');
     var chunkSize = this.get('chunkSize');
-    if (!lazyContent[index]) {
+    if (!lazyContent[index] || lazyContent[index].get('isError')) {
       this.loadOneChunk(Math.floor(index / chunkSize));
     }
     this.tryPreload(index, chunkSize);
@@ -51,7 +51,11 @@ export default Ember.ArrayProxy.extend({
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
-      lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
+      if (!lazyContent[chunkStart + x]) {
+        lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
+      } else {
+        lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
+      }
     }
 
     this.callback(chunkIndex).then(function (chunk) {
