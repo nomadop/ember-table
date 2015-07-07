@@ -238,12 +238,18 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
+    var table = this;
+    var content = this.get('content');
+    content.set('onLoadError', function(errorMessage, groupingName, chunkIndex) {
+      table.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
+    });
+
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
       container: this.get('container'),
       itemController: Row,
-      content: this.get('content')
+      content: content
     });
   }).property('content'),
 
