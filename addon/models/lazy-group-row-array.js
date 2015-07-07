@@ -3,6 +3,7 @@ import GroupingRowProxy from './grouping-row-proxy';
 
 export default Ember.ArrayProxy.extend({
   loadChildren: Ember.K,
+  onLoadError: Ember.K,
   groupingLevel: 0,
   groupingMetadata: null,
   parentQuery: {},
@@ -31,6 +32,7 @@ export default Ember.ArrayProxy.extend({
         groupingLevel: this.get('groupingLevel'),
         content: row,
         loadChildren: this.loadChildren,
+        onLoadError: this.onLoadError,
         parent: this,
         parentQuery: this.get('parentQuery')
       });
@@ -93,8 +95,11 @@ export default Ember.ArrayProxy.extend({
     this.loadOneChunk(chunkIndex).then(function (result) {
       self.onOneChunkLoaded(result);
       self.set('_hasInProgressLoading', false);
-    }).catch(function() {
+    }).catch(function(response) {
+      self.updatePlaceHolderWithError(response);
+      self.onLoadError("Failed to load data.", response);
       self.set('_hasInProgressLoading', false);
+
     });
   },
 
@@ -125,7 +130,7 @@ export default Ember.ArrayProxy.extend({
   },
 
   addLoadingPlaceHolder: function () {
-    this.pushObject(Ember.ObjectProxy.create({"isLoading": true, "isLoaded": false}));
+    this.pushObject(Ember.ObjectProxy.create({"isLoading": true, "isLoaded": false, "isError":false}));
   },
 
   updatePlaceHolderWithContent: function (content) {
@@ -135,6 +140,13 @@ export default Ember.ArrayProxy.extend({
       'isLoading': false,
       'isLoaded': true
     });
+  },
+
+  updatePlaceHolderWithError: function () {
+    var lastObject = this.get('lastObject');
+    if (lastObject.get('isLoading')) {
+      lastObject.set('isError', true);
+    }
   },
 
   isCompleted: Ember.computed(function(){

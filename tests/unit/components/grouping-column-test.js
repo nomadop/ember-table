@@ -8,32 +8,32 @@ import EmberTableHelper from '../../helpers/ember-table-helper';
 var content = Ember.ArrayProxy.create({
   content: [
     {
-      groupName: 'firstRootGroupName',
+      firstLevel: 'firstRootGroupName',
       id: 100,
       state: 'up'
     },
     {
-      groupName: 'secondRootGroupName',
+      firstLevel: 'secondRootGroupName',
       id: 1000,
       state: 'up'
     },
     {
-      groupName: 'thirdRootGroupName',
+      firstLevel: 'thirdRootGroupName',
       id: 10000,
       state: 'down',
       children: [
         {
-          groupName: 'secondRootGroupName',
+          secondLevel: 'secondRootGroupName',
           id: 10007,
           state: 'up'
         },
         {
-          groupName: 'secondRootGroupName',
+          secondLevel: 'secondRootGroupName',
           id: 10002,
           state: 'down'
         }]
     }],
-  groupingMetadata: ["", ""]
+  groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
 });
 
 moduleForEmberTable('render grouping column',
@@ -46,12 +46,12 @@ moduleForEmberTable('render grouping column',
 
 test('it should has a grouping column at most left position', function(assert) {
   var component = this.subject();
-  Ember.run(function() {
-    component.set('hasGroupingColumn', true);
-  });
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
-  var fixedColumns = this.$('.ember-table-left-table-block > .ember-table-table-row > .ui-sortable > .ember-table-header-cell');
-  assert.equal(fixedColumns.length, 1);
+  this.render();
+
+  var fixedBodyCell = helper.fixedBodyCell(0, 0);
+  assert.equal(fixedBodyCell.length, 1);
 });
 
 test('it should render group name in grouping column', function(assert) {
@@ -191,11 +191,11 @@ moduleForEmberTable('table with two group rows',
       width: 700,
       content: Ember.ArrayProxy.create({
         content: [{
-          groupName: 'firstRootGroupName',
+          firstLevel: 'firstRootGroupName',
           id: 100,
           state: 'up'
         }, {
-          groupName: 'secondRootGroupName',
+          firstLevel: 'secondRootGroupName',
           id: 10000,
           state: 'down',
           children: [{
@@ -206,7 +206,7 @@ moduleForEmberTable('table with two group rows',
             state: 'down'
           }]
         }, {
-          groupName: 'thirdRootGroupName',
+          firstLevel: 'thirdRootGroupName',
           id: 20000,
           state: 'down',
           children: [{
@@ -217,7 +217,7 @@ moduleForEmberTable('table with two group rows',
             state: 'down'
           }]
         }],
-        groupingMetadata: ["", ""]
+        groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
       }),
       numFixedColumns: 2
     });
@@ -299,15 +299,15 @@ moduleForEmberTable('table with two level of grouped rows',
       width: 700,
       content: Ember.ArrayProxy.create({
         content: [{
-          groupName: 'first-level',
+          firstLevel: 'first-level',
           id: 100,
           state: 'up',
           children: [{
-            groupName: 'second-level-row1',
+            secondLevel: 'second-level-row1',
             id: 1001,
             state: 'up'
           }, {
-            groupName: 'second-level-row2',
+            secondLevel: 'second-level-row2',
             id: 1002,
             state: 'down',
             children: [{
@@ -319,7 +319,7 @@ moduleForEmberTable('table with two level of grouped rows',
             }]
           }]
         }],
-        groupingMetadata: ["", "", ""]
+        groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}, {id: "thirdLevel"}]
       })
     });
   }
@@ -417,19 +417,19 @@ moduleForEmberTable('table with five level of grouped rows',
       width: 700,
       content: Ember.ArrayProxy.create({
         content: [{
-          groupName: 'first-level',
+          firstLevel: 'first-level',
           id: 100,
           state: 'up',
           children: [{
-            groupName: 'second-level',
+            secondLevel: 'second-level',
             id: 200,
             state: 'down',
             children: [{
-              groupName: 'third-level',
+              thirdLevel: 'third-level',
               id: 300,
               state: 'down',
               children: [{
-                groupName: 'fourth-level',
+                fourthLevel: 'fourth-level',
                 id: 400,
                 state: 'down',
                 children: [{
@@ -443,7 +443,7 @@ moduleForEmberTable('table with five level of grouped rows',
             }]
           }]
         }],
-        groupingMetadata: ["", "", "", "", ""]
+        groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}, {id: "thirdLevel"}, {id: "fourthLevel"}, {id: "fifthLevel"}]
       })
     });
   }
@@ -515,18 +515,18 @@ moduleForEmberTable('table with two levels of grouped rows', function () {
       content: Ember.ArrayProxy.create({
         content: [
           {
-            groupName: 'first level row 1',
+            firstLevel: 'first level row 1',
             id: 1
           },
           {
-            groupName: 'first level row 2',
+            firstLevel: 'first level row 2',
             id: 2,
             children: [
               {id: 21}
             ]
           }
         ],
-        groupingMetadata: ["", ""]
+        groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
       })
     });
   }
@@ -558,18 +558,18 @@ moduleForEmberTable('table with custom grouped row indicator view', function () 
       content: Ember.ArrayProxy.create({
         content: [
           {
-            groupName: 'first level row 1',
+            firstLevel: 'first level row 1',
             id: 1
           },
           {
-            groupName: 'first level row 2',
+            firstLevel: 'first level row 2',
             id: 2,
             children: [
               {id: 21}
             ]
           }
         ],
-        groupingMetadata: ["", ""]
+        groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
       })
     });
   }

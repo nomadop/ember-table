@@ -4,6 +4,7 @@ import LazyGroupRowArray from './lazy-group-row-array';
 export default Ember.ObjectProxy.extend({
 
   loadChildren: Ember.K,
+  onLoadError: Ember.K,
 
   groupingMetadata: null,
 
@@ -31,6 +32,7 @@ export default Ember.ObjectProxy.extend({
   children: Ember.computed(function () {
     var lazyArray = LazyGroupRowArray.create({
       loadChildren: this.loadChildren,
+      onLoadError: this.onLoadError,
       groupingLevel: this.get('groupingLevel') + 1,
       groupingMetadata: this.get('groupingMetadata'),
       parentQuery: this.get('selfQuery'),

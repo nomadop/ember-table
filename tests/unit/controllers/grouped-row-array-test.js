@@ -10,11 +10,14 @@ module('grouped-row-array', {});
 
 test('object at for grouping row', function(assert) {
   var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 1
-    }, {
-      id: 2
-    }],
+    content: Ember.ArrayProxy.create({
+      content: [{
+        id: 1
+      }, {
+        id: 2
+      }],
+      groupingMetadata: [{id: "firstLevel"}]
+    }),
     itemController: Row
   });
 
@@ -24,20 +27,26 @@ test('object at for grouping row', function(assert) {
   assert.ok(subject.get('length') === 2, 'should has length === 2');
 });
 
-test('init state', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }],
+function twoLevelController() {
+  return GroupedRowArrayController.create({
+    content: Ember.ArrayProxy.create({
+      content: [{
+        id: 10,
+        children: [
+          {id: 11},
+          {id: 12},
+          {id: 13}
+        ]
+      }, {
+        id: 20
+      }],
+      groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+    }),
     itemController: Row
   });
+}
+test('init state', function(assert) {
+  var subject = twoLevelController();
 
   var rowController = subject.objectAt(1);
 
@@ -45,19 +54,7 @@ test('init state', function(assert) {
 });
 
 test('access first object', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelController();
 
   var rowController = subject.objectAt(1);
 
@@ -65,19 +62,7 @@ test('access first object', function(assert) {
 });
 
 test('expand grouped row', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelController();
 
   subject.expandChildren(subject.objectAt(0));
 
@@ -87,25 +72,31 @@ test('expand grouped row', function(assert) {
   assert.ok(subject.objectAt(1).get('parentController'), 'should has parent controller');
 });
 
-test('expand two grouped rows', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20,
-      children: [
-        {id: 21},
-        {id: 22}
-      ]
-    }],
+function twoLevelTwoGroupsController() {
+  return GroupedRowArrayController.create({
+    content: Ember.ArrayProxy.create({
+      content: [{
+        id: 10,
+        children: [
+          {id: 11},
+          {id: 12},
+          {id: 13}
+        ]
+      }, {
+        id: 20,
+        children: [
+          {id: 21},
+          {id: 22}
+        ]
+      }],
+      groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+    }),
     itemController: Row
   });
+}
 
+test('expand two grouped rows', function(assert) {
+  var subject = twoLevelTwoGroupsController();
   subject.expandChildren(subject.objectAt(0));
   subject.expandChildren(subject.objectAt(4));
 
@@ -119,19 +110,7 @@ test('expand two grouped rows', function(assert) {
 });
 
 test('collapse children rows', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelController();
 
   subject.expandChildren(subject.objectAt(0));
   subject.collapseChildren(subject.objectAt(0));
@@ -142,23 +121,7 @@ test('collapse children rows', function(assert) {
 });
 
 test('collapse first children rows', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20,
-      children: [
-        {id: 21},
-        {id: 22}
-      ]
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelTwoGroupsController();
 
   subject.expandChildren(subject.objectAt(0));
   subject.expandChildren(subject.objectAt(4));
@@ -169,23 +132,7 @@ test('collapse first children rows', function(assert) {
 });
 
 test('collapse second children rows', function(assert) {
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20,
-      children: [
-        {id: 21},
-        {id: 22}
-      ]
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelTwoGroupsController();
 
   subject.expandChildren(subject.objectAt(0));
   subject.expandChildren(subject.objectAt(4));
@@ -197,19 +144,7 @@ test('collapse second children rows', function(assert) {
 
 test('it shoudld trigger observe when grouped row array length changed', function(assert) {
   assert.expect(2);
-  var subject = GroupedRowArrayController.create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }],
-    itemController: Row
-  });
+  var subject = twoLevelController();
 
   subject.addObserver('length', function () {
     assert.equal(subject.get('length'), 5);
@@ -242,16 +177,19 @@ test('observe computed computed property', function (assert) {
     }).property('content.[]')
 
   }).create({
-    content: [{
-      id: 10,
-      children: [
-        {id: 11},
-        {id: 12},
-        {id: 13}
-      ]
-    }, {
-      id: 20
-    }]
+    content: Ember.ArrayProxy.create({
+      content: [{
+        id: 10,
+        children: [
+          {id: 11},
+          {id: 12},
+          {id: 13}
+        ]
+      }, {
+        id: 20
+      }],
+      groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+    })
   });
   emberTable.get('bodyContent').get('length');
   var groupRowArrayController = emberTable.get('bodyContent');
@@ -259,14 +197,17 @@ test('observe computed computed property', function (assert) {
 });
 
 test('different instance', function (assert) {
-  var content = [{
-    id: 10,
-    children: [
-      {id: 11},
-      {id: 12},
-      {id: 13}
-    ]
-  }];
+  var content = Ember.ArrayProxy.create({
+    content: [{
+      id: 10,
+      children: [
+        {id: 11},
+        {id: 12},
+        {id: 13}
+      ]
+    }],
+    groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+  });
   var subject1 = GroupedRowArrayController.create({
     content: content,
     itemController: Row
@@ -282,7 +223,7 @@ test('different instance', function (assert) {
 });
 
 
-test('different instance', function (assert) {
+test('different instance more levels', function (assert) {
   var content = [{
     id: 10,
     children: [
@@ -317,7 +258,13 @@ test('different instance', function (assert) {
     ]
   }];
   var subject = GroupedRowArrayController.create({
-    content: content,
+    content: Ember.ArrayProxy.create({
+      content: content,
+      groupingMetadata: [
+        {id: "firstLevel"}, {id: "secondLevel"}, {id: "thirdLevel"},
+        {id: "fourthLevel"}, {id: "fifthLevel"}
+      ]
+    }),
     itemController: Row
   });
 

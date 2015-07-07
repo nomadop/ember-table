@@ -23,13 +23,13 @@ moduleForEmberTable('Given a table with chunked group row data',
             for (var i = 0; i < chunkSize; i++) {
               var childrenStart = 10 * (chunkIndex + 1);
               result.content.push({
-                id: i, name: 'name-' + i
+                id: i, firstLevel: 'firstLevel-' + i, secondLevel: 'secondLevel-' + i
               });
             }
             defer.resolve(result);
             return defer.promise;
           },
-          groupingMetadata: ["", ""]
+          groupingMetadata: [{"id": "firstLevel"}, {"id": "secondLevel"}]
         })
     });
   });
@@ -82,8 +82,7 @@ moduleForEmberTable('Given a table with 3 chunked group row data', function subj
   return EmberTableFixture.create({
     height: 90,
     width: 700,
-    content: content,
-    groupingMetadata: ["", ""]
+    content: content
   });
 });
 
@@ -100,14 +99,14 @@ test('load top level chunk data in need', function (assert) {
         for (var i = 0; i < chunkSize; i++) {
           var childrenStart = 10 * (pageIndex + 1);
           result.push({
-            id: i, name: 'name-' + i
+            id: i, firstLevel: 'firstLevel-' + i, secondLevel: 'secondLevel-' + i
           });
         }
         defer.resolve({content: result, meta: {totalCount: 15, chunkSize: 5}});
         return defer.promise;
       },
 
-      groupingMetadata: [{id: ''}, {id: ''}]
+      groupingMetadata: [{"id": "firstLevel"}, {"id": "secondLevel"}]
     }));
 
   this.render();
@@ -122,18 +121,13 @@ test('show grouping name in grouping column', function (assert) {
   var chunkSize = 5;
   var component = this.subject(LazyGroupRowArray.create(
     {
-      loadChildren: function getChunk(pageIndex, parentQuery) {
+      loadChildren: function getChunk(chunkIndex, parentQuery) {
         var defer = defers.next();
         var result = [];
         for (var i = 0; i < chunkSize; i++) {
-          var childrenStart = 10 * (pageIndex + 1);
-          result.push({
-            id: i,
-            firstLevel: 'firstLevel-' + i,
-            secondLevel: 'secondLevel-' + i
-          });
+          result.push({ id: i, firstLevel: 'firstLevel-' + i, secondLevel: 'secondLevel-' + i});
         }
-        defer.resolve({content: result, meta: {totalCount: 15, chunkSize: 5}});
+        defer.resolve({content: result, meta: {totalCount: 15, chunkSize: chunkSize}});
         return defer.promise;
       },
       groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
