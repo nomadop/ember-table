@@ -50,7 +50,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       numFixedColumns++;
     }
     return numFixedColumns;
-  }).property('numFixedColumns', 'hasGroupingColumn'),
+  }).property('numFixedColumns', '_hasGroupingColumn'),
 
   groupingMetadata: Ember.computed(function() {
     return this.get('content.groupingMetadata') || [];
@@ -289,14 +289,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.flattenColumnOrColumnGroups(this.get('fixedColumnGroups'));
   }).property('fixedColumnGroups'),
 
-  fixedColumnGroups: Ember.computed(function() {
-    var columns = this.get('_columns');
-    if (!columns) {
-      return Ember.A();
-    }
-    var numFixedColumns = this.get('_numFixedColumns') || 0;
-    return columns.slice(0, numFixedColumns) || [];
-  }).property('_columns.[]', '_numFixedColumns'),
+  fixedColumnGroups: Ember.computed.alias('fixedColumns'),
 
   tableColumns: Ember.computed(function() {
     var columns = this.get('_columns');

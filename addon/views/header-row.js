@@ -17,12 +17,14 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
     }, 0);
   }).property('columns.@each.width'),
   scrollLeft: Ember.computed.alias('tableComponent._tableScrollLeft'),
-
+  isFixedBlock: Ember.computed.alias('parentView.isFixedBlock'),
   rowWidth: Ember.computed(function() {
     var hasColumnGroup = this.get('tableComponent.hasGroupColumn');
     return this.get(hasColumnGroup ? 'width' : 'controller._tableColumnsWidth');
   }),
-
+  isNotFixedBlock: Ember.computed.not('isFixedBlock'),
+  isNotTopRow: Ember.computed.not('isTopRow'),
+  enableColumnReorder: Ember.computed.and('tableComponent.enableColumnReorder', 'isNotTopRow', 'isNotFixedBlock'),
   // Options for jQuery UI sortable
   sortableOption: Ember.computed(function() {
     return {
@@ -57,13 +59,13 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
 
   didInsertElement: function() {
     this._super();
-    if (this.get('tableComponent.enableColumnReorder') && !this.get('isTopRow')) {
+    if (this.get('enableColumnReorder')) {
       this.$('> div').sortable(this.get('sortableOption'));
     }
   },
 
   willDestroyElement: function() {
-    if (this.get('tableComponent.enableColumnReorder') && !this.get('isTopRow')) {
+    if (this.get('enableColumnReorder')) {
       // TODO(azirbel): Get rid of this check, as in onColumnSortDone?
       var $divs = this.$('> div');
       if ($divs) {
