@@ -20,7 +20,7 @@ var firstRowObject = {
 };
 
 moduleForEmberTable('loading indicator', function(content) {
-  return EmberTableFixture.create({
+  return EmberTableFixture.create({  
     content: Ember.ArrayProxy.create({
       content: content,
       groupingMetadata: ["", ""]
@@ -36,6 +36,7 @@ test('render loading indicator', function(assert) {
   var loadingRow = helper.bodyRows().eq(0);
 
   assert.equal(loadingRow.find('.loading-indicator').length, 0, 'should not render default loading indicator in normal columns');
+  assert.equal(helper.rowGroupingIndicator(0).length, 0, 'should not show grouped row indicator');
 });
 
 test('expand grouped rows', function(assert) {
