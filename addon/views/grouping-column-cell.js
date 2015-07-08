@@ -42,8 +42,11 @@ export default TableCell.extend(
     }
   },
 
+  groupIndicatorWidth: Ember.computed.alias('tableComponent.groupIndicatorWidth'),
   "padding-left": Ember.computed(function() {
-    return this.get('expandLevel') * 10 + 15;
+    var groupIndicatorWidth = this.get('groupIndicatorWidth');
+    var numOfGroupIndicators = this.get('expandLevel') + 1; //expandLevel is zero based
+    return numOfGroupIndicators * groupIndicatorWidth + 5;
   }).property('expandLevel'),
 
   isExpanded: Ember.computed.alias('row.isExpanded')

@@ -117,7 +117,13 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // By default the indicator view should be supported by ember-table.
   // if you want to custom grouped row view should set a custom view which inherit
   // from 'grouped-row-indicator'.
+  // This view is expected to be positioned as absolute.
   groupedRowIndicatorView: null,
+
+  //Width of group indicator, grouping column will auto expand with each level expanded and
+  //cell content will positioned to the right of group indicator.
+  //If width of custom group row indicator view is not 10 pixel, this property must be set with the real value.
+  groupIndicatorWidth: 10,
 
   // By default the indicator view should be supported by ember-table.
   // if you want to custom grouped row view should set a custom view which inherit

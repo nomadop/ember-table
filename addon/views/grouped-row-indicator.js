@@ -20,9 +20,11 @@ export default Ember.View.extend(StyleBindingsMixin, {
 
   expandLevel: 0,
 
+  groupIndicatorWidth: Ember.computed.alias('parentView.groupIndicatorWidth'),
+
   left: Ember.computed(function() {
-    return this.get('expandLevel') * 10 + 5;
-  }).property('expandLevel'),
+    return this.get('parentView.padding-left') - this.get('groupIndicatorWidth');
+  }).property('parentView.padding-left', 'groupIndicatorWidth'),
 
   indicatorClass: Ember.computed(function() {
     var classNames = ['grouping-column-indicator'];
