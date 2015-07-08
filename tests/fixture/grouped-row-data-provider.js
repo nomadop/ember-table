@@ -28,25 +28,28 @@ var DataProvider = function() {
     'chunkIndex=1': function () {
       return makeJsonArray([6, 7, 8, 9, 10]);
     },
-    'accountType=1&chunkIndex=0': function () {
+    'accountSection=1&chunkIndex=0': function () {
       return makeJsonArray([2, 1, 5, 4, 3], 100);
     },
-    'accountType=1&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
+    'accountSection=1&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
       return makeJsonArray([1, 2, 3, 4, 5], 100);
     },
-    'accountType=1&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
+    'accountSection=1&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
       return makeJsonArray([10, 9, 8, 7, 6], 100);
     },
-    'accountCode=102&accountType=1&chunkIndex=0': function () {
+    'accountSection=1&accountType=102&chunkIndex=0': function () {
       return makeJsonArray([3, 5, 1, 2, 4], 1000);
     },
-    'accountCode=102&accountType=1&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
+    'accountSection=1&accountType=102&chunkIndex=1': function () {
+      return makeJsonArray([7, 9, 10, 6, 8], 1000);
+    },
+    'accountSection=1&accountType=102&chunkIndex=0&sortDirect=asc&sortName=Column1': function () {
       return makeJsonArray([1, 2, 3, 4, 5], 1000);
     },
-    'accountCode=102&accountType=1&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
+    'accountSection=1&accountType=102&chunkIndex=0&sortDirect=desc&sortName=Column1': function () {
       return makeJsonArray([10, 9, 8, 7, 6], 1000);
     },
-    'accountType=1&chunkIndex=1': function () {
+    'accountSection=1&chunkIndex=1': function () {
       return makeJsonArray([8, 7, 9, 10, 6], 100);
     }
   };

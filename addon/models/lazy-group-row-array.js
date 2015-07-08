@@ -105,6 +105,7 @@ export default Ember.ArrayProxy.extend({
     this.loadOneChunk(chunkIndex).then(function (result) {
       self.onOneChunkLoaded(result);
       self.set('_hasInProgressLoading', false);
+      self.notifyPropertyChange('length');
     }).catch(function() {
       self.set('_hasInProgressLoading', false);
       self.onLoadError("Failed to load data.", group, chunkIndex);

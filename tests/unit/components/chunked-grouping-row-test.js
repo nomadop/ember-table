@@ -194,34 +194,3 @@ test('load chunked data', function (assert) {
     assert.equal(secondLevelRowCell, 'chunked-1', "should load chunked row when get only one chunked data");
   });
 });
-
-moduleForEmberTable("Given a ember table with 800px height", function (content) {
-  return EmberTableFixture.create({
-    height: 800,
-    content: content
-  });
-});
-
-test('load two chunks', function (assert) {
-  var defers = DeferPromises.create({count: 5});
-  var provider = GroupedRowDataProvider.create({defers: defers, groupingMetadata: [{id: 'accountType'}, {id: ''}]});
-  var component = this.subject(provider.get('content'));
-  this.render();
-  var helper = EmberTableHelper.create({_assert: assert, _component: component});
-  defers.ready(function () {
-    helper.rowGroupingIndicator(0).click();
-  }, [0, 1]);
-
-  return defers.ready(function () {
-    assert.equal(helper.bodyRows().length, 22, 'should display all rows');
-  });
-});
-
-
-
-
-
-
-
-
-
