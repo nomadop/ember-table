@@ -6,6 +6,7 @@ export default TableBlock.extend({
   // TODO(new-api): Eliminate view alias
   itemView: 'header-row',
   itemViewClass: Ember.computed.alias('itemView'),
+  isFixedBlock: false,
 
   content: Ember.computed(function() {
     return [this.get('columns')];

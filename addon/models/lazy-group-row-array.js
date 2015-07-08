@@ -88,18 +88,26 @@ export default Ember.ArrayProxy.extend({
     return this.get('groupingLevel') < this.get('groupingMetadata.length');
   }).property('groupingMetadata.[]', 'groupingLevel'),
 
+  _group: Ember.computed(function() {
+    if (this.get('isGroupingRow')) {
+      var groupingMetadata = this.get('groupingMetadata');
+      var groupingLevel = this.get('groupingLevel');
+      return groupingMetadata[groupingLevel];
+    }
+    return null;
+  }).property('groupingMetadata.[]', 'groupingLevel'),
+
   triggerLoading: function (index) {
     this.set('_hasInProgressLoading', true);
     var chunkIndex = this.chunkIndex(index);
+    var group = this.get('_group');
     var self = this;
     this.loadOneChunk(chunkIndex).then(function (result) {
       self.onOneChunkLoaded(result);
       self.set('_hasInProgressLoading', false);
-    }).catch(function(response) {
-      self.updatePlaceHolderWithError(response);
-      self.onLoadError("Failed to load data.", response);
+    }).catch(function() {
       self.set('_hasInProgressLoading', false);
-
+      self.onLoadError("Failed to load data.", group, chunkIndex);
     });
   },
 

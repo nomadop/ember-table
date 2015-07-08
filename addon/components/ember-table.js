@@ -50,7 +50,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       numFixedColumns++;
     }
     return numFixedColumns;
-  }).property('numFixedColumns', 'hasGroupingColumn'),
+  }).property('numFixedColumns', '_hasGroupingColumn'),
 
   groupingMetadata: Ember.computed(function() {
     return this.get('content.groupingMetadata') || [];
@@ -238,12 +238,18 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
+    var table = this;
+    var content = this.get('content');
+    content.set('onLoadError', function(errorMessage, groupingName, chunkIndex) {
+      table.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
+    });
+
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
       container: this.get('container'),
       itemController: Row,
-      content: this.get('content')
+      content: content
     });
   }).property('content'),
 
@@ -283,14 +289,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.flattenColumnOrColumnGroups(this.get('fixedColumnGroups'));
   }).property('fixedColumnGroups'),
 
-  fixedColumnGroups: Ember.computed(function() {
-    var columns = this.get('_columns');
-    if (!columns) {
-      return Ember.A();
-    }
-    var numFixedColumns = this.get('_numFixedColumns') || 0;
-    return columns.slice(0, numFixedColumns) || [];
-  }).property('_columns.[]', '_numFixedColumns'),
+  fixedColumnGroups: Ember.computed.alias('fixedColumns'),
 
   tableColumns: Ember.computed(function() {
     var columns = this.get('_columns');
