@@ -5,6 +5,7 @@ import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
 import DeferPromises from '../../fixture/defer-promises';
+import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 
 moduleForEmberTable('Given a table with chunked group row data',
   function (defers) {
