@@ -142,6 +142,12 @@
   .box-sizing();
 }
 
+.ember-table-left-table-block {
+  .ember-table-table-row {
+    overflow: hidden;
+  }
+}
+
 .ember-table-table-fixed-wrapper {
   // Height and Width defined dynamically through JS
   overflow: hidden;
@@ -623,7 +629,7 @@
 /* Levels */
 
 .ember-table-table-row {
-  overflow: hidden;
+  min-width: 100%;
   border-bottom: 1px dotted @table-row-border-color;
 
   &.ember-table-row-style-1 {
