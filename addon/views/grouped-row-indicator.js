@@ -15,8 +15,8 @@ export default Ember.View.extend(StyleBindingsMixin, {
   row: Ember.computed.alias('parentView.row'),
 
   isShown: Ember.computed(function(){
-    return this.get('hasChildren');
-  }).property('hasChildren'),
+    return this.get('hasChildren') && !this.get('row.isLoading');
+  }).property('hasChildren', 'row.isLoading'),
 
   expandLevel: 0,
 
