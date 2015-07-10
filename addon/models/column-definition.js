@@ -12,7 +12,7 @@ export default Ember.Object.extend({
   cellStyle: undefined,
 
   sortBy: function(prev, next){
-    return prev.id - next.id;
+    return Ember.get(prev, 'id') - Ember.get(next, 'id');
   },
 
   sortIndicatorStyles: Ember.computed(function() {

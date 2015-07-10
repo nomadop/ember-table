@@ -4,6 +4,8 @@ export default Ember.ArrayProxy.extend({
   //Total count of rows
   totalCount: undefined,
 
+  _sortConditions: null,
+
   // Function to get next chunk of rows.
   // The callback should return a promise which will return an array of rows.
   // The callback function should maintain the sequence of chunks,
@@ -15,6 +17,19 @@ export default Ember.ArrayProxy.extend({
   initContent: undefined,
 
   content: Ember.computed.alias('_lazyContent'),
+
+  sortFn: Ember.K,
+
+  // This is a content or _lazyContent cache for sortable order
+  _contentCache: Ember.computed(function() {
+    var sortDirect = this.get('_sortConditions.sortDirect');
+    var sortFn = this.get('sortFn');
+    var lazyContent = this.get('_lazyContent');
+    if(sortDirect){
+      return lazyContent.slice().sort(sortFn);
+    }
+    return lazyContent;
+  }).property('sortFn'),
 
   isEmberTableContent: true,
 
@@ -36,13 +51,13 @@ export default Ember.ArrayProxy.extend({
   },
 
   objectAt: function (index) {
-    var lazyContent = this.get('_lazyContent');
+    var cacheContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
-    if (!lazyContent[index] || lazyContent[index].get('isError')) {
+    if (!cacheContent[index] || cacheContent[index].get('isError')) {
       this.loadOneChunk(Math.floor(index / chunkSize));
     }
     this.tryPreload(index, chunkSize);
-    return lazyContent[index];
+    return cacheContent[index];
   },
 
   length: Ember.computed.alias('_totalCount'),
@@ -97,8 +112,9 @@ export default Ember.ArrayProxy.extend({
   sort: function (callback){
     var content;
     if(this.get('isCompleted')){
-      content = this.get('_lazyContent').sort(callback);
-      this.set('_lazyContent', content);
+      //content = this.get('_lazyContent').sort(callback);
+      //this.set('_lazyContent', content);
+      this.set('sortFn', callback);
     } else {
       // Do not set `_lazyContent` to a new Array object, otherwise,
       // the content did change event in RowArrayController will be triggered,
