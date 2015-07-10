@@ -237,20 +237,6 @@ test('Should return 51th When access 51th', function (assert) {
   });
 });
 
-test('it should return reorder lazy content when sort by id', function (assert) {
-
-  accessObject(50);
-
-  return asyncAssert(function(){
-
-    lazyArray.sort(function(prev, next){
-      return -prev.get('id') + next.get('id');
-    });
-
-    assert.equal(accessObject(1).get('id'), 50);
-  });
-});
-
 module('Lazy Array TotalCount in String', {
   beforeEach: function () {
     loadedCount = 0;

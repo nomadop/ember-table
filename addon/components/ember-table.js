@@ -211,7 +211,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         this.set('_sortedColumn', column);
         this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
         var content = this.get('content');
-        this.sendAction('setSortConditionBy', column);
         content.set('_sortConditions',{sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
         content.sort(sortFn);
         this.toggleProperty('_reloadBody');

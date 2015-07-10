@@ -4,7 +4,7 @@ export default Ember.ArrayProxy.extend({
   //Total count of rows
   totalCount: undefined,
 
-  _sortConditions: null,
+  _sortConditions: {},
 
   // Function to get next chunk of rows.
   // The callback should return a promise which will return an array of rows.
@@ -20,6 +20,12 @@ export default Ember.ArrayProxy.extend({
 
   sortFn: Ember.K,
 
+  _query: Ember.computed(function(){
+    var sortConditons = this.get('_sortConditions');
+    return Ember.get(sortConditons, 'sortDirect') ? sortConditons : {};
+  }).property('_sortConditions'),
+
+
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
     var sortDirect = this.get('_sortConditions.sortDirect');
@@ -29,7 +35,7 @@ export default Ember.ArrayProxy.extend({
       return lazyContent.slice().sort(sortFn);
     }
     return lazyContent;
-  }).property('sortFn'),
+  }).property('sortFn', '_sortConditions'),
 
   isEmberTableContent: true,
 
@@ -63,7 +69,7 @@ export default Ember.ArrayProxy.extend({
   length: Ember.computed.alias('_totalCount'),
 
   loadOneChunk: function (chunkIndex) {
-    var lazyContent = this.get('_lazyContent');
+    var lazyContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
@@ -75,7 +81,7 @@ export default Ember.ArrayProxy.extend({
       }
     }
 
-    this.callback(chunkIndex).then(function (chunk) {
+    this.callback(chunkIndex, this.get('_query')).then(function (chunk) {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);
@@ -110,10 +116,7 @@ export default Ember.ArrayProxy.extend({
   }).property('_lazyContent.[]', '_lazyContent.@each', 'totalCount'),
 
   sort: function (callback){
-    var content;
     if(this.get('isCompleted')){
-      //content = this.get('_lazyContent').sort(callback);
-      //this.set('_lazyContent', content);
       this.set('sortFn', callback);
     } else {
       // Do not set `_lazyContent` to a new Array object, otherwise,
@@ -124,6 +127,8 @@ export default Ember.ArrayProxy.extend({
   },
 
   _lazyContent: null,
-  _preloadGate: 10
 
+  // TODO:(Stephen): This property indicate the value of preload count, and it will be override by user if need.
+  // Should change to percentage of 'Chunksize' ?
+  _preloadGate: 10
 });

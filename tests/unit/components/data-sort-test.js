@@ -44,23 +44,54 @@ test('sort by id column', function (assert) {
   helper.assertCellContent(0, 0, '2', 'should display unsort state');
 });
 
-moduleForEmberTable('A completed lazy-array as ember-table content', function (options) {
+moduleForEmberTable('lazy-array as ember-table content', function (options) {
+  var toQuery = function(obj) {
+    var keys = Object.keys(obj).sort();
+    return keys.map(function (key) {
+      return key + '=' + obj[key];
+    }).join('&');
+  };
   var content = LazyArray.create({
     totalCount: 20,
     chunkSize: 5,
-    callback: function(pageIndex) {
+    _preloadGate: 1,
+    callback: function(pageIndex, query) {
       var defer = options.defers.next();
-      defer.resolve(this.initChunk(pageIndex));
+      defer.resolve(this.initChunk(pageIndex, query));
       return defer.promise;
     },
-    initChunk: function (pageIndex) {
-      var index, chunk = [];
-      var chunkSize = this.get('chunkSize');
-      for (var i = 1; i <= chunkSize; i++) {
-        index = (i+2) % chunkSize + pageIndex * chunkSize;
-        chunk.push({id: index});
-      }
-      return chunk;
+    initChunk: function (pageIndex, query) {
+      var self = this;
+      var resultMap = {
+        '': function () {
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 1; i <= chunkSize; i++) {
+            index = (i + 2) % chunkSize + pageIndex * chunkSize;
+            chunk.push({id: index});
+          }
+          return chunk;
+        },
+        'sortDirect=asc&sortName=ID': function() {
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 0; i < chunkSize; i++) {
+            index = i + pageIndex * chunkSize;
+            chunk.push({id: index});
+          }
+          return chunk;
+        },
+        'sortDirect=desc&sortName=ID': function(){
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 1; i <= chunkSize; i++) {
+            index = self.get('_totalCount') - (i + pageIndex * chunkSize);
+            chunk.push({id: index});
+          }
+          return chunk;
+        }
+      };
+      return resultMap[toQuery(query)]();
     }
   });
   var columns = Columns.create();
@@ -71,7 +102,7 @@ moduleForEmberTable('A completed lazy-array as ember-table content', function (o
   });
 });
 
-test('sort by id column', function (assert) {
+test('sort column of id by completed data', function (assert) {
   var defers = DefersPromise.create({count: 4});
   var component = this.subject({defers:defers, height: 800});
   this.render();
@@ -89,6 +120,36 @@ test('sort by id column', function (assert) {
     helper.assertCellContent(0, 0, '19', 'should sort as descending');
 
     helper.getHeaderCellContent(0).click();
+    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
+    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+    helper.assertCellContent(0, 0, '3', 'should display unsort state');
+  });
+});
+
+test('sort column of id by partial data', function (assert) {
+  var defers = DefersPromise.create({count: 8});
+  var component = this.subject({defers:defers, height: 200});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.assertCellContent(0, 0, '3', 'should sort as ascending');
+    helper.getHeaderCellContent(0).click();
+  }, [0, 1]);
+  defers.ready(function () {
+    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertCellContent(0, 0, '0', 'should sort as ascending');
+
+    helper.getHeaderCellContent(0).click();
+  }, [2, 3]);
+
+  defers.ready(function () {
+    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should show descending indicator');
+    helper.assertCellContent(0, 0, '19', 'should sort as descending');
+
+    helper.getHeaderCellContent(0).click();
+  }, [4, 5]);
+
+  return defers.ready(function(){
     assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
     assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsort state');
