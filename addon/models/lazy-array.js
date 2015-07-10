@@ -16,6 +16,8 @@ export default Ember.ArrayProxy.extend({
 
   content: Ember.computed.alias('_lazyContent'),
 
+  isEmberTableContent: true,
+
   init: function () {
     var totalCount = this.get('_totalCount');
     var lazyContent = new Array(totalCount);

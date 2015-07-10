@@ -6,7 +6,7 @@ export default Ember.ArrayProxy.extend({
   loadGrandTotal: Ember.K,
   groupingMetadata: null,
   parentQuery: {},
-
+  isEmberTableContent: true,
   init: function () {
     this.set('content', Ember.A());
     this._super();

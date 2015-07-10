@@ -11,13 +11,16 @@ export default Ember.Object.extend({
     return groupHeader;
   },
 
-  getHeaderCell: function getHeaderCell (colIndex)  {
+  getHeaderCellContent: function getHeaderCellContent (colIndex)  {
+    return this.getHeaderCell(colIndex).find(".ember-table-content-container");
+  },
+
+  getHeaderCell: function getHeaderCell(colIndex){
     var component = this.get('_component');
     return component.$(
       ".ember-table-right-table-block " +
       ".ember-table-header-row " +
-      ".ember-table-header-cell:eq(%@) ".fmt(colIndex) +
-      ".ember-table-content-container"
+      ".ember-table-header-cell:eq(%@) ".fmt(colIndex)
     );
   },
 

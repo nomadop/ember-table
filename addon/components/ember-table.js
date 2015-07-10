@@ -5,6 +5,7 @@ import RowArrayController from 'ember-table/controllers/row-array';
 import GroupedRowArrayController from 'ember-table/controllers/grouped-row-array';
 import Row from 'ember-table/controllers/row';
 import ColumnDefinition from 'ember-table/models/column-definition';
+import TableContent from 'ember-table/models/table-content';
 
 export default Ember.Component.extend(
 StyleBindingsMixin, ResizeHandlerMixin, {
@@ -173,6 +174,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   columnsFillTable: true,
 
   init: function() {
+    this.wrapContent();
     this._super();
     if (this.get('hasColumnGroup')) {
       this.set('columnGroups', this.get('_columns'));
@@ -189,6 +191,13 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.prepareTableColumns();
   },
 
+  wrapContent: function() {
+    var content = this.get('content');
+    if(!content.get('isEmberTableContent')){
+      this.set('content', TableContent.create({content: content}));
+    }
+  },
+
   _reloadBody: false,
 
   _sortConditions: null,
@@ -200,10 +209,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       var sortFn = column.sortFn();
       if(sortFn){
         this.set('_sortedColumn', column);
-        this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('currentDirect')});
+        this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
         var content = this.get('content');
         this.sendAction('setSortConditionBy', column);
-        content.set('_sortConditions',{sortName: column.get('headerCellName'), sortDirect: column.get('currentDirect')});
+        content.set('_sortConditions',{sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
         content.sort(sortFn);
         this.toggleProperty('_reloadBody');
         Ember.run.next(this, this.updateLayout);

@@ -8,7 +8,7 @@ export default Ember.ArrayProxy.extend({
   groupingMetadata: null,
   parentQuery: {},
   parent: null,
-
+  isEmberTableContent: true,
   init: function () {
     this.set('content', Ember.A());
     this._super();

@@ -77,10 +77,7 @@ export default Ember.Object.extend({
           content: DataProvider.sortData(chunkIndex, parentQuery),
           meta: {totalCount: 10, chunkSize: 5}
         };
-        setTimeout(function () {
-          defer.resolve(result);
-        }, 138);
-
+        defer.resolve(result);
         self.incrementProperty('loadChunkCount');
         return defer.promise;
       },
