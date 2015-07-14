@@ -211,7 +211,11 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         this.set('_sortedColumn', column);
         this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
         var content = this.get('content');
-        content.set('_sortConditions',{sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
+        content.set('_sortConditions',{
+          sortName: column.get('headerCellName'),
+          sortDirect: column.get('sortDirect'),
+          sortFn: sortFn
+        });
         content.sort(sortFn);
         this.toggleProperty('_reloadBody');
         Ember.run.next(this, this.updateLayout);

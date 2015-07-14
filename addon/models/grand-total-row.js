@@ -7,6 +7,7 @@ export default Ember.ArrayProxy.extend({
   groupingMetadata: null,
   parentQuery: {},
   isEmberTableContent: true,
+
   init: function () {
     this.set('content', Ember.A());
     this._super();
@@ -33,6 +34,15 @@ export default Ember.ArrayProxy.extend({
     });
   },
 
+  sort: function(callBack){
+    var groupedRow = this.get('lastObject.content');
+    if(groupedRow.cacheFor('children')){
+      var children = groupedRow.get('children');
+      children.set('_sortConditions', this.get('_sortConditions'));
+      children.sort(callBack);
+    }
+  },
+
   wrapLoadedContent: function (row) {
     var groupingMetadata = this.get('groupingMetadata');
     return GroupingRowProxy.create({
@@ -40,7 +50,8 @@ export default Ember.ArrayProxy.extend({
       groupingLevel: -1,
       content: row,
       loadChildren: this.loadChildren,
-      parentQuery: this.get('parentQuery')
+      parentQuery: this.get('parentQuery'),
+      parent: this
     });
   },
 

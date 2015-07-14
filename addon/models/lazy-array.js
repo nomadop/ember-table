@@ -22,7 +22,10 @@ export default Ember.ArrayProxy.extend({
 
   _query: Ember.computed(function(){
     var sortConditons = this.get('_sortConditions');
-    return Ember.get(sortConditons, 'sortDirect') ? sortConditons : {};
+    if(Ember.get(sortConditons, 'sortDirect')){
+      return Ember.getProperties(sortConditons, 'sortDirect', 'sortName');
+    }
+    return {};
   }).property('_sortConditions'),
 
 
