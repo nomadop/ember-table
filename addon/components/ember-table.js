@@ -106,7 +106,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // through ctrl/cmd-click or shift-click).
   selectionMode: 'single',
 
-  setSortConditionBy: null,
+  sortAction: null,
 
   groupingColumnWidth: 150,
 
@@ -206,20 +206,20 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   actions: {
     addColumn: Ember.K,
     sortByColumn: function(column){
+      column.toggleSortState();
       var sortFn = column.sortFn();
-      if(sortFn){
-        this.set('_sortedColumn', column);
-        this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
-        var content = this.get('content');
-        content.set('_sortConditions',{
-          sortName: column.get('headerCellName'),
-          sortDirect: column.get('sortDirect'),
-          sortFn: sortFn
-        });
-        content.sort(sortFn);
-        this.toggleProperty('_reloadBody');
-        Ember.run.next(this, this.updateLayout);
-      }
+      var sortCondition = Ember.Object.create({
+        sortName: column.get('headerCellName'),
+        sortDirect: column.get('sortDirect'),
+        sortFn: sortFn
+      });
+      this.sendAction('sortAction', sortCondition);
+      this.set('_sortedColumn', column);
+      this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
+      var content = this.get('content');
+      content.set('_sortConditions',sortCondition);
+      this.toggleProperty('_reloadBody');
+      Ember.run.next(this, this.updateLayout);
     }
   },
 

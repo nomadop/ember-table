@@ -32,13 +32,15 @@ export default Ember.ArrayProxy.extend({
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
     var sortDirect = this.get('_sortConditions.sortDirect');
-    var sortFn = this.get('sortFn');
-    var lazyContent = this.get('_lazyContent');
-    if(sortDirect){
-      return lazyContent.slice().sort(sortFn);
+    var sortFn = this.get('_sortConditions.sortFn');
+    var content = this.get('content');
+    if(this.get('isCompleted') && sortDirect){
+      return content.slice().sort(sortFn);
+    } else if(sortDirect){
+      return Ember.A();
     }
-    return lazyContent;
-  }).property('sortFn', '_sortConditions'),
+    return content;
+  }).property('_sortConditions'),
 
   isEmberTableContent: true,
 
@@ -78,7 +80,7 @@ export default Ember.ArrayProxy.extend({
     var totalCount = this.get('_totalCount');
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
       if (!lazyContent[chunkStart + x]) {
-        lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
+        lazyContent.replace(chunkStart + x, 1, Ember.ObjectProxy.create({"isLoaded": false, "isError": false}));
       } else {
         lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
       }
@@ -113,21 +115,10 @@ export default Ember.ArrayProxy.extend({
   }).property('totalCount'),
 
   isCompleted: Ember.computed(function(){
-    var content = this.get('_lazyContent');
+    var content = this.get('content');
     var hasUnloaded = content.getEach('isLoaded').any(function(isLoaded){ return !isLoaded; });
     return  !hasUnloaded && content.length === this.get('totalCount');
-  }).property('_lazyContent.[]', '_lazyContent.@each', 'totalCount'),
-
-  sort: function (callback){
-    if(this.get('isCompleted')){
-      this.set('sortFn', callback);
-    } else {
-      // Do not set `_lazyContent` to a new Array object, otherwise,
-      // the content did change event in RowArrayController will be triggered,
-      // and the last index will be accessed.
-      this.get('_lazyContent').clear();
-    }
-  },
+  }).property('content.@each.isLoaded', 'totalCount'),
 
   _lazyContent: null,
 

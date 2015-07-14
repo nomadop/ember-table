@@ -64,36 +64,6 @@ export default Ember.ArrayProxy.extend({
     return content;
   }).property('_sortConditions'),
 
-  sort: Ember.K,
-
-  //sort: function (callback){
-  //  var isLeafParent = this.get('isLeafParent');
-  //  var isCompleted = this.get('isCompleted');
-  //  if (isLeafParent) {
-  //    console.log('isCompleted', isCompleted);
-  //    if(!isCompleted) {
-  //      console.log('content length', this.get('content').length);
-  //      this.get('content').clear();
-  //      this.addLoadingPlaceHolder('content');
-  //      console.log('content length', this.get('content').length);
-  //    }
-  //    this.set('sortFn', callback);
-  //    this.notifyPropertyChange('_content');
-  //  } else {
-  //    var loadedLength = this.get('length');
-  //    if(!isCompleted){
-  //      loadedLength--;
-  //    }
-  //    for(var i=0; i < loadedLength; i++){
-  //      var item = this.objectAt(i);
-  //      var itemContent = item.get('content');
-  //      if (itemContent && itemContent.cacheFor('children')) {
-  //        item.get('children').sort(callback);
-  //      }
-  //    }
-  //  }
-  //},
-
   // As a root data provider, `_sortConditions` should be set when sort.
   _sortConditions: Ember.computed.oneWay('parent._sortConditions'),
 

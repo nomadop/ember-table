@@ -34,15 +34,6 @@ export default Ember.ArrayProxy.extend({
     });
   },
 
-  sort: function(callBack){
-    var groupedRow = this.get('lastObject.content');
-    if(groupedRow.cacheFor('children')){
-      var children = groupedRow.get('children');
-      children.set('_sortConditions', this.get('_sortConditions'));
-      children.sort(callBack);
-    }
-  },
-
   wrapLoadedContent: function (row) {
     var groupingMetadata = this.get('groupingMetadata');
     return GroupingRowProxy.create({

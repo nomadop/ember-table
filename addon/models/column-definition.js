@@ -114,7 +114,6 @@ export default Ember.Object.extend({
   }).property('width', 'maxWidth'),
 
   sortFn: function(){
-    this.toggleSortState();
     var self = this;
     return function(prev, next){
       return self.get('_sortState') * self.sortBy(prev, next);

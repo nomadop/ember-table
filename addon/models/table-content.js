@@ -11,21 +11,15 @@ export default Ember.ArrayProxy.extend({
 
   _content: Ember.computed(function() {
     var sortDirect = this.get('_sortConditions.sortDirect');
-    var sortFn = this.get('sortFn');
+    var sortFn = this.get('_sortConditions.sortFn');
     var content = this.get('content');
     if(sortDirect){
       return content.slice().sort(sortFn);
     }
     return content.slice();
-  }).property('_sortConditions', 'sortFn'),
+  }).property('_sortConditions'),
 
   objectAt: function(index){
     return this.get('_content').objectAt(index);
-  },
-
-  sort: function(callBack) {
-    this.set('sortFn', callBack);
-  },
-
-  sortFn: Ember.K
+  }
 });

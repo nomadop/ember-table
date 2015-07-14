@@ -45,6 +45,11 @@ var DataProvider = function(options) {
       return makeJsonArray([10, 9, 8, 7, 6], 100);
     });
   sortDataMap.set(
+    'accountSection=1&chunkIndex=1&sortDirect=desc&sortName=%@'.fmt(this.columnName),
+    function () {
+      return makeJsonArray([5, 4, 3, 2, 1], 100);
+    });
+  sortDataMap.set(
     'accountSection=1&accountType=102&chunkIndex=0',
     function () {
       return makeJsonArray([3, 5, 1, 2, 4], 1000);

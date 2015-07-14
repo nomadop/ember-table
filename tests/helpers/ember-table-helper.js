@@ -152,5 +152,11 @@ export default Ember.Object.extend({
       '.ember-table-%@-table-block '.fmt(blockPosition) +
       ('.ember-table-table-row:eq(%@) '.fmt(rowIndex)) +
       ('.ember-table-cell:eq(%@) '.fmt(colIndex)));
+  },
+
+  scrollTop: function(y) {
+    var component = this.get('_component');
+    component.$('.antiscroll-box .antiscroll-inner').scrollTop(y);
   }
+
 });

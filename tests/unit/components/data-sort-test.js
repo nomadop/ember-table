@@ -129,7 +129,7 @@ test('sort column of id by completed data', function (assert) {
 });
 
 test('sort column of id by partial data', function (assert) {
-  var defers = DefersPromise.create({count: 8});
+  var defers = DefersPromise.create({count: 6});
   var component = this.subject({defers:defers, height: 200});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -219,6 +219,36 @@ test('sort partial data for lazy group row array', function (assert) {
 
   return defers.ready(function () {
     helper.assertCellContent(1, 0, '102', 'should unsort before click header cell');
+  });
+});
+
+test('sort completed descending data to unsorted state', function (assert) {
+  var defers = DefersPromise.create({count: 7});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.getHeaderCellContent(0).click();
+    helper.getHeaderCellContent(0).click();
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  defers.ready(function () {
+    helper.assertCellContent(1, 0, '110', 'should sort descending when click header cell');
+    helper.scrollTop(150);
+  }, [1]);
+
+  defers.ready(function () {
+    helper.getHeaderCellContent(0).click();
+  }, [2]);
+
+  defers.ready(function () {
+    helper.scrollTop(-150);
+    defers.next().resolve();
+  }, [3]);
+
+  return defers.ready(function () {
+    helper.assertCellContent(1, 0, '102', 'should sort when state changed to unsort');
   });
 });
 
@@ -348,5 +378,39 @@ test('sort partial data', function (assert) {
 
   return defers.ready(function () {
     helper.assertCellContent(2, 0, '303', 'should unsort before click header cell');
+  });
+});
+
+test('sort completed descending data to unsorted state123', function (assert) {
+  var defers = DefersPromise.create({count: 8});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.getHeaderCellContent(0).click();
+    helper.getHeaderCellContent(0).click();
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  defers.ready(function () {
+    helper.rowGroupingIndicator(1).click();
+  }, [1]);
+
+  defers.ready(function () {
+    helper.assertCellContent(2, 0, '309', 'should sort descending when click header cell');
+    helper.scrollTop(150);
+  }, [2]);
+
+  defers.ready(function () {
+    helper.getHeaderCellContent(0).click();
+  }, [3]);
+
+  defers.ready(function () {
+    helper.scrollTop(-150);
+    defers.next().resolve();
+  }, [4, 5, 6]);
+
+  return defers.ready(function () {
+    helper.assertCellContent(2, 0, '303', 'should sort when state changed to unsort');
   });
 });
