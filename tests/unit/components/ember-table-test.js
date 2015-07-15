@@ -5,7 +5,7 @@ import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import ColumnDefinition from 'ember-table/models/column-definition';
 import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
 import TableFixture from '../../fixture/table';
-import LazyArrayFixture from '../../fixture/lazy-array';
+import LazyArrayFactory from '../../fixture/lazy-array-factory';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableGroupFixture from '../../fixture/ember-table-with-group';
 import EmberTableGroupAndFixedFixture from '../../fixture/ember-table-with-group-and-fixed';
@@ -122,7 +122,7 @@ test('Should reorder inner columns when dragging the inner column', function (as
 moduleForEmberTable('Given a group table And the height is 150 And the table row height is 30',
   function() {
     return EmberTableGroupFixture.create({
-      content: LazyArrayFixture.create().normalFixture(),
+      content: LazyArrayFactory.normalFixture(),
       height: 157 //seems in Chrome row height is 32px
     });
 });
@@ -132,14 +132,14 @@ test('Should show 3 rows in table body ', function(assert) {
   assert.ok(this.$('.ember-table-body-container .ember-table-table-row').length === 5, 'should render 3 body row and 2 hidden row');
 });
 
-moduleForEmberTable('Given a table And the height is 330 And the table row height is 30 And callback return normal data',
+moduleForEmberTable('Given a table And the height is 330 And the table row height is 30 And callback return normalFixture data',
   function() {
     return EmberTableFixture.create({
-      content: LazyArrayFixture.create().normalFixture(),
+      content: LazyArrayFactory.normalFixture(),
       height: 330});
 });
 
-test('lazy array has no error handling', function(assert) {
+test('lazy array has no errorFixture handling', function(assert) {
   this.subject();
   var firstRow = this.$('.ember-table-body-container .ember-table-table-row').first();
   assert.ok(firstRow.hasClass('ember-table-load-error') === false, 'all row should not has class ember-table-load-error');
@@ -148,7 +148,7 @@ test('lazy array has no error handling', function(assert) {
 moduleForEmberTable('Given a table And the height is 330 And the table row height is 30 And callback return error',
   function() {
     return EmberTableFixture.create({
-      content: LazyArrayFixture.create().errorFixture(),
+      content: LazyArrayFactory.errorFixture(),
       height: 330});
 });
 
@@ -162,7 +162,7 @@ test('lazy array error handling', function(assert) {
 moduleForEmberTable('Given a table And has 1 fixed column And has 1 group column',
   function() {
     return EmberTableGroupAndFixedFixture.create({
-      content: LazyArrayFixture.create().normalFixture(),
+      content: LazyArrayFactory.normalFixture(),
       height: 330,
       columnNames: ['firstColumn', 'firstGroup']});
 });
@@ -178,7 +178,8 @@ test('render group and fixed columns together', function(assert) {
   var secondColumn = this.$('.ember-table-right-table-block .ember-table-header-block:nth-child(1)');
   assert.ok(secondColumn, 'should have second column');
   assert.ok(secondColumn.find('.ember-table-table-row').length === 2,
-    'Second column should be group column with two header rows');
+    'Second column should be group col' +
+    'umn with two header rows');
 
   var groupHeader = secondColumn.find('.ember-table-table-row:nth-child(1) .ember-table-header-cell');
   assert.ok(groupHeader.length ===1, 'First header row should have only one cell');
@@ -188,7 +189,7 @@ test('render group and fixed columns together', function(assert) {
 moduleForEmberTable('Given a table with 1 fixed column and 2 column groups',
   function() {
     return EmberTableGroupAndFixedFixture.create({
-      content: LazyArrayFixture.create().normalFixture(),
+      content: LazyArrayFactory.normalFixture(),
       height: 330,
       columnNames: ['firstColumn', 'firstGroup', 'secondGroup']
     });
@@ -219,7 +220,7 @@ test('reorder two column groups', function (assert) {
 moduleForEmberTable('Given a table with 1 fixed column group and 1 column',
   function() {
     return EmberTableGroupAndFixedFixture.create({
-      content: LazyArrayFixture.create().normalFixture(),
+      content: LazyArrayFactory.normalFixture(),
       height: 330,
       columnNames: ['firstGroup', 'firstColumn']
     });

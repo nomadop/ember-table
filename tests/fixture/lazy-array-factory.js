@@ -1,0 +1,91 @@
+import Ember from 'ember';
+import LazyArray from 'ember-table/models/lazy-array';
+
+var toQuery = function(obj) {
+  var keys = Object.keys(obj).sort();
+  return keys.map(function (key) {
+    return key + '=' + obj[key];
+  }).join('&');
+};
+
+export function defaultFixture(options) {
+  return LazyArray.create({
+    totalCount: options.totalCount || 20,
+
+    chunkSize: options.chunkSize || 5,
+
+    _preloadGate: options._preloadGate || 1,
+
+    callback: function (pageIndex, query) {
+      var defer = options.defers.next();
+      defer.resolve(this.initChunk(pageIndex, query));
+      return defer.promise;
+    },
+
+    initChunk: function (pageIndex, query) {
+      var self = this;
+      var resultMap = {
+        '': function () {
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 1; i <= chunkSize; i++) {
+            index = (i + 2) % chunkSize + pageIndex * chunkSize;
+            chunk.push({id: index});
+          }
+          return chunk;
+        },
+        'sortDirect=asc&sortName=ID': function () {
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 0; i < chunkSize; i++) {
+            index = i + pageIndex * chunkSize;
+            chunk.push({id: index});
+          }
+          return chunk;
+        },
+        'sortDirect=desc&sortName=ID': function () {
+          var index, chunk = [];
+          var chunkSize = self.get('chunkSize');
+          for (var i = 1; i <= chunkSize; i++) {
+            index = self.get('_totalCount') - (i + pageIndex * chunkSize);
+            chunk.push({id: index});
+          }
+          return chunk;
+        }
+      };
+      return resultMap[toQuery(query)]();
+    }
+  });
+}
+
+export function normalFixture() {
+  return LazyArray.create({
+    totalCount: 200,
+    chunkSize: 50,
+    callback: function (pageIndex) {
+      var self = this;
+      return new Ember.RSVP.Promise(function (resolve, reject) {
+        resolve(self.initChunk());
+      });
+    },
+    initChunk: function () {
+      var chunk = [];
+      for (var i = 0; i < 50; i++) {
+        chunk.push(i);
+      }
+      return chunk;
+    }
+  });
+}
+
+export function errorFixture() {
+  return LazyArray.create({
+    totalCount: 200,
+    chunkSize: 50,
+    callback: function (pageIndex) {
+      return new Ember.RSVP.Promise(function (resolve, reject) {
+        reject('server is down');
+      });
+    }
+  });
+}

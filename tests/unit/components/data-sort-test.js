@@ -4,11 +4,11 @@ import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableHelper from '../../helpers/ember-table-helper';
 import Columns from '../../fixture/columns';
-import LazyArrayFixture from '../../fixture/lazy-array';
 import LazyArray from 'ember-table/models/lazy-array';
 import DefersPromise from '../../fixture/defer-promises';
 import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 import GrandTotalRow from 'ember-table/models/grand-total-row';
+import { defaultFixture } from '../../fixture/lazy-array-factory';
 
 moduleForEmberTable('A normal JavaScript array as ember-table content', function () {
   var content = [{
@@ -33,15 +33,15 @@ test('regular click to sort by id column', function (assert) {
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   helper.getHeaderCell(0).click();
-  assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+  helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
   helper.assertCellContent(0, 0, '1', 'should sort as ascending');
 
   helper.getHeaderCell(0).click();
-  assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should show descending indicator');
+  helper.assertDescendingIndicatorInHeaderCell(0, 'should show descending indicator');
   helper.assertCellContent(0, 0, '4', 'should sort as descending');
 
   helper.getHeaderCell(0).click();
-  assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+  helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
   helper.assertCellContent(0, 0, '1', 'should sort as ascending');
 });
 
@@ -51,12 +51,11 @@ test('click with command key to sort by id column', function (assert) {
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   helper.clickHeaderCellWithCommand(0);
-  assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+  helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
   helper.assertCellContent(0, 0, '1', 'should sort as ascending');
 
   helper.clickHeaderCellWithCommand(0);
-  assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
-  assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+  helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
   helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
 
   helper.getHeaderCell(0).click();
@@ -67,59 +66,10 @@ test('click with command key to sort by id column', function (assert) {
 });
 
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
-  var toQuery = function(obj) {
-    var keys = Object.keys(obj).sort();
-    return keys.map(function (key) {
-      return key + '=' + obj[key];
-    }).join('&');
-  };
-  var content = LazyArray.create({
-    totalCount: 20,
-    chunkSize: 5,
-    _preloadGate: 1,
-    callback: function(pageIndex, query) {
-      var defer = options.defers.next();
-      defer.resolve(this.initChunk(pageIndex, query));
-      return defer.promise;
-    },
-    initChunk: function (pageIndex, query) {
-      var self = this;
-      var resultMap = {
-        '': function () {
-          var index, chunk = [];
-          var chunkSize = self.get('chunkSize');
-          for (var i = 1; i <= chunkSize; i++) {
-            index = (i + 2) % chunkSize + pageIndex * chunkSize;
-            chunk.push({id: index});
-          }
-          return chunk;
-        },
-        'sortDirect=asc&sortName=ID': function() {
-          var index, chunk = [];
-          var chunkSize = self.get('chunkSize');
-          for (var i = 0; i < chunkSize; i++) {
-            index = i + pageIndex * chunkSize;
-            chunk.push({id: index});
-          }
-          return chunk;
-        },
-        'sortDirect=desc&sortName=ID': function(){
-          var index, chunk = [];
-          var chunkSize = self.get('chunkSize');
-          for (var i = 1; i <= chunkSize; i++) {
-            index = self.get('_totalCount') - (i + pageIndex * chunkSize);
-            chunk.push({id: index});
-          }
-          return chunk;
-        }
-      };
-      return resultMap[toQuery(query)]();
-    }
-  });
   var columns = Columns.create();
   return EmberTableFixture.create({
     height: options.height,
-    content: content,
+    content: defaultFixture(options),
     columns: [columns.get('noSortFnID')]
   });
 });
@@ -134,15 +84,15 @@ test('regular click to sort column of id by completed data', function (assert) {
     helper.assertCellContent(0, 0, '3', 'should sort as unsorted');
 
     helper.getHeaderCell(0).click();
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
 
     helper.getHeaderCell(0).click();
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should show descending indicator');
+    helper.assertDescendingIndicatorInHeaderCell(0, 'should show descending indicator');
     helper.assertCellContent(0, 0, '19', 'should sort as descending');
 
     helper.getHeaderCell(0).click();
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
   });
 });
@@ -157,20 +107,18 @@ test('click with command key to sort column of id by completed data', function (
     helper.assertCellContent(0, 0, '3', 'should sort as unsorted');
 
     helper.clickHeaderCellWithCommand(0);
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
 
     helper.clickHeaderCellWithCommand(0);
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+    helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
 
     helper.getHeaderCell(0).click();
     helper.getHeaderCell(0).click();
 
     helper.clickHeaderCellWithCommand(0);
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+    helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
   });
 });
@@ -185,21 +133,19 @@ test('regular click to sort column of id by partial data', function (assert) {
     helper.getHeaderCell(0).click();
   }, [0, 1]);
   defers.ready(function () {
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
-
     helper.getHeaderCell(0).click();
   }, [2, 3]);
 
   defers.ready(function () {
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should show descending indicator');
+    helper.assertDescendingIndicatorInHeaderCell(0, 'should show descending indicator');
     helper.assertCellContent(0, 0, '19', 'should sort as descending');
-
     helper.getHeaderCell(0).click();
   }, [4, 5]);
 
   return defers.ready(function(){
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
   });
 });
@@ -214,11 +160,10 @@ test('click with command key to sort column of id by partial data', function (as
     helper.clickHeaderCellWithCommand(0);
   }, [0, 1]);
   defers.ready(function () {
-    assert.ok(helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should show ascending indicator');
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
     helper.clickHeaderCellWithCommand(0);
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+    helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
     helper.getHeaderCell(0).click();
   }, [2, 3]);
@@ -229,8 +174,7 @@ test('click with command key to sort column of id by partial data', function (as
 
   return defers.ready(function(){
     helper.clickHeaderCellWithCommand(0);
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-down'), 'should not show descending indicator');
-    assert.ok(!helper.getHeaderCell(0).hasClass('sort-indicator-icon-up'), 'should not show ascending indicator');
+    helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
   }, [6, 7]);
 });
