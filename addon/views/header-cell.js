@@ -164,5 +164,10 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
         this.$().resizable('destroy');
       }
     }
+  },
+
+  click: function(event) {
+    this.get('controller').send('sortByColumn', this.get('content'), event);
   }
+
 });

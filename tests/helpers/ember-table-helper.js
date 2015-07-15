@@ -11,10 +11,6 @@ export default Ember.Object.extend({
     return groupHeader;
   },
 
-  getHeaderCellContent: function getHeaderCellContent (colIndex)  {
-    return this.getHeaderCell(colIndex).find(".ember-table-content-container");
-  },
-
   getHeaderCell: function getHeaderCell(colIndex){
     var component = this.get('_component');
     return component.$(
@@ -157,6 +153,10 @@ export default Ember.Object.extend({
   scrollTop: function(y) {
     var component = this.get('_component');
     component.$('.antiscroll-box .antiscroll-inner').scrollTop(y);
+  },
+
+  clickHeaderCellWithCommand: function (colIndex) {
+    this.getHeaderCell(colIndex).trigger({type: 'click', metaKey: true});
   }
 
 });
