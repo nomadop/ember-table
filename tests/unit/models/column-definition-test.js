@@ -5,26 +5,6 @@ import ColumnDefinition from 'ember-table/models/column-definition';
 
 var column;
 
-module('column definition without sortBy', {
-  beforeEach: function() {
-    column = ColumnDefinition.create({
-      headerCellName: 'Column1',
-      getCellContent: function (row) {
-        return row.get('c');
-      }
-    });
-  },
-
-  afterEach: function(){
-    column = null;
-  }
-});
-
-test('it should return undefined if column do not have sortBy', function (assert) {
-  var sortFn = column.sortFn();
-  assert.ok(!sortFn);
-});
-
 module('column definition with sortBy', {
   beforeEach: function() {
     column = ColumnDefinition.create({
@@ -44,10 +24,11 @@ module('column definition with sortBy', {
 });
 
 test('sortFn should reverse sort order on second time ', function (assert) {
+  column.toggleSortState();
   var ascSortFn = column.sortFn();
 
   assert.equal(ascSortFn({id: 2}, {id: 3}), -1);
-
+  column.toggleSortState();
   var descSortFn = column.sortFn();
 
   assert.equal(descSortFn({id: 2}, {id: 3}), 1);

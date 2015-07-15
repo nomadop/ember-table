@@ -11,18 +11,20 @@ export default Ember.Object.extend({
 
   cellStyle: undefined,
 
-  sortBy: undefined,
+  sortBy: function(prev, next){
+    return Ember.get(prev, 'id') - Ember.get(next, 'id');
+  },
 
   sortIndicatorStyles: Ember.computed(function() {
     var sortIndicatorStyles = ['sort-indicator-icon'];
     var sortIndicatorClassMap = {
-      true: 'sort-indicator-icon-up',
-      false: 'sort-indicator-icon-down',
-      undefined: ''
+      '1': 'sort-indicator-icon-up',
+      '-1': 'sort-indicator-icon-down',
+      '0': ''
     };
-    sortIndicatorStyles.push(sortIndicatorClassMap[this.get('_asc')]);
+    sortIndicatorStyles.push(sortIndicatorClassMap[this.get('_sortState')]);
     return sortIndicatorStyles;
-  }).property('_asc'),
+  }).property('_sortState'),
 
   // Path of the content for this cell. If the row object is a hash of keys
   // and values to specify data for each column, `contentPath` corresponds to
@@ -32,9 +34,9 @@ export default Ember.Object.extend({
   // Minimum column width. Affects both manual resizing and automatic resizing.
   minWidth: Ember.computed(function(){
     var defaultWidth = 25;
-    var triangleWidth = this.get('_asc') === undefined ? 0 : 15;
+    var triangleWidth = this.get('_sortState') === 0 ? 0 : 15;
     return defaultWidth + triangleWidth;
-  }).property('_asc'),
+  }).property('_sortState'),
 
   // Maximum column width. Affects both manual resizing and automatic resizing.
   maxWidth: undefined,
@@ -112,20 +114,33 @@ export default Ember.Object.extend({
   }).property('width', 'maxWidth'),
 
   sortFn: function(){
-    if(!this.sortBy){
-      return;
-    }
-    this.set('_asc', !this.get('_asc'));
-    var sortDirect = this.get('_asc') ? 1 : -1;
-    var _column = this;
+    var self = this;
     return function(prev, next){
-      return sortDirect * _column.sortBy(prev, next);
+      return self.get('_sortState') * self.sortBy(prev, next);
     };
   },
 
-  _asc: undefined,
+  // if you want to change sort order, you should invoke this function
+  toggleSortState: function(){
+    var sortState = this.get('_sortState');
+    var states = [0, 1, -1];
+    var index = states.indexOf(sortState);
+    sortState = states[(index + 1) % 3];
+    this.set('_sortState', sortState);
+  },
 
-  currentDirect: Ember.computed(function(){
-    return this.get('_asc') ? 'asc' : 'desc';
-  }).property('_asc')
+  // Set `_sortState` by using 'toggleSortState' function
+  // if `_sortState` is 0, sort default.
+  // if `_sortState` is 1, sort ascending.
+  // if `_sortState` is -1, sort descending.
+  _sortState: 0,
+
+  sortDirect: Ember.computed(function(){
+    var sortDierctMap = {
+      '0': null,
+      '1': 'asc',
+      '-1': 'desc'
+    };
+    return sortDierctMap[this.get('_sortState').toString()];
+  }).property('_sortState')
 });

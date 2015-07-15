@@ -4,6 +4,8 @@ export default Ember.ArrayProxy.extend({
   //Total count of rows
   totalCount: undefined,
 
+  _sortConditions: {},
+
   // Function to get next chunk of rows.
   // The callback should return a promise which will return an array of rows.
   // The callback function should maintain the sequence of chunks,
@@ -15,6 +17,32 @@ export default Ember.ArrayProxy.extend({
   initContent: undefined,
 
   content: Ember.computed.alias('_lazyContent'),
+
+  sortFn: Ember.K,
+
+  _query: Ember.computed(function(){
+    var sortConditons = this.get('_sortConditions');
+    if(Ember.get(sortConditons, 'sortDirect')){
+      return Ember.getProperties(sortConditons, 'sortDirect', 'sortName');
+    }
+    return {};
+  }).property('_sortConditions'),
+
+
+  // This is a content or _lazyContent cache for sortable order
+  _contentCache: Ember.computed(function() {
+    var sortDirect = this.get('_sortConditions.sortDirect');
+    var sortFn = this.get('_sortConditions.sortFn');
+    var content = this.get('content');
+    if(this.get('isCompleted') && sortDirect){
+      return content.slice().sort(sortFn);
+    } else if(sortDirect){
+      return Ember.A();
+    }
+    return content;
+  }).property('_sortConditions'),
+
+  isEmberTableContent: true,
 
   init: function () {
     var totalCount = this.get('_totalCount');
@@ -34,31 +62,31 @@ export default Ember.ArrayProxy.extend({
   },
 
   objectAt: function (index) {
-    var lazyContent = this.get('_lazyContent');
+    var cacheContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
-    if (!lazyContent[index] || lazyContent[index].get('isError')) {
+    if (!cacheContent[index] || cacheContent[index].get('isError')) {
       this.loadOneChunk(Math.floor(index / chunkSize));
     }
     this.tryPreload(index, chunkSize);
-    return lazyContent[index];
+    return cacheContent[index];
   },
 
   length: Ember.computed.alias('_totalCount'),
 
   loadOneChunk: function (chunkIndex) {
-    var lazyContent = this.get('_lazyContent');
+    var lazyContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
       if (!lazyContent[chunkStart + x]) {
-        lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
+        lazyContent.replace(chunkStart + x, 1, Ember.ObjectProxy.create({"isLoaded": false, "isError": false}));
       } else {
         lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
       }
     }
 
-    this.callback(chunkIndex).then(function (chunk) {
+    this.callback(chunkIndex, this.get('_query')).then(function (chunk) {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);
@@ -87,25 +115,14 @@ export default Ember.ArrayProxy.extend({
   }).property('totalCount'),
 
   isCompleted: Ember.computed(function(){
-    var content = this.get('_lazyContent');
+    var content = this.get('content');
     var hasUnloaded = content.getEach('isLoaded').any(function(isLoaded){ return !isLoaded; });
     return  !hasUnloaded && content.length === this.get('totalCount');
-  }).property('_lazyContent.[]', '_lazyContent.@each', 'totalCount'),
-
-  sort: function (callback){
-    var content;
-    if(this.get('isCompleted')){
-      content = this.get('_lazyContent').sort(callback);
-      this.set('_lazyContent', content);
-    } else {
-      // Do not set `_lazyContent` to a new Array object, otherwise,
-      // the content did change event in RowArrayController will be triggered,
-      // and the last index will be accessed.
-      this.get('_lazyContent').clear();
-    }
-  },
+  }).property('content.@each.isLoaded', 'totalCount'),
 
   _lazyContent: null,
-  _preloadGate: 10
 
+  // TODO:(Stephen): This property indicate the value of preload count, and it will be override by user if need.
+  // Should change to percentage of 'Chunksize' ?
+  _preloadGate: 10
 });

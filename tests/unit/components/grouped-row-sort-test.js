@@ -27,11 +27,11 @@ test('sort completed data of grouped row', function (assert) {
     helper.assertCellContent(1, 0, '102', 'second row id should be equal to 102 before sort');
     helper.assertFixedCellContent(1, 0, '102', 'second row group name should be equal to 102 before sort');
 
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
     helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
     helper.assertFixedCellContent(1, 0, '101', 'second row groupName should be equal to 101 when sort asc');
 
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
     helper.assertCellContent(1, 0, '110', 'second row id should be equal to 110 when sort desc');
     helper.assertFixedCellContent(1, 0, '110', 'second row group name should be equal to 101 when sort asc');
   });
@@ -56,12 +56,12 @@ test('sort partial data of grouped row', function (assert) {
 
   defers.ready(function () {
     helper.assertCellContent(1, 0, '102', 'second row id should be equal to 102 before sort');
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
   }, [1]);
 
   defers.ready(function () {
     helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
   }, [2]);
 
   return defers.ready(function () {
@@ -77,13 +77,13 @@ test('expand grouped row with leaf rows when sorted', function(assert){
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   defers.ready(function () {
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
     helper.rowGroupingIndicator(0).click();
   }, [0]);
 
   defers.ready(function () {
     helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
   }, [1]);
 
   return defers.ready(function () {
@@ -125,12 +125,12 @@ test('sort leaf column with three levels', function (assert) {
 
   defers.ready(function () {
     helper.assertCellContent(2, 0, '1003', 'it should render 1003 before sort');
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
   }, [2]);
 
   defers.ready(function () {
     helper.assertCellContent(2, 0, '1001', 'it should render 1001 before sort');
-    helper.getHeaderCell(0).click();
+    helper.getHeaderCellContent(0).click();
   }, [3]);
 
   return defers.ready(function () {

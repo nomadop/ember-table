@@ -11,13 +11,16 @@ export default Ember.Object.extend({
     return groupHeader;
   },
 
-  getHeaderCell: function getHeaderCell (colIndex)  {
+  getHeaderCellContent: function getHeaderCellContent (colIndex)  {
+    return this.getHeaderCell(colIndex).find(".ember-table-content-container");
+  },
+
+  getHeaderCell: function getHeaderCell(colIndex){
     var component = this.get('_component');
     return component.$(
       ".ember-table-right-table-block " +
       ".ember-table-header-row " +
-      ".ember-table-header-cell:eq(%@) ".fmt(colIndex) +
-      ".ember-table-content-container"
+      ".ember-table-header-cell:eq(%@) ".fmt(colIndex)
     );
   },
 
@@ -149,5 +152,11 @@ export default Ember.Object.extend({
       '.ember-table-%@-table-block '.fmt(blockPosition) +
       ('.ember-table-table-row:eq(%@) '.fmt(rowIndex)) +
       ('.ember-table-cell:eq(%@) '.fmt(colIndex)));
+  },
+
+  scrollTop: function(y) {
+    var component = this.get('_component');
+    component.$('.antiscroll-box .antiscroll-inner').scrollTop(y);
   }
+
 });

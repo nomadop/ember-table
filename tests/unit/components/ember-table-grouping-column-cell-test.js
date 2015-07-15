@@ -9,10 +9,10 @@ moduleForEmberTable('grouping column cell', function () {
     height: 330,
     width: 700,
     content: Ember.ArrayProxy.create({
-      groupingMetadata: ["", ""],
+      groupingMetadata: [{id: 'accountSection'}, {id:''}],
       content: [
         {
-          groupName: "this is a very long string"
+          accountSection: "this is a very long string"
         }
       ]
     })
@@ -22,7 +22,6 @@ moduleForEmberTable('grouping column cell', function () {
 test('render very long string', function (assert) {
   var component = this.subject();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
-
   this.render();
 
   var cell = helper.fixedBodyCell(0, 0);

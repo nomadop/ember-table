@@ -177,7 +177,7 @@ export default RowArrayController.extend({
 
   depthFirstTraverse: function(content, visitChild, level) {
     var _this = this;
-    var children = content.get && content.get('children') || content.children;
+    var children = Ember.get(content, 'children');
     for (var i = 0; i < this.arrayLength(children); i++) {
       var child = children.objectAt(i);
       var decision = visitChild(child, content, level || 0);
