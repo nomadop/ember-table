@@ -21,10 +21,8 @@ var normalArray = [{
   }];
 
 moduleForEmberTable('A normal JavaScript array as ember-table content', function (content) {
-  var columns = Columns.create();
   return EmberTableFixture.create({
-    content: content,
-    columns: [columns.get('noSortFnID')]
+    content: content
   });
 });
 
@@ -66,7 +64,7 @@ test('click with command key to sort by id column', function (assert) {
   helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
 });
 
-test('sort with grouped row array', function(assert){
+test('sort with grouped row array', function(assert) {
   var content = Ember.ArrayProxy.create({
     groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
     content: [{
@@ -76,17 +74,17 @@ test('sort with grouped row array', function(assert){
         id: 12,
         children: [{
           id: '122'
-        },{
+        }, {
           id: '121'
-        },{
+        }, {
           id: '123'
         }]
       }, {
         id: 13
-      },{
+      }, {
         id: 11
       }]
-    },{
+    }, {
       id: 2,
       accountSection: 'f-2'
     }]
@@ -104,12 +102,36 @@ test('sort with grouped row array', function(assert){
   helper.assertCellContent(2, 0, '123', 'should show descending');
 });
 
+test('sort by id:asc, activity:desc', function(assert) {
+  var content = [
+    {id: "id-a", activity: "activity-b"},
+    {id: "id-a", activity: "activity-a"},
+    {id: "id-c", activity: "activity-a"},
+    {id: "id-b", activity: "activity-a"}
+  ];
+  var sortedContent = [
+    ["id-a","activity-a"],
+    ["id-a", "activity-b"],
+    ["id-b", "activity-a"],
+    ["id-c", "activity-a"]
+  ];
+  var component = this.subject(content);
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  this.render();
+  helper.getHeaderCell(0).click();
+  helper.clickHeaderCellWithCommand(1);
+
+  var bodyCellsContent = helper.bodyCellsContent([0, 1, 2, 3], [0, 1]);
+
+  assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+});
+
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
-  var columns = Columns.create();
   return EmberTableFixture.create({
     height: options.height,
     content: defaultFixture(options),
-    columns: [columns.get('noSortFnID')]
+    testOptions: options
   });
 });
 
@@ -234,6 +256,36 @@ test('click with command key to sort column of id by partial data', function (as
     helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
   }, [6, 7]);
+});
+
+test('multiple columns sort with complete data', function(assert) {
+  var defers = DefersPromise.create({count: 1});
+  var options = {defers: defers, height: 800, totalCount: 3, chunkSize: 3, multipleColumns: true};
+  var component = this.subject(options);
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  options.chunks = [
+    [
+      {id: 2, activity: "a"},
+      {id: 1, activity: "b"},
+      {id: 1, activity: "a"}
+    ]
+  ];
+  this.render();
+
+  return defers.ready(function() {
+    helper.getHeaderCell(0).click();
+    helper.clickHeaderCellWithCommand(1);
+
+    var sortedContent = [
+      ["1", "a"],
+      ["1", "b"],
+      ["2", "a"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([0, 1, 2], [0, 1]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+  });
+
 });
 
 moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (options) {
@@ -428,13 +480,10 @@ moduleForEmberTable('Grand total row as ember-table content', function (options)
       },
 
       'accountSection=3': function(){
-        var index, chunk = [];
-        var chunkSize = 5;
-        for (var i = 0; i < chunkSize; i++) {
-          index = (i + 3) % chunkSize + pageIndex * chunkSize + 300;
-          chunk.push({id: index});
-        }
-        return chunk;
+        var chunks = [[303, 304, 300, 301, 302], [308, 309, 305, 306, 307]];
+        return chunks[pageIndex].map(function (x) {
+          return {id: x};
+        });
       },
 
       'accountSection=3&sortDirect=asc&sortName=ID': function () {
