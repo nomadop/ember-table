@@ -2,7 +2,7 @@ import Ember from 'ember';
 import LazyGroupRowArray from './lazy-group-row-array';
 
 export default Ember.ObjectProxy.extend({
-
+  status: null,
   loadChildren: Ember.K,
   onLoadError: Ember.K,
 
@@ -36,7 +36,8 @@ export default Ember.ObjectProxy.extend({
       groupingLevel: this.get('groupingLevel') + 1,
       groupingMetadata: this.get('groupingMetadata'),
       parentQuery: this.get('selfQuery'),
-      parent: this
+      parent: this,
+      status: this.get('status')
     });
     return lazyArray;
   }).property(),

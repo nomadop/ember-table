@@ -8,6 +8,16 @@ var toQuery = function(obj) {
   }).join('&');
 };
 
+var delayResolve = function(defer, result, time){
+  if (time > 0) {
+    setTimeout(function(){
+      defer.resolve(result);
+    }, time);
+  } else {
+    defer.resolve(result);
+  }
+};
+
 export function defaultFixture(options) {
   return LazyArray.create({
     totalCount: options.totalCount || 20,
@@ -18,7 +28,8 @@ export function defaultFixture(options) {
 
     callback: function (pageIndex, query) {
       var defer = options.defers.next();
-      defer.resolve(this.initChunk(pageIndex, query));
+      var result = this.initChunk(pageIndex, query);
+      delayResolve(defer, result, options.delayTime);
       return defer.promise;
     },
 

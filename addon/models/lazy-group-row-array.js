@@ -2,6 +2,7 @@ import Ember from 'ember';
 import GroupingRowProxy from './grouping-row-proxy';
 
 export default Ember.ArrayProxy.extend({
+  status: null,
   loadChildren: Ember.K,
   onLoadError: Ember.K,
   groupingLevel: 0,
@@ -13,6 +14,11 @@ export default Ember.ArrayProxy.extend({
 
   init: function () {
     this.set('content', Ember.A());
+    if(!this.get('status')){
+      this.set('status', Ember.Object.create({
+        loadingCount: 0
+      }));  
+    }
     this._super();
     this.addLoadingPlaceHolder();
   },
@@ -36,7 +42,8 @@ export default Ember.ArrayProxy.extend({
         loadChildren: this.loadChildren,
         onLoadError: this.onLoadError,
         parent: this,
-        parentQuery: this.get('parentQuery')
+        parentQuery: this.get('parentQuery'),
+        status: this.get('status')
       });
     } else {
       return row;
@@ -95,13 +102,16 @@ export default Ember.ArrayProxy.extend({
     var chunkIndex = this.chunkIndex(index);
     var group = this.get('_group');
     var self = this;
+    this.incrementProperty('status.loadingCount');
     this.loadOneChunk(chunkIndex).then(function (result) {
       self.onOneChunkLoaded(result);
       self.set('_hasInProgressLoading', false);
       self.notifyPropertyChange('length');
+      self.decrementProperty('status.loadingCount');
     }).catch(function() {
       self.set('_hasInProgressLoading', false);
       self.onLoadError("Failed to load data.", group, chunkIndex);
+      self.decrementProperty('status.loadingCount');
     });
   },
 
@@ -168,5 +178,7 @@ export default Ember.ArrayProxy.extend({
 
   chunkSize: null,
 
-  _hasInProgressLoading: false
+  _hasInProgressLoading: false,
+
+  loadingCount: Ember.computed.oneWay('status.loadingCount')
 });
