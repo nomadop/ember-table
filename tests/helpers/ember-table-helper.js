@@ -11,10 +11,6 @@ export default Ember.Object.extend({
     return groupHeader;
   },
 
-  getHeaderCellContent: function getHeaderCellContent (colIndex)  {
-    return this.getHeaderCell(colIndex).find(".ember-table-content-container");
-  },
-
   getHeaderCell: function getHeaderCell(colIndex){
     var component = this.get('_component');
     return component.$(
@@ -23,6 +19,8 @@ export default Ember.Object.extend({
       ".ember-table-header-cell:eq(%@) ".fmt(colIndex)
     );
   },
+
+  // assert
 
   assertGroupColumnHeader: function assertGroupColumnHeader(colIndex, headerCellName, message) {
     var assert = this.get('_assert');
@@ -64,6 +62,27 @@ export default Ember.Object.extend({
     var assert = this.get('_assert');
     var cellContent = fetchCell.apply(this, [rowIndex, colIndex]).text().trim();
     assert.equal(cellContent, value, message);
+  },
+
+  assertNonSortIndicatorInHeaderCell: function (headerCellIndex, message) {
+    var assert = this.get('_assert');
+    var headerCell = this.getHeaderCell(headerCellIndex);
+    assert.ok(!headerCell.hasClass('sort-indicator-icon-up'), message);
+    assert.ok(!headerCell.hasClass('sort-indicator-icon-down'), message);
+  },
+
+  assertAscendingIndicatorInHeaderCell: function (headerCellIndex, message) {
+    this._assertSortIndicatorInHeaderCell(headerCellIndex, 'sort-indicator-icon-up', message);
+  },
+
+  assertDescendingIndicatorInHeaderCell: function (headerCellIndex, message) {
+    this._assertSortIndicatorInHeaderCell(headerCellIndex, 'sort-indicator-icon-down', message);
+  },
+
+  _assertSortIndicatorInHeaderCell: function(headerCellIndex, indicatorClass, message) {
+    var assert = this.get('_assert');
+    var headerCell = this.getHeaderCell(headerCellIndex);
+    assert.ok(headerCell.hasClass(indicatorClass), message);
   },
 
   reorderColumn: function dragToRight(colIndex, offset) {
@@ -157,6 +176,10 @@ export default Ember.Object.extend({
   scrollTop: function(y) {
     var component = this.get('_component');
     component.$('.antiscroll-box .antiscroll-inner').scrollTop(y);
+  },
+
+  clickHeaderCellWithCommand: function (colIndex) {
+    this.getHeaderCell(colIndex).trigger({type: 'click', metaKey: true});
   }
 
 });

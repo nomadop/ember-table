@@ -121,11 +121,15 @@ export default Ember.Object.extend({
   },
 
   // if you want to change sort order, you should invoke this function
-  toggleSortState: function(){
+  toggleSortState: function(recoverUnsorted){
     var sortState = this.get('_sortState');
-    var states = [0, 1, -1];
-    var index = states.indexOf(sortState);
-    sortState = states[(index + 1) % 3];
+    if(sortState !== 0 && recoverUnsorted){
+      sortState = 0;
+    } else {
+      var states = [1, -1];
+      var index = states.indexOf(sortState);
+      sortState = states[(index + 1) % states.length];
+    }
     this.set('_sortState', sortState);
   },
 

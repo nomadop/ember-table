@@ -205,8 +205,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // TODO(azirbel): Document
   actions: {
     addColumn: Ember.K,
-    sortByColumn: function(column){
-      column.toggleSortState();
+    sortByColumn: function(column, event){
+      column.toggleSortState(event.ctrlKey||event.metaKey);
       var sortFn = column.sortFn();
       var sortCondition = Ember.Object.create({
         sortName: column.get('headerCellName'),
