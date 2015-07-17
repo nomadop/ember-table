@@ -154,7 +154,7 @@ export default Ember.Object.extend({
       '.ember-table-table-row');
   },
 
-   bodyRows: function(){
+  bodyRows: function(){
     var component = this.get('_component');
     return component.$('.ember-table-body-container ' +
       '.ember-table-right-table-block ' +

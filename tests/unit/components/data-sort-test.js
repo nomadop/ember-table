@@ -10,8 +10,7 @@ import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 import GrandTotalRow from 'ember-table/models/grand-total-row';
 import { defaultFixture } from '../../fixture/lazy-array-factory';
 
-moduleForEmberTable('A normal JavaScript array as ember-table content', function () {
-  var content = [{
+var normalArray = [{
     id: 2
   }, {
     id: 1
@@ -20,6 +19,8 @@ moduleForEmberTable('A normal JavaScript array as ember-table content', function
   }, {
     id: 3
   }];
+
+moduleForEmberTable('A normal JavaScript array as ember-table content', function (content) {
   var columns = Columns.create();
   return EmberTableFixture.create({
     content: content,
@@ -28,7 +29,7 @@ moduleForEmberTable('A normal JavaScript array as ember-table content', function
 });
 
 test('regular click to sort by id column', function (assert) {
-  var component = this.subject();
+  var component = this.subject(normalArray);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
@@ -46,7 +47,7 @@ test('regular click to sort by id column', function (assert) {
 });
 
 test('click with command key to sort by id column', function (assert) {
-  var component = this.subject();
+  var component = this.subject(normalArray);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
@@ -63,6 +64,44 @@ test('click with command key to sort by id column', function (assert) {
   helper.assertCellContent(0, 0, '4', 'should sort as descending');
   helper.clickHeaderCellWithCommand(0);
   helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
+});
+
+test('sort with grouped row array', function(assert){
+  var content = Ember.ArrayProxy.create({
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
+    content: [{
+      id: 1,
+      accountSection: 'f-1',
+      children: [{
+        id: 12,
+        children: [{
+          id: '122'
+        },{
+          id: '121'
+        },{
+          id: '123'
+        }]
+      }, {
+        id: 13
+      },{
+        id: 11
+      }]
+    },{
+      id: 2,
+      accountSection: 'f-2'
+    }]
+  });
+  var component = this.subject(content);
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  helper.rowGroupingIndicator(0).click();
+  helper.assertCellContent(1, 0, '12', 'should show unsorted');
+  helper.rowGroupingIndicator(1).click();
+  helper.assertCellContent(2, 0, '122', 'should show unsorted');
+  helper.getHeaderCell(0).click();
+  helper.assertCellContent(2, 0, '121', 'should show ascending');
+  helper.getHeaderCell(0).click();
+  helper.assertCellContent(2, 0, '123', 'should show descending');
 });
 
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
