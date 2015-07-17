@@ -166,6 +166,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _sortedColumn: undefined,
 
+  contentStatus: Ember.computed.alias('wrapedContent.status'),
+
   // true if is dragging an inner column of group
   // otherwise is false
   // the value is set when reordering starts
@@ -174,7 +176,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   columnsFillTable: true,
 
   init: function() {
-    this.wrapContent();
     this._super();
     if (this.get('hasColumnGroup')) {
       this.set('columnGroups', this.get('_columns'));
@@ -191,12 +192,22 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.prepareTableColumns();
   },
 
-  wrapContent: function() {
+  wrapedContent: Ember.computed(function() {
+    var self = this;
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
-      this.set('content', TableContent.create({content: content}));
+      content = TableContent.create({content: content});
     }
-  },
+    if(!content.get('status')){
+      content.set('status', Ember.Object.create({
+        loadingCount: 0
+      }));    
+    }
+    content.set('onLoadError', function(errorMessage, groupingName, chunkIndex) {
+      self.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
+    });
+    return content;
+  }).property('content'),
 
   _reloadBody: false,
 
@@ -206,6 +217,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   actions: {
     addColumn: Ember.K,
     sortByColumn: function(column, event){
+      if (this.get('content.loadingCount')){
+        return;
+      }
       column.toggleSortState(event.ctrlKey||event.metaKey);
       var sortFn = column.sortFn();
       var sortCondition = Ember.Object.create({
@@ -216,7 +230,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       this.sendAction('sortAction', sortCondition);
       this.set('_sortedColumn', column);
       this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
-      var content = this.get('content');
+      var content = this.get('wrapedContent');
       content.set('_sortConditions',sortCondition);
       this.toggleProperty('_reloadBody');
       Ember.run.next(this, this.updateLayout);
@@ -251,12 +265,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
-    var table = this;
-    var content = this.get('content');
-    content.set('onLoadError', function(errorMessage, groupingName, chunkIndex) {
-      table.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
-    });
-
+    var content = this.get('wrapedContent');
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
@@ -276,7 +285,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       parentController: this,
       container: this.get('container'),
       itemController: Row,
-      content: this.get('content')
+      content: this.get('wrapedContent')
     });
   }).property('content.[]', '_reloadBody', '_hasGroupingColumn'),
 

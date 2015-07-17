@@ -4,6 +4,8 @@ export default Ember.ArrayProxy.extend({
   //Total count of rows
   totalCount: undefined,
 
+  loadingCount: 0,
+
   _sortConditions: {},
 
   // Function to get next chunk of rows.
@@ -78,6 +80,7 @@ export default Ember.ArrayProxy.extend({
     var chunkSize = this.get('chunkSize');
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
+    var self = this;
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
       if (!lazyContent[chunkStart + x]) {
         lazyContent.replace(chunkStart + x, 1, Ember.ObjectProxy.create({"isLoaded": false, "isError": false}));
@@ -85,18 +88,20 @@ export default Ember.ArrayProxy.extend({
         lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
       }
     }
-
+    this.incrementProperty('loadingCount');
     this.callback(chunkIndex, this.get('_query')).then(function (chunk) {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);
           row.set('content', chunk[x]);
         });
+      self.decrementProperty('loadingCount');
     }, function () {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row) {
           row.set('isError', true);
         });
+      self.decrementProperty('loadingCount');
     });
   },
 

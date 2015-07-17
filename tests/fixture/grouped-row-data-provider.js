@@ -83,6 +83,16 @@ var DataProvider = function(options) {
   };
 };
 
+var delayResolve = function(defer, result, time){
+  if (time > 0) {
+    setTimeout(function(){
+      defer.resolve(result);
+    }, time);
+  } else {
+    defer.resolve(result);
+  }
+};
+
 export default Ember.Object.extend({
   loadChunkCount: 0,
   groupingMetadata: null,
@@ -90,6 +100,7 @@ export default Ember.Object.extend({
   columnName: 'Column1',
   totalCount: 10,
   chunkSize: 5,
+  delayTime: 0,
   content: Ember.computed(function () {
     var self = this;
     var dataProvider = new DataProvider({columnName: this.get('columnName')});
@@ -100,7 +111,7 @@ export default Ember.Object.extend({
           content: dataProvider.sortData(chunkIndex, parentQuery),
           meta: {totalCount: self.get('totalCount'), chunkSize: self.get('chunkSize')}
         };
-        defer.resolve(result);
+        delayResolve(defer, result, self.get('delayTime'));
         self.incrementProperty('loadChunkCount');
         return defer.promise;
       },

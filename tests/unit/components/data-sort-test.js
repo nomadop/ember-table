@@ -56,7 +56,7 @@ test('click with command key to sort by id column', function (assert) {
 
   helper.clickHeaderCellWithCommand(0);
   helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
-  helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
+  helper.assertCellContent(0, 0, '2', ' should sort as unsorted');
 
   helper.getHeaderCell(0).click();
   helper.getHeaderCell(0).click();
@@ -150,6 +150,24 @@ test('regular click to sort column of id by partial data', function (assert) {
   });
 });
 
+test('sort quickly twice', function (assert) {
+  var defers = DefersPromise.create({count: 4});
+  var component = this.subject({defers:defers, height: 200, delayTime: 500});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.assertCellContent(0, 0, '3', 'should sort as unsorted');
+    var idHeaderCell = helper.getHeaderCell(0);
+    idHeaderCell.click();
+    idHeaderCell.click();
+  }, [0, 1]);
+
+  return defers.ready(function(){
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
+    helper.assertCellContent(0, 0, '0', 'should ascending');
+  });
+});
+
 test('click with command key to sort column of id by partial data', function (assert) {
   var defers = DefersPromise.create({count: 8});
   var component = this.subject({defers:defers, height: 200});
@@ -184,6 +202,7 @@ moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (o
   var column = columns.get('noSortFnID');
   var provider = GroupedRowDataProvider.create({
     defers: options.defers,
+    delayTime: options.delayTime || 0,
     groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
     columnName: column.get('headerCellName')
   });
@@ -325,6 +344,27 @@ test('sort completed descending data to unsorted state with command key', functi
 
   return defers.ready(function () {
     helper.assertCellContent(1, 0, '102', 'should sort when state changed to unsorted');
+  });
+});
+
+test('sort quickly twice', function (assert) {
+  var defers = DefersPromise.create({count: 3});
+  var component = this.subject({defers:defers, height: 120, delayTime: 500});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function(){
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+  defers.ready(function () {
+    helper.assertCellContent(1, 0, '102', 'should sort as unsorted');
+    var idHeaderCell = helper.getHeaderCell(0);
+    idHeaderCell.click();
+    idHeaderCell.click();
+  }, [1]);
+
+  return defers.ready(function(){
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
+    helper.assertCellContent(1, 0, '101', 'should ascending');
   });
 });
 
