@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import LazyGroupRowArray from './lazy-group-row-array';
 
-export default Ember.ObjectProxy.extend({
+var GroupRowProxy = Ember.ObjectProxy.extend({
   status: null,
   loadChildren: Ember.K,
   onLoadError: Ember.K,
@@ -51,5 +51,8 @@ export default Ember.ObjectProxy.extend({
     return "";
   }).property('groupingName', 'content'),
 
-  _sortConditions: Ember.computed.oneWay('root._sortConditions')
+  _sortConditions: Ember.computed.oneWay('root._sortConditions'),
+  sortingColumns: Ember.computed.oneWay('root.sortingColumns')
 });
+
+export default GroupRowProxy;

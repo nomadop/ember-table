@@ -200,7 +200,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.prepareTableColumns();
   },
 
-  wrapedContent: Ember.computed(function() {
+  wrappedContent: Ember.computed(function() {
     var self = this;
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
@@ -231,7 +231,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       }
       var sortingColumns = this.get('sortingColumns');
       sortingColumns.update(column, event);
-
       var sortCondition = Ember.Object.create({
         sortName: column.get('headerCellName'),
         sortDirect: column.get('sortDirect'),
@@ -239,11 +238,12 @@ StyleBindingsMixin, ResizeHandlerMixin, {
           return column.sortFn(prev, next);
         }
       });
-      this.sendAction('sortAction', sortCondition);
+      this.sendAction('sortAction', sortCondition, sortingColumns);
+
       //TODO: remove after sortingColumns ready for lazy and group data
       this.set('_sortedColumn', column);
       this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
-      var content = this.get('wrapedContent');
+      var content = this.get('wrappedContent');
 
       //TODO: remove after sortingColumns ready for lazy and group data
       content.set('_sortConditions',sortCondition);
@@ -282,7 +282,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
-    var content = this.get('wrapedContent');
+    var content = this.get('wrappedContent');
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
@@ -302,7 +302,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       parentController: this,
       container: this.get('container'),
       itemController: Row,
-      content: this.get('wrapedContent')
+      content: this.get('wrappedContent')
     });
   }).property('content.[]', '_reloadBody', '_hasGroupingColumn'),
 
