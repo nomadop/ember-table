@@ -26,7 +26,7 @@ var GroupedArray = TableContent.extend({
         Ember.set(item, 'children', GroupedArray.create({
           content: children,
           groupingLevel: self.groupingLevel + 1,
-          parent: self,
+          parent: self
         }));
       }
     });

@@ -10,7 +10,7 @@ StyleBindingsMixin, {
   rowHeight: null,
   scrollTop: null,
   startIndex: null,
-  sortCondition:null,
+  sortCondition: null,
 
   init: function() {
     this._super();

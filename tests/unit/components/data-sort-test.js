@@ -21,10 +21,8 @@ var normalArray = [{
   }];
 
 moduleForEmberTable('A normal JavaScript array as ember-table content', function (content) {
-  var columns = Columns.create();
   return EmberTableFixture.create({
-    content: content,
-    columns: [columns.get('noSortFnID')]
+    content: content
   });
 });
 
@@ -66,7 +64,7 @@ test('click with command key to sort by id column', function (assert) {
   helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
 });
 
-test('sort with grouped row array', function(assert){
+test('sort with grouped row array', function(assert) {
   var content = Ember.ArrayProxy.create({
     groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
     content: [{
@@ -76,24 +74,25 @@ test('sort with grouped row array', function(assert){
         id: 12,
         children: [{
           id: '122'
-        },{
+        }, {
           id: '121'
-        },{
+        }, {
           id: '123'
         }]
       }, {
         id: 13
-      },{
+      }, {
         id: 11
       }]
-    },{
+    }, {
       id: 2,
       accountSection: 'f-2'
     }]
   });
   var component = this.subject(content);
-  this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
   helper.rowGroupingIndicator(0).click();
   helper.assertCellContent(1, 0, '12', 'should show unsorted');
   helper.rowGroupingIndicator(1).click();
@@ -104,12 +103,36 @@ test('sort with grouped row array', function(assert){
   helper.assertCellContent(2, 0, '123', 'should show descending');
 });
 
+test('sort by id:asc, activity:desc', function(assert) {
+  var content = [
+    {id: "id-a", activity: "activity-b"},
+    {id: "id-a", activity: "activity-a"},
+    {id: "id-c", activity: "activity-a"},
+    {id: "id-b", activity: "activity-a"}
+  ];
+  var sortedContent = [
+    ["id-a","activity-a"],
+    ["id-a", "activity-b"],
+    ["id-b", "activity-a"],
+    ["id-c", "activity-a"]
+  ];
+  var component = this.subject(content);
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  this.render();
+  helper.getHeaderCell(0).click();
+  helper.clickHeaderCellWithCommand(1);
+
+  var bodyCellsContent = helper.bodyCellsContent([0, 1, 2, 3], [0, 1]);
+
+  assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+});
+
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
-  var columns = Columns.create();
   return EmberTableFixture.create({
     height: options.height,
     content: defaultFixture(options),
-    columns: [columns.get('noSortFnID')]
+    testOptions: options
   });
 });
 
@@ -189,6 +212,29 @@ test('regular click to sort column of id by partial data', function (assert) {
   });
 });
 
+test('multiple columns sort by partial data', function (assert) {
+  var defers = DefersPromise.create({count: 6});
+  var component = this.subject({defers:defers, height: 200});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.getHeaderCell(1).click();
+  }, [0, 1]);
+  defers.ready(function () {
+    helper.clickHeaderCellWithCommand(2);
+  }, [2, 3]);
+
+  return defers.ready(function () {
+    var sortedContent = [
+      ["activity-0", "state-1"],
+      ["activity-0", "state-3"],
+      ["activity-0", "state-5"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([0, 1, 2], [1, 2]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+  });
+});
+
 test('sort quickly twice', function (assert) {
   var defers = DefersPromise.create({count: 4});
   var component = this.subject({defers:defers, height: 200, delayTime: 500});
@@ -236,19 +282,47 @@ test('click with command key to sort column of id by partial data', function (as
   }, [6, 7]);
 });
 
+test('multiple columns sort with complete data', function(assert) {
+  var defers = DefersPromise.create({count: 1});
+  var options = {defers: defers, height: 800, totalCount: 3, chunkSize: 3, multipleColumns: true};
+  var component = this.subject(options);
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  options.chunks = [
+    [
+      {id: 2, activity: "a"},
+      {id: 1, activity: "b"},
+      {id: 1, activity: "a"}
+    ]
+  ];
+  this.render();
+
+  return defers.ready(function() {
+    helper.getHeaderCell(0).click();
+    helper.clickHeaderCellWithCommand(1);
+
+    var sortedContent = [
+      ["1", "a"],
+      ["1", "b"],
+      ["2", "a"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([0, 1, 2], [0, 1]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+  });
+
+});
+
 moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (options) {
-  var columns = Columns.create();
-  var column = columns.get('noSortFnID');
   var provider = GroupedRowDataProvider.create({
     defers: options.defers,
     delayTime: options.delayTime || 0,
     groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    columnName: column.get('headerCellName')
+    testOptions: options
   });
   return EmberTableFixture.create({
     height: options.height,
     content: provider.get('content'),
-    columns: [column]
+    testOptions: options
   });
 });
 
@@ -269,6 +343,30 @@ test('regular click to sort completed data for lazy group row array', function (
     helper.assertCellContent(1, 0, '110', 'should sort descending');
     helper.getHeaderCell(0).click();
     helper.assertCellContent(1, 0, '101', 'should sort ascending');
+  });
+});
+
+test('multiple columns sort completed data for lazy group row array', function (assert) {
+  var defers = DefersPromise.create({count: 4});
+  var component = this.subject({defers: defers, height: 1000});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  this.render();
+  defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+  }, [0, 1]);
+
+  return defers.ready(function () {
+    helper.getHeaderCell(1).click();
+    helper.clickHeaderCellWithCommand(2);
+
+    var sortedContent = [
+      ["activity-0", "state-1"],
+      ["activity-0", "state-3"],
+      ["activity-0", "state-5"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([1, 2, 3], [1, 2]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
   });
 });
 
@@ -298,7 +396,8 @@ test('click with command key to sort completed data for lazy group row array', f
 
 test('regular click to sort partial data for lazy group row array', function (assert) {
   var defers = DefersPromise.create({count: 5});
-  var component = this.subject({defers: defers, height: 120});
+  var options = {defers: defers, height: 120};
+  var component = this.subject(options);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -407,77 +506,48 @@ test('sort quickly twice', function (assert) {
   });
 });
 
-moduleForEmberTable('Grand total row as ember-table content', function (options) {
-  var toQuery = function(obj) {
-    var keys = Object.keys(obj).sort();
-    return keys.map(function (key) {
-      return key + '=' + obj[key];
-    }).join('&');
-  };
-  var fetchData = function (pageIndex, query) {
-    var self = this;
-    var resultMap = {
-      '': function () {
-        var index, chunk = [];
-        var chunkSize = 5;
-        for (var i = 1; i <= chunkSize; i++) {
-          index = (i + 2) % chunkSize + pageIndex * chunkSize;
-          chunk.push({id: index});
-        }
-        return chunk;
-      },
+test('multiple column sort partial data for lazy group row array', function (assert) {
+  var defers = DefersPromise.create({count: 4});
+  var component = this.subject({defers: defers, height: 120});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
-      'accountSection=3': function(){
-        var index, chunk = [];
-        var chunkSize = 5;
-        for (var i = 0; i < chunkSize; i++) {
-          index = (i + 3) % chunkSize + pageIndex * chunkSize + 300;
-          chunk.push({id: index});
-        }
-        return chunk;
-      },
+  this.render();
+  defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
 
-      'accountSection=3&sortDirect=asc&sortName=ID': function () {
-        var index, chunk = [];
-        var chunkSize = 5;
-        for (var i = 0; i < chunkSize; i++) {
-          index = i + pageIndex * chunkSize + 300;
-          chunk.push({id: index});
-        }
-        return chunk;
-      },
-      'accountSection=3&sortDirect=desc&sortName=ID': function () {
-        var index, chunk = [];
-        var chunkSize = 5;
-        for (var i = 1; i <= chunkSize; i++) {
-          index = 10 - (i + pageIndex * chunkSize) + 300;
-          chunk.push({id: index});
-        }
-        return chunk;
-      }
-    };
-    return {meta: {totalCount: 10, chunkSize: 5}, content: resultMap[toQuery(query)]()};
-  };
-  var content = GrandTotalRow.create({
-    loadChildren:function(chunkIndex, query){
-      var defer = options.defers.next();
-      defer.resolve(fetchData(chunkIndex, query));
-      return defer.promise;
-    },
+  defers.ready(function () {
+    helper.getHeaderCell(1).click();
+  }, [1]);
 
-    loadGrandTotal: function () {
-      var defer = options.defers.next();
-      defer.resolve({id: 'grand total'});
-      return defer.promise;
-    },
-    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
-    grandTotalTitle: "Total"
+  defers.ready(function () {
+    helper.clickHeaderCellWithCommand(2);
+  }, [2]);
+
+  return defers.ready(function () {
+    var sortedContent = [
+      ["activity-0", "state-1"],
+      ["activity-0", "state-3"],
+      ["activity-0", "state-5"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([1, 2, 3], [1, 2]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
   });
+});
+
+moduleForEmberTable('Grand total row as ember-table content', function (options) {
+  var groupedRowDataProvider = GroupedRowDataProvider.create({
+    defers: options.defers,
+    delayTime: options.delayTime || 0,
+    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
+    testOptions: options
+});
+
   var columns = Columns.create();
   return EmberTableFixture.create({
-    content: content,
+    content: groupedRowDataProvider.get('grandTotalRowContent'),
     height: options.height,
-    columns: [columns.get('noSortFnID')]
+    testOptions: options
   });
 });
 
@@ -490,16 +560,16 @@ test('regular click to sort completed data', function (assert) {
     helper.rowGroupingIndicator(0).click();
   }, [0]);
   defers.ready(function () {
-    helper.rowGroupingIndicator(1).click();
+    helper.rowGroupingIndicator(3).click();
   }, [1, 2]);
   return defers.ready(function () {
-    helper.assertCellContent(2, 0, '303', 'should unsorted before click header cell');
+    helper.assertCellContent(4, 0, '303', 'should unsorted before click header cell');
     helper.getHeaderCell(0).click();
-    helper.assertCellContent(2, 0, '300', 'should sort ascending');
+    helper.assertCellContent(4, 0, '301', 'should sort ascending');
     helper.getHeaderCell(0).click();
-    helper.assertCellContent(2, 0, '309', 'should sort descending');
+    helper.assertCellContent(4, 0, '310', 'should sort descending');
     helper.getHeaderCell(0).click();
-    helper.assertCellContent(2, 0, '300', 'should sort ascending');
+    helper.assertCellContent(4, 0, '301', 'should sort ascending');
   });
 });
 
@@ -512,18 +582,18 @@ test('click with command key to sort completed data', function (assert) {
     helper.rowGroupingIndicator(0).click();
   }, [0]);
   defers.ready(function () {
-    helper.rowGroupingIndicator(1).click();
+    helper.rowGroupingIndicator(3).click();
   }, [1, 2]);
   return defers.ready(function () {
-    helper.assertCellContent(2, 0, '303', 'should unsorted before click header cell');
+    helper.assertCellContent(4, 0, '303', 'should unsorted before click header cell');
     helper.clickHeaderCellWithCommand(0);
-    helper.assertCellContent(2, 0, '300', 'should sort ascending');
+    helper.assertCellContent(4, 0, '301', 'should sort ascending');
     helper.clickHeaderCellWithCommand(0);
-    helper.assertCellContent(2, 0, '303', 'should unsorted');
+    helper.assertCellContent(4, 0, '303', 'should unsorted');
     helper.getHeaderCell(0).click();
     helper.getHeaderCell(0).click();
     helper.clickHeaderCellWithCommand(0);
-    helper.assertCellContent(2, 0, '303', 'should unsorted');
+    helper.assertCellContent(4, 0, '303', 'should unsorted');
   });
 });
 
@@ -537,26 +607,26 @@ test('regular click to sort partial data', function (assert) {
   }, [0]);
 
   defers.ready(function () {
-    helper.rowGroupingIndicator(1).click();
+    helper.rowGroupingIndicator(3).click();
   }, [1]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '303', 'should unsorted before click header cell');
+    helper.assertCellContent(4, 0, '303', 'should unsorted before click header cell');
     helper.getHeaderCell(0).click();
   }, [2]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '300', 'should sort ascending');
+    helper.assertCellContent(4, 0, '301', 'should sort ascending');
     helper.getHeaderCell(0).click();
   }, [3]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '309', 'should sort descending');
+    helper.assertCellContent(4, 0, '310', 'should sort descending');
     helper.getHeaderCell(0).click();
   }, [4]);
 
   return defers.ready(function () {
-    helper.assertCellContent(2, 0, '300', 'should sort ascending');
+    helper.assertCellContent(4, 0, '301', 'should sort ascending');
   });
 });
 
@@ -570,18 +640,18 @@ test('click with command key to sort partial data', function (assert) {
   }, [0]);
 
   defers.ready(function () {
-    helper.rowGroupingIndicator(1).click();
+    helper.rowGroupingIndicator(3).click();
   }, [1]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '303', 'should unsorted before click header cell');
+    helper.assertCellContent(4, 0, '303', 'should unsorted before click header cell');
     helper.clickHeaderCellWithCommand(0);
   }, [2]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '300', 'should ascending');
+    helper.assertCellContent(4, 0, '301', 'should ascending');
     helper.clickHeaderCellWithCommand(0);
-    helper.assertCellContent(2, 0, '303', 'should unsorted');
+    helper.assertCellContent(4, 0, '303', 'should unsorted');
     helper.getHeaderCell(0).click();
   }, [3]);
 
@@ -591,13 +661,14 @@ test('click with command key to sort partial data', function (assert) {
 
   return defers.ready(function () {
     helper.clickHeaderCellWithCommand(0);
-    helper.assertCellContent(2, 0, '303', 'should unsorted');
+    helper.assertCellContent(4, 0, '303', 'should unsorted');
   });
 });
 
 test('sort completed descending data to unsorted state with command key', function (assert) {
   var defers = DefersPromise.create({count: 8});
-  var component = this.subject({defers: defers, height: 120});
+  var options = {defers: defers, height: 120};
+    var component = this.subject(options);
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -607,11 +678,11 @@ test('sort completed descending data to unsorted state with command key', functi
   }, [0]);
 
   defers.ready(function () {
-    helper.rowGroupingIndicator(1).click();
+    helper.rowGroupingIndicator(3).click();
   }, [1]);
 
   defers.ready(function () {
-    helper.assertCellContent(2, 0, '309', 'should sort descending when click header cell');
+    helper.assertCellContent(4, 0, '310', 'should sort descending when click header cell');
     helper.scrollTop(150);
   }, [2]);
 
@@ -625,6 +696,63 @@ test('sort completed descending data to unsorted state with command key', functi
   }, [4, 5, 6]);
 
   return defers.ready(function () {
-    helper.assertCellContent(2, 0, '303', 'should sort when state changed to unsort');
+    helper.assertCellContent(4, 0, '303', 'should sort when state changed to unsort');
+  });
+});
+
+test('multiple columns sort completed data', function (assert) {
+  var defers = DefersPromise.create({count: 5});
+  var component = this.subject({defers: defers, height: 1000});
+  this.render();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+  defers.ready(function () {
+    helper.rowGroupingIndicator(1).click();
+  }, [1, 2]);
+  return defers.ready(function () {
+    helper.getHeaderCell(1).click();
+    helper.clickHeaderCellWithCommand(2);
+    var sortedContent = [
+      ["activity-0", "state-1"],
+      ["activity-0", "state-3"],
+      ["activity-0", "state-5"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([2, 3, 4], [1, 2]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
+  });
+});
+
+test('multiple columns sort partial data', function (assert) {
+  var defers = DefersPromise.create({count: 5});
+  var component = this.subject({defers: defers, height: 120});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+
+  this.render();
+  defers.ready(function () {
+    helper.rowGroupingIndicator(0).click();
+  }, [0]);
+
+  defers.ready(function () {
+    helper.rowGroupingIndicator(1).click();
+  }, [1]);
+
+  defers.ready(function () {
+    helper.getHeaderCell(1).click();
+  }, [2]);
+
+  defers.ready(function () {
+    helper.clickHeaderCellWithCommand(2);
+  }, [3]);
+
+  return defers.ready(function () {
+    var sortedContent = [
+      ["activity-0", "state-1"],
+      ["activity-0", "state-3"],
+      ["activity-0", "state-5"]
+    ];
+    var bodyCellsContent = helper.bodyCellsContent([2, 3, 4], [1, 2]);
+    assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
   });
 });
