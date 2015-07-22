@@ -6,7 +6,6 @@ export default Ember.ArrayProxy.extend({
 
   loadingCount: 0,
 
-  _sortConditions: {},
   sortingColumns: null,
 
   // Function to get next chunk of rows.
@@ -38,7 +37,7 @@ export default Ember.ArrayProxy.extend({
       }
     }
     return content;
-  }).property('sortingColumns'),
+  }).property('sortingColumns._columns'),
 
   isEmberTableContent: true,
 

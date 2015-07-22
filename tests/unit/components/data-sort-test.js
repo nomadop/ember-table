@@ -73,11 +73,11 @@ test('sort with grouped row array', function(assert) {
       children: [{
         id: 12,
         children: [{
-          id: '122'
+          id: 122
         }, {
-          id: '121'
+          id: 121
         }, {
-          id: '123'
+          id: 123
         }]
       }, {
         id: 13
@@ -97,7 +97,9 @@ test('sort with grouped row array', function(assert) {
   helper.assertCellContent(1, 0, '12', 'should show unsorted');
   helper.rowGroupingIndicator(1).click();
   helper.assertCellContent(2, 0, '122', 'should show unsorted');
+
   helper.getHeaderCell(0).click();
+
   helper.assertCellContent(2, 0, '121', 'should show ascending');
   helper.getHeaderCell(0).click();
   helper.assertCellContent(2, 0, '123', 'should show descending');

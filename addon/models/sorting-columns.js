@@ -10,19 +10,23 @@ export default Ember.Object.extend({
   _columns: null,
 
   update: function (column, event) {
+    this.propertyWillChange('_columns');
     var columns = this.get('_columns');
-    if (columns.indexOf(column) === -1 && (event.ctrlKey || event.metaKey)) {
-      column.toggleSortState(false);
-      columns.pushObject(column);
-    } else {
-      column.toggleSortState(event.ctrlKey || event.metaKey);
-      if (columns.indexOf(column) !== -1 && (event.ctrlKey || event.metaKey)) {
-        columns.clear();
-      } else {
-        columns.clear();
-        columns.pushObject(column);
-      }
+    if (columns.indexOf(column) !== -1) {
+      columns.removeObject(column);
     }
+    columns.pushObject(column);
+    columns.forEach(function(item) {
+      if (item === column) {
+        item.toggleSortState(event.ctrlKey || event.metaKey);
+      } else {
+        if (!(event.ctrlKey || event.metaKey)) {
+          item.changeToUnsortedState();
+        }
+      }
+    });
+    this.set('_columns', columns.filterBy('isSorted', true));
+    this.propertyDidChange('_columns');
   },
 
   isNotEmpty: Ember.computed(function () {
@@ -45,5 +49,4 @@ export default Ember.Object.extend({
     var columns = this.get('_columns');
     return columns.map(fn);
   }
-
 });

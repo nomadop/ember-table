@@ -205,7 +205,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
       var contentClass = content.get('groupingMetadata') ?  GroupedArray : TableContent;
-      content = contentClass.create({content: content});
+      content = contentClass.create({content: content, sortingColumns: this.get('sortingColumns')});
     }
     if(!content.get('status')){
       content.set('status', Ember.Object.create({
@@ -220,8 +220,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _reloadBody: false,
 
-  _sortConditions: null,
-
   // TODO(azirbel): Document
   actions: {
     addColumn: Ember.K,
@@ -231,24 +229,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       }
       var sortingColumns = this.get('sortingColumns');
       sortingColumns.update(column, event);
-      var sortCondition = Ember.Object.create({
-        sortName: column.get('headerCellName'),
-        sortDirect: column.get('sortDirect'),
-        sortFn: function (prev, next) {
-          return column.sortFn(prev, next);
-        }
-      });
-      this.sendAction('sortAction', sortCondition, sortingColumns);
+      this.sendAction('sortAction', sortingColumns);
 
-      //TODO: remove after sortingColumns ready for lazy and group data
-      this.set('_sortedColumn', column);
-      this.set('sortCondition', {sortName: column.get('headerCellName'), sortDirect: column.get('sortDirect')});
       var content = this.get('wrappedContent');
-
-      //TODO: remove after sortingColumns ready for lazy and group data
-      content.set('_sortConditions',sortCondition);
       content.set('sortingColumns', sortingColumns);
-      content.notifyPropertyChange('sortingColumns');
       this.toggleProperty('_reloadBody');
       Ember.run.next(this, this.updateLayout);
     }
