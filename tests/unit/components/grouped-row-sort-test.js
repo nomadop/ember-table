@@ -40,20 +40,17 @@ test('sort completed data of grouped row', function (assert) {
 moduleForEmberTable("Given a table with chunked partial group row data", function (options) {
   return EmberTableFixture.create({
     height: 120,
-    content:options.content,
-    testOptions: options.testOptions
+    content:options.content
   });
 });
 
 test('sort partial data of grouped row', function (assert) {
   var defers = DeferPromises.create({count: 4});
-  var testOptions = {id:"tttt"};
   var provider = GroupedRowDataProvider.create({
     defers: defers,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    testOptions: testOptions
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
   });
-  var component = this.subject({content: provider.get('content'), testOptions: testOptions});
+  var component = this.subject({content: provider.get('content')});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -77,13 +74,11 @@ test('sort partial data of grouped row', function (assert) {
 
 test('expand grouped row with leaf rows when sorted', function(assert){
   var defers = DeferPromises.create({count: 3});
-  var testOptions = {};
   var provider = GroupedRowDataProvider.create({
     defers: defers,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    testOptions: testOptions
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
   });
-  var component = this.subject({content: provider.get('content'), testOptions: testOptions});
+  var component = this.subject({content: provider.get('content')});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
@@ -104,13 +99,11 @@ test('expand grouped row with leaf rows when sorted', function(assert){
 
 test('expand second level rows twice', function(assert) {
   var defers = DeferPromises.create({count: 2});
-  var testOptions = {};
   var provider = GroupedRowDataProvider.create({
     defers: defers,
-    groupingMetadata: [{id: 'accountSection'}, {id: ''}],
-    testOptions: testOptions
+    groupingMetadata: [{id: 'accountSection'}, {id: ''}]
   });
-  var component = this.subject({content: provider.get('content'), testOptions: testOptions});
+  var component = this.subject({content: provider.get('content')});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   defers.ready(function () {
@@ -126,13 +119,11 @@ test('expand second level rows twice', function(assert) {
 
 test('sort leaf column with three levels', function (assert) {
   var defers = DeferPromises.create({count: 5});
-  var testOptions = {};
   var provider = GroupedRowDataProvider.create({
     defers: defers,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: ''}],
-    testOptions: testOptions
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: ''}]
   });
-  var component = this.subject({content: provider.get('content'), testOptions: testOptions});
+  var component = this.subject({content: provider.get('content')});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 

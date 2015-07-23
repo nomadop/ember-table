@@ -10,7 +10,7 @@ StyleBindingsMixin, {
   rowHeight: null,
   scrollTop: null,
   startIndex: null,
-  sortCondition: null,
+  sortingColumns: null,
 
   init: function() {
     this._super();
@@ -90,5 +90,5 @@ StyleBindingsMixin, {
         childView.prepareContent();
       }
     });
-  }, 'content.length', 'length', 'startIndex', 'sortCondition')
+  }, 'content.length', 'length', 'startIndex', 'sortingColumns._columns')
 });

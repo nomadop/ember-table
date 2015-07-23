@@ -73,11 +73,11 @@ test('sort with grouped row array', function(assert) {
       children: [{
         id: 12,
         children: [{
-          id: '122'
+          id: 122
         }, {
-          id: '121'
+          id: 121
         }, {
-          id: '123'
+          id: 123
         }]
       }, {
         id: 13
@@ -97,7 +97,9 @@ test('sort with grouped row array', function(assert) {
   helper.assertCellContent(1, 0, '12', 'should show unsorted');
   helper.rowGroupingIndicator(1).click();
   helper.assertCellContent(2, 0, '122', 'should show unsorted');
+
   helper.getHeaderCell(0).click();
+
   helper.assertCellContent(2, 0, '121', 'should show ascending');
   helper.getHeaderCell(0).click();
   helper.assertCellContent(2, 0, '123', 'should show descending');
@@ -131,8 +133,7 @@ test('sort by id:asc, activity:desc', function(assert) {
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
   return EmberTableFixture.create({
     height: options.height,
-    content: defaultFixture(options),
-    testOptions: options
+    content: defaultFixture(options)
   });
 });
 
@@ -316,13 +317,11 @@ moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (o
   var provider = GroupedRowDataProvider.create({
     defers: options.defers,
     delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    testOptions: options
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
   });
   return EmberTableFixture.create({
     height: options.height,
-    content: provider.get('content'),
-    testOptions: options
+    content: provider.get('content')
   });
 });
 
@@ -539,15 +538,12 @@ moduleForEmberTable('Grand total row as ember-table content', function (options)
   var groupedRowDataProvider = GroupedRowDataProvider.create({
     defers: options.defers,
     delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
-    testOptions: options
+    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}]
 });
 
-  var columns = Columns.create();
   return EmberTableFixture.create({
     content: groupedRowDataProvider.get('grandTotalRowContent'),
-    height: options.height,
-    testOptions: options
+    height: options.height
   });
 });
 

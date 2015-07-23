@@ -130,6 +130,10 @@ export default Ember.Object.extend({
     this.set('_sortState', sortState);
   },
 
+  changeToUnsortedState: function() {
+    this.set('_sortState', 0);
+  },
+
   // Set `_sortState` by using 'toggleSortState' function
   // if `_sortState` is 0, sort default.
   // if `_sortState` is 1, sort ascending.
@@ -143,5 +147,9 @@ export default Ember.Object.extend({
       '-1': 'desc'
     };
     return sortDierctMap[this.get('_sortState').toString()];
+  }).property('_sortState'),
+
+  isSorted: Ember.computed(function() {
+    return this.get('_sortState') !== 0;
   }).property('_sortState')
 });

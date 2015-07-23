@@ -6,7 +6,6 @@ export default Ember.ArrayProxy.extend({
 
   loadingCount: 0,
 
-  _sortConditions: {},
   sortingColumns: null,
 
   // Function to get next chunk of rows.
@@ -23,15 +22,6 @@ export default Ember.ArrayProxy.extend({
 
   sortFn: Ember.K,
 
-  _query: Ember.computed(function(){
-    var sortConditions = this.get('_sortConditions');
-    if(Ember.get(sortConditions, 'sortDirect')){
-      return Ember.getProperties(sortConditions, 'sortDirect', 'sortName');
-    }
-    return {};
-  }).property('_sortConditions'),
-
-
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
     var sortingColumns = this.get('sortingColumns');
@@ -47,7 +37,7 @@ export default Ember.ArrayProxy.extend({
       }
     }
     return content;
-  }).property('sortingColumns'),
+  }).property('sortingColumns._columns'),
 
   isEmberTableContent: true,
 
@@ -94,7 +84,7 @@ export default Ember.ArrayProxy.extend({
       }
     }
     this.incrementProperty('loadingCount');
-    this.callback(chunkIndex, this.get('_query')).then(function (chunk) {
+    this.callback(chunkIndex, this.get('sortingColumns')).then(function (chunk) {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);
