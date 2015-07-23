@@ -133,8 +133,7 @@ test('sort by id:asc, activity:desc', function(assert) {
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
   return EmberTableFixture.create({
     height: options.height,
-    content: defaultFixture(options),
-    testOptions: options
+    content: defaultFixture(options)
   });
 });
 
@@ -318,13 +317,11 @@ moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (o
   var provider = GroupedRowDataProvider.create({
     defers: options.defers,
     delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    testOptions: options
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
   });
   return EmberTableFixture.create({
     height: options.height,
-    content: provider.get('content'),
-    testOptions: options
+    content: provider.get('content')
   });
 });
 
@@ -541,15 +538,12 @@ moduleForEmberTable('Grand total row as ember-table content', function (options)
   var groupedRowDataProvider = GroupedRowDataProvider.create({
     defers: options.defers,
     delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
-    testOptions: options
+    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}]
 });
 
-  var columns = Columns.create();
   return EmberTableFixture.create({
     content: groupedRowDataProvider.get('grandTotalRowContent'),
-    height: options.height,
-    testOptions: options
+    height: options.height
   });
 });
 

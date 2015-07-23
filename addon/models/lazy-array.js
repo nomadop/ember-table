@@ -84,7 +84,7 @@ export default Ember.ArrayProxy.extend({
       }
     }
     this.incrementProperty('loadingCount');
-    this.callback(chunkIndex).then(function (chunk) {
+    this.callback(chunkIndex, this.get('sortingColumns')).then(function (chunk) {
       lazyContent.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);

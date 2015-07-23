@@ -19,14 +19,14 @@ export function defaultFixture(options) {
 
     _preloadGate: options._preloadGate || 1,
 
-    callback: function (pageIndex) {
+    callback: function (pageIndex, sortingColumns) {
       var defer = options.defers.next();
-      var result = this.initChunk(pageIndex);
+      var result = this.initChunk(pageIndex, sortingColumns);
       delayResolve(defer, result, options.delayTime);
       return defer.promise;
     },
 
-    initChunk: function (pageIndex) {
+    initChunk: function (pageIndex, sortingColumns) {
       if (options.multipleColumns) {
         return options.chunks[pageIndex];
       }
@@ -68,8 +68,8 @@ export function defaultFixture(options) {
       }
 
       var query = "";
-      if (options.sortingColumns) {
-        query = options.sortingColumns.map(function(column) {
+      if (sortingColumns) {
+        query = sortingColumns.map(function(column) {
           return column.get('contentPath') + ':' + column.get('sortDirect');
         }).join(',');
       }

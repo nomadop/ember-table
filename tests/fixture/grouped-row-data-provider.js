@@ -55,9 +55,7 @@ var DataProvider = function(options) {
       return makeJsonArray(item[1], item[2]);
     });
   });
-  this.sortData = function (chunkIndex, query, testOptions, groupingMetadata) {
-    testOptions = testOptions || {};
-    var sortingColumns = testOptions.sortingColumns;
+  this.sortData = function (chunkIndex, query, sortingColumns, groupingMetadata) {
     var queryObj = {};
     Ember.setProperties(queryObj, query);
     Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
@@ -93,12 +91,11 @@ export default Ember.Object.extend({
   totalCount: 10,
   chunkSize: 5,
   delayTime: 0,
-  testOptions: null,
-  doLoadChildren: function (chunkIndex, parentQuery, testOptions, groupingMetadata) {
+  doLoadChildren: function (chunkIndex, parentQuery, sortingColumns, groupingMetadata) {
     var dataProvider = new DataProvider({columnName: this.get('columnName')});
     var defer = this.get('defers').next();
     var result = {
-      content: dataProvider.sortData(chunkIndex, parentQuery, testOptions, groupingMetadata),
+      content: dataProvider.sortData(chunkIndex, parentQuery, sortingColumns, groupingMetadata),
       meta: {totalCount: this.get('totalCount'), chunkSize: this.get('chunkSize')}
     };
     delayResolve(defer, result, this.get('delayTime'));
@@ -108,9 +105,9 @@ export default Ember.Object.extend({
   content: Ember.computed(function () {
     var self = this;
     return LazyGroupRowArray.create({
-      loadChildren: function (chunkIndex, parentQuery) {
+      loadChildren: function (chunkIndex, parentQuery, sortingColumns) {
         return self.doLoadChildren(chunkIndex, parentQuery,
-          self.get('testOptions'), self.get('groupingMetadata'));
+          sortingColumns, self.get('groupingMetadata'));
       },
       groupingMetadata: this.get('groupingMetadata')
     });
@@ -118,9 +115,9 @@ export default Ember.Object.extend({
   grandTotalRowContent: Ember.computed(function() {
     var self = this;
     return GrandTotalRow.create({
-      loadChildren: function (chunkIndex, parentQuery) {
+      loadChildren: function (chunkIndex, parentQuery, sortingColumns) {
         return self.doLoadChildren(chunkIndex, parentQuery,
-          self.get('testOptions'), self.get('groupingMetadata'));
+          sortingColumns, self.get('groupingMetadata'));
       },
 
       loadGrandTotal: function () {
