@@ -1,51 +1,42 @@
 import Ember from 'ember';
 import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
-
-import ColumnDefinition from 'ember-table/models/column-definition';
-import ColumnGroupDefinition from 'ember-table/models/column-group-definition';
-import LazyArray from 'ember-table/models/lazy-array';
 import TableFixture from '../../fixture/table';
+import EmberTableHelper from '../../helpers/ember-table-helper';
+import DefersPromise from '../../fixture/defer-promises';
+import EmberTableFixture from '../../fixture/ember-table';
 
-var tableFixture = TableFixture.create();
-moduleForEmberTable('sortIndicator');
+var normalArray = [{
+  id: 2
+}, {
+  id: 1
+}, {
+  id: 4
+}, {
+  id: 3
+}];
+
+moduleForEmberTable('Sort Indicator', function (options) {
+  return EmberTableFixture.create({
+    height: options.height,
+    content: normalArray
+  });
+});
 
 test('should show indicator when sort by column', function (assert) {
-  tableFixture.table(this);
+  var defers = DefersPromise.create({count: 0});
+  var component = this.subject({defers:defers, height: 120});
+  this.render();
 
-  this.$('.ember-table-content-container:contains(Column1)').click();
+  return defers.ready(function () {
+    var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
-  assert.ok(this.$('.sort-indicator-icon:contains(Column1)').hasClass('sort-indicator-icon-up'));
-});
+    helper.getHeaderCell(0).click();
+    helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
 
-test('should toggle indicator when click column twice', function (assert) {
-  tableFixture.table(this);
-
-  var columnCellContainer = this.$('.ember-table-content-container:contains(Column2)');
-  var columnCell = this.$('.ember-table-header-cell:contains(Column2)');
-
-  columnCellContainer.click();
-
-  assert.ok(columnCell.hasClass('sort-indicator-icon-up'));
-
-  columnCellContainer.click();
-
-  assert.ok(columnCell.hasClass('sort-indicator-icon-down'));
-});
-
-test('should only one indicator show at the same time', function(assert) {
-  tableFixture.table(this);
-
-  var firstColumnCellContainer = this.$('.ember-table-content-container:contains(Column1)');
-  var secondColumnCellContainer = this.$('.ember-table-content-container:contains(Column2)');
-  var firstColumnCell = this.$('.ember-table-header-cell:contains(Column1)');
-  var secondColumnCell = this.$('.ember-table-header-cell:contains(Column2)');
-
-  firstColumnCellContainer.click();
-  secondColumnCellContainer.click();
-
-  assert.ok(!firstColumnCell.hasClass('sort-indicator-icon-up'));
-  assert.ok(secondColumnCell.hasClass('sort-indicator-icon-up'));
+    helper.getHeaderCell(0).click();
+    helper.assertDescendingIndicatorInHeaderCell(0, 'should show descending indicator while changing indicator');
+  });
 });
 
 
