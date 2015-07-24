@@ -11,20 +11,22 @@ export default Ember.Object.extend({
 
   update: function (column, event) {
     this.propertyWillChange('_columns');
+    var isControlClick = event.ctrlKey || event.metaKey;
     var columns = this.get('_columns');
-    if (columns.indexOf(column) !== -1) {
-      columns.removeObject(column);
-    }
-    columns.pushObject(column);
-    columns.forEach(function(item) {
-      if (item === column) {
-        item.toggleSortState(event.ctrlKey || event.metaKey);
-      } else {
-        if (!(event.ctrlKey || event.metaKey)) {
-          item.changeToUnsortedState();
+    column.toggleSortState(isControlClick);
+    if (columns.length === 0) {
+      columns.pushObject(column);
+    } else {
+      if (!columns.contains(column)) {
+        if (!isControlClick) {
+          columns.forEach(function (item) {
+            item.changeToUnsortedState();
+          });
+          columns.clear();
         }
+        columns.pushObject(column);
       }
-    });
+    }
     this.set('_columns', columns.filterBy('isSorted', true));
     this.propertyDidChange('_columns');
   },
