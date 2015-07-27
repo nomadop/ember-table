@@ -31,9 +31,9 @@ export default Ember.Object.extend({
     this.propertyDidChange('_columns');
   },
 
-  isNotEmpty: Ember.computed(function () {
-    return this.get('_columns').length > 0;
-  }).property('_columns.@each'),
+  isNotEmpty: Ember.computed.notEmpty('_columns'),
+
+  isMultipleColumns: Ember.computed.gt('_columns.length', 1),
 
   sortBy: function (prev, next) {
     var columns = this.get('_columns');
