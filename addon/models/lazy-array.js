@@ -16,12 +16,6 @@ export default Ember.ArrayProxy.extend({
 
   chunkSize: undefined,
 
-  initContent: undefined,
-
-  content: Ember.computed.alias('_lazyContent'),
-
-  sortFn: Ember.K,
-
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
     var sortingColumns = this.get('sortingColumns');
@@ -44,18 +38,7 @@ export default Ember.ArrayProxy.extend({
   init: function () {
     var totalCount = this.get('_totalCount');
     var lazyContent = new Array(totalCount);
-    var initContent = this.get('initContent');
-    this.set('_lazyContent', lazyContent);
-    if (initContent) {
-      this.fillInitContent(initContent);
-    }
-  },
-
-  fillInitContent: function fillInitContent(initContent) {
-    var content = this.get('_lazyContent');
-    initContent.forEach(function(x, idx) {
-        content[idx] =  Ember.ObjectProxy.create({"isLoaded": true, "isError": false, "content": x});
-    });
+    this.set('content', lazyContent);
   },
 
   objectAt: function (index) {
@@ -119,8 +102,6 @@ export default Ember.ArrayProxy.extend({
     var hasUnloaded = content.getEach('isLoaded').any(function(isLoaded){ return !isLoaded; });
     return  !hasUnloaded && content.length === this.get('totalCount');
   }).property('content.@each.isLoaded', 'totalCount'),
-
-  _lazyContent: null,
 
   // TODO:(Stephen): This property indicate the value of preload count, and it will be override by user if need.
   // Should change to percentage of 'Chunksize' ?
