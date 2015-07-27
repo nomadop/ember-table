@@ -50,5 +50,14 @@ export default Ember.Object.extend({
   map: function (fn) {
     var columns = this.get('_columns');
     return columns.map(fn);
+  },
+
+  // 0-based index of columns
+  findOrder: function(column) {
+    var columns = this.get('_columns');
+    if(!columns || !column) {
+      return 0;
+    }
+    return columns.indexOf(column) + 1;
   }
 });

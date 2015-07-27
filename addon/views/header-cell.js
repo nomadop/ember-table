@@ -15,15 +15,16 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
 
   styleBindings: ['width', 'height'],
 
+  isNotTopRow: Ember.computed.alias('parentView.isNotTopRow'),
+
   columnCellStyle: Ember.computed(function(){
     var columnClasses = [];
     var cellStyle = this.get('column.cellStyle');
     if (!!cellStyle){
       columnClasses.push(cellStyle);
     }
-    columnClasses = columnClasses.concat(this.get('column.sortIndicatorStyles'));
     return columnClasses.join(' ');
-  }).property('column.cellStyle', 'column.sortIndicatorStyles'),
+  }).property('column.cellStyle'),
   // ---------------------------------------------------------------------------
   // Internal properties
   // ---------------------------------------------------------------------------
@@ -163,7 +164,8 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   },
 
   click: function(event) {
-    this.get('controller').send('sortByColumn', this.get('content'), event);
+    if(!this.get('column.isGroup')) {
+      this.get('controller').send('sortByColumn', this.get('content'), event);
+    }
   }
-
 });

@@ -20,6 +20,16 @@ export default Ember.Object.extend({
     );
   },
 
+  getSortIndicatorContainer: function getSortIndicatorContainer(colIndex) {
+    var component = this.get('_component');
+    return component.$(
+      ".ember-table-right-table-block " +
+      ".ember-table-header-row " +
+      ".ember-table-header-cell:eq(%@) ".fmt(colIndex) +
+      ".column-sort-indicator "
+    );
+  },
+
   // assert
 
   assertGroupColumnHeader: function assertGroupColumnHeader(colIndex, headerCellName, message) {
@@ -66,9 +76,9 @@ export default Ember.Object.extend({
 
   assertNonSortIndicatorInHeaderCell: function (headerCellIndex, message) {
     var assert = this.get('_assert');
-    var headerCell = this.getHeaderCell(headerCellIndex);
-    assert.ok(!headerCell.hasClass('sort-indicator-icon-up'), message);
-    assert.ok(!headerCell.hasClass('sort-indicator-icon-down'), message);
+    var sortContainer = this.getSortIndicatorContainer(headerCellIndex);
+    assert.ok(!sortContainer.hasClass('sort-indicator-icon-up'), message);
+    assert.ok(!sortContainer.hasClass('sort-indicator-icon-down'), message);
   },
 
   assertAscendingIndicatorInHeaderCell: function (headerCellIndex, message) {
@@ -81,8 +91,8 @@ export default Ember.Object.extend({
 
   _assertSortIndicatorInHeaderCell: function(headerCellIndex, indicatorClass, message) {
     var assert = this.get('_assert');
-    var headerCell = this.getHeaderCell(headerCellIndex);
-    assert.ok(headerCell.hasClass(indicatorClass), message);
+    var sortContainer = this.getSortIndicatorContainer(headerCellIndex);
+    assert.ok(sortContainer.hasClass(indicatorClass), message);
   },
 
   reorderColumn: function dragToRight(colIndex, offset) {
