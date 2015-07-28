@@ -24,6 +24,10 @@ module('SortingColumns contains no column', {
   }
 });
 
+test('multiple column sorting', function(assert) {
+  assert.ok(sortingColumns.get('isMultipleColumns') === false, 'no column is not multiple columns sorting');
+});
+
 test('click to add it', function(assert) {
   sortingColumns.update(idColumn, {metaKey: false});
 
@@ -49,6 +53,10 @@ module('SortingColumns contains "id" column', {
     idColumn = null;
     nameColumn = null;
   }
+});
+
+test('multiple column sorting', function(assert) {
+  assert.ok(sortingColumns.get('isMultipleColumns') === false, 'single column is not multiple columns sorting');
 });
 
 test('click "id" column to change sort direction to desc', function(assert) {
@@ -99,6 +107,10 @@ module('SortingColumns contains "id", "name" columns', {
     nameColumn = null;
     ageColumn = null;
   }
+});
+
+test('multiple column sorting', function(assert) {
+  assert.ok(sortingColumns.get('isMultipleColumns'), 'is multiple columns sorting');
 });
 
 test('click "id" column to change sort direction of "id" to desc', function(assert) {

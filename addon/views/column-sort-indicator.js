@@ -12,11 +12,11 @@ export default Ember.View.extend(RegisterTableComponentMixin,{
 
   sortOrder: Ember.computed(function () {
     var sortingColumns = this.get('tableComponent.sortingColumns');
-    if (!sortingColumns || !sortingColumns._columns) {
-      return "";
+    if (sortingColumns && sortingColumns.get('isMultipleColumns')) {
+      var index = sortingColumns.findOrder(this.get('column'));
+      return index > 0 ? index: "";
     }
-    var index = sortingColumns.findOrder(this.get('column'));
-    return index > 0 ? index: "";
+    return "";
   }).property('tableComponent.sortingColumns._columns'),
 
   columnCellStyle: Ember.computed(function(){
