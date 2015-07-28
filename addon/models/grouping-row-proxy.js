@@ -5,49 +5,32 @@ var GroupRowProxy = Ember.ObjectProxy.extend({
   status: null,
   loadChildren: Ember.K,
   onLoadError: Ember.K,
-
-  groupingMetadata: null,
-
-  groupingLevel: 0,
-
-  groupingName: Ember.computed(function () {
-    var groupingLevel = this.get('groupingLevel');
-    var groupingMetadata = this.get('groupingMetadata');
-    if (groupingLevel >= 0 && groupingLevel < groupingMetadata.length) {
-      return Ember.get(this.get('groupingMetadata').objectAt(groupingLevel), 'id');
-    } else {
-      return null;
-    }
-  }).property('groupingMetadata', 'groupingLevel'),
+  grouping: null,
 
   selfQuery: Ember.computed(function () {
     var query = {};
-    var groupingName = this.get('groupingName');
-    if (groupingName) {
-      query[groupingName] = this.get('content.id');
+    var groupingKey = this.get('grouping.key');
+    if (groupingKey) {
+      query[groupingKey] = this.get('content.id');
     }
     return Ember.setProperties(query, this.get('parentQuery') || {});
   }).property('content'),
+
+  nextLevelGrouping: Ember.computed(function() {
+    var grouping = this.get('grouping');
+    return grouping.nextLevel(this.get('content'));
+  }).property('content', 'grouping'),
 
   children: Ember.computed(function () {
     return LazyGroupRowArray.create({
       loadChildren: this.loadChildren,
       onLoadError: this.onLoadError,
-      groupingLevel: this.get('groupingLevel') + 1,
-      groupingMetadata: this.get('groupingMetadata'),
+      grouping: this.get('nextLevelGrouping'),
       parentQuery: this.get('selfQuery'),
       status: this.get('status'),
       root: this.get('root')
     });
   }).property(),
-
-  groupName: Ember.computed(function() {
-    var groupingName = this.get('groupingName');
-    if (groupingName) {
-      return this.get(groupingName);
-    }
-    return "";
-  }).property('groupingName', 'content'),
 
   sortingColumns: Ember.computed.oneWay('root.sortingColumns')
 });

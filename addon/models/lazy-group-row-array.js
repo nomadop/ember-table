@@ -1,15 +1,7 @@
 import Ember from 'ember';
 import GroupingRowProxy from './grouping-row-proxy';
-
-var LoadingPlaceHolder = Ember.ObjectProxy.extend({
-  isLoading: true,
-  isLoaded: false,
-  isError:false,
-  contentLoaded: Ember.observer('content', function() {
-    this.set('isLoaded', true);
-    this.set('isLoading', false);
-  })
-});
+import Grouping from './grouping';
+import LoadingPlaceHolder from './loading-place-holder';
 
 var LazyGroupRowArray = Ember.ArrayProxy.extend({
   status: null,
@@ -20,6 +12,13 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
   parentQuery: {},
   sortFn: Ember.K,
   isEmberTableContent: true,
+
+  grouping: Ember.computed(function() {
+    return Grouping.create({
+      groupingMetadata: this.get('groupingMetadata'),
+      groupingLevel: this.get('groupingLevel')
+    });
+  }).property('groupingLevel', 'groupingMetadata'),
 
   init: function () {
     this.set('content', Ember.A());
@@ -35,15 +34,13 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
   loadOneChunk: function(chunkIndex) {
     var parentQueryCopy = {};
     Ember.setProperties(parentQueryCopy, this.get('parentQuery'));
-    return this.loadChildren(chunkIndex, parentQueryCopy, this.get('sortingColumns'));
+    return this.loadChildren(chunkIndex, parentQueryCopy, this.get('sortingColumns'), this.get('grouping.query'));
   },
 
   wrapLoadedContent: function (row) {
-    if (this.get('isGroupingRow')) {
-      var groupingMetadata = this.get('groupingMetadata');
+    if (this.get('grouping.isGroup')) {
       return GroupingRowProxy.create({
-        groupingMetadata: groupingMetadata,
-        groupingLevel: this.get('groupingLevel'),
+        grouping: this.get('grouping'),
         content: row,
         loadChildren: this.loadChildren,
         onLoadError: this.onLoadError,
@@ -55,10 +52,6 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
       return row;
     }
   },
-
-  isLeafParent: Ember.computed(function(){
-    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 1;
-  }).property('groupLevel', 'groupingMetadata.[]'),
 
   _content: Ember.computed(function() {
     if (!this.get('needSort')) {
@@ -72,7 +65,7 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
 
   sortingColumns: Ember.computed.oneWay('root.sortingColumns'),
 
-  needSort: Ember.computed.and('sortingColumns.isNotEmpty', 'isLeafParent'),
+  needSort: Ember.computed.and('sortingColumns.isNotEmpty', 'grouping.isLeafParent'),
 
   sortedContent: Ember.computed(function() {
     var content = this.get('content');
@@ -90,23 +83,10 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
   },
 
   /*---------------Private methods -----------------------*/
-  isGroupingRow: Ember.computed(function() {
-    return this.get('groupingLevel') < this.get('groupingMetadata.length');
-  }).property('groupingMetadata.[]', 'groupingLevel'),
-
-  _group: Ember.computed(function() {
-    if (this.get('isGroupingRow')) {
-      var groupingMetadata = this.get('groupingMetadata');
-      var groupingLevel = this.get('groupingLevel');
-      return groupingMetadata[groupingLevel];
-    }
-    return null;
-  }).property('groupingMetadata.[]', 'groupingLevel'),
-
   triggerLoading: function (index) {
     this.set('_hasInProgressLoading', true);
     var chunkIndex = this.chunkIndex(index);
-    var group = this.get('_group');
+    var group = this.get('grouping.key');
     var self = this;
     this.incrementProperty('status.loadingCount');
     this.loadOneChunk(chunkIndex).then(function (result) {

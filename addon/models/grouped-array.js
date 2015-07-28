@@ -1,22 +1,25 @@
 import Ember from 'ember';
 import TableContent from './table-content';
+import Grouping from './grouping';
 
 var GroupedArray = TableContent.extend({
 
-  root: null,
   groupingLevel: 0,
 
   init: function () {
     this.wrapSubChildren();
   },
 
-  groupingMetadata: Ember.computed(function () {
-    if (this.get('groupingLevel') === 0) {
-      return this.get('content.groupingMetadata');
-    } else {
-      return this.get('root.groupingMetadata');
-    }
-  }).property('root.groupingMetadata', 'content.groupingMetadata'),
+  grouping: Ember.computed(function () {
+    return Grouping.create({
+      groupingMetadata: this.get('content.groupingMetadata'),
+      groupingLevel: this.get('groupingLevel')
+    });
+  }),
+
+  nextLevelGrouping: Ember.computed(function() {
+    return this.get('grouping').nextLevel();
+  }).property('grouping'),
 
   wrapSubChildren: function () {
     var self = this;
@@ -26,24 +29,18 @@ var GroupedArray = TableContent.extend({
       if (children) {
         Ember.set(item, 'children', GroupedArray.create({
           content: children,
-          groupingLevel: self.groupingLevel + 1,
-          root: self.get('root') || self,
+          grouping: self.get('nextLevelGrouping'),
           sortingColumns: self.get('sortingColumns')
         }));
       }
     });
   },
 
-  isLeafCollection: Ember.computed(function () {
-    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 1;
-  }).property('groupingLevel', 'groupingMetadata.[]'),
-
   _content: Ember.computed(function () {
-    var content = this.get('content');
-    if (!this.get('isLeafCollection')) {
-      return content;
+    if (this.get('grouping.isLeafParent')) {
+      return this._super();
     }
-    return this._super();
+    return this.get('content');
   }).property('sortingColumns._columns')
 });
 

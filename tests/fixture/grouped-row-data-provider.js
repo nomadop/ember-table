@@ -55,9 +55,11 @@ var DataProvider = function(options) {
       return makeJsonArray(item[1], item[2]);
     });
   });
-  this.sortData = function (chunkIndex, query, sortingColumns, groupingMetadata) {
+  this.sortData = function (chunkIndex, sortingColumns, groupingMetadata, groupQuery) {
     var queryObj = {};
-    Ember.setProperties(queryObj, query);
+    groupQuery.upperGroupings.forEach(function(x) {
+      queryObj[x[0]] = x[1].id;
+    });
     Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
     var isSecondLastLevel = queryObj.hasOwnProperty(groupingMetadata[groupingMetadata.length - 2].id);
     delete queryObj.sortDirect;
@@ -91,11 +93,11 @@ export default Ember.Object.extend({
   totalCount: 10,
   chunkSize: 5,
   delayTime: 0,
-  doLoadChildren: function (chunkIndex, parentQuery, sortingColumns, groupingMetadata) {
+  doLoadChildren: function (chunkIndex, sortingColumns, groupingMetadata, groupQuery) {
     var dataProvider = new DataProvider({columnName: this.get('columnName')});
     var defer = this.get('defers').next();
     var result = {
-      content: dataProvider.sortData(chunkIndex, parentQuery, sortingColumns, groupingMetadata),
+      content: dataProvider.sortData(chunkIndex, sortingColumns, groupingMetadata, groupQuery),
       meta: {totalCount: this.get('totalCount'), chunkSize: this.get('chunkSize')}
     };
     delayResolve(defer, result, this.get('delayTime'));
@@ -105,9 +107,9 @@ export default Ember.Object.extend({
   content: Ember.computed(function () {
     var self = this;
     return LazyGroupRowArray.create({
-      loadChildren: function (chunkIndex, parentQuery, sortingColumns) {
-        return self.doLoadChildren(chunkIndex, parentQuery,
-          sortingColumns, self.get('groupingMetadata'));
+      loadChildren: function (chunkIndex, parentQuery, sortingColumns, groupQuery) {
+        return self.doLoadChildren(chunkIndex,
+          sortingColumns, self.get('groupingMetadata'), groupQuery);
       },
       groupingMetadata: this.get('groupingMetadata')
     });
@@ -115,9 +117,9 @@ export default Ember.Object.extend({
   grandTotalRowContent: Ember.computed(function() {
     var self = this;
     return GrandTotalRow.create({
-      loadChildren: function (chunkIndex, parentQuery, sortingColumns) {
-        return self.doLoadChildren(chunkIndex, parentQuery,
-          sortingColumns, self.get('groupingMetadata'));
+      loadChildren: function (chunkIndex, parentQuery, sortingColumns, groupQuery) {
+        return self.doLoadChildren(chunkIndex,
+          sortingColumns, self.get('groupingMetadata'), groupQuery);
       },
 
       loadGrandTotal: function () {
