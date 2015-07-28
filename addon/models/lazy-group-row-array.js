@@ -1,6 +1,16 @@
 import Ember from 'ember';
 import GroupingRowProxy from './grouping-row-proxy';
 
+var LoadingPlaceHolder = Ember.ObjectProxy.extend({
+  isLoading: true,
+  isLoaded: false,
+  isError:false,
+  contentLoaded: Ember.observer('content', function() {
+    this.set('isLoaded', true);
+    this.set('isLoading', false);
+  })
+});
+
 var LazyGroupRowArray = Ember.ArrayProxy.extend({
   status: null,
   loadChildren: Ember.K,
@@ -51,28 +61,24 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
   }).property('groupLevel', 'groupingMetadata.[]'),
 
   _content: Ember.computed(function() {
-    var content = this.get('content');
-    if(!this.get('isLeafParent')){
-      return content;
+    if (!this.get('needSort')) {
+      return this.get('content');
     }
-    var sortingColumns = this.get('sortingColumns');
-    var needSort = sortingColumns && sortingColumns.get('isNotEmpty');
-
-    if (needSort) {
-      if (this.get('isCompleted')) {
-        return content.slice().sort(function (prev, next) {
-          return sortingColumns.sortBy(prev, next);
-        });
-      } else {
-        return Ember.A([
-          Ember.ObjectProxy.create({"isLoading": true, "isLoaded": false, "isError": false})
-        ]);
-      }
+    if (this.get('isCompleted')) {
+      return this.get('sortedContent');
     }
-    return content;
-  }).property('sortingColumns._columns'),
+    return Ember.A([LoadingPlaceHolder.create()]);
+  }).property('sortedContent', 'isCompleted', 'needSort'),
 
   sortingColumns: Ember.computed.oneWay('root.sortingColumns'),
+
+  needSort: Ember.computed.and('sortingColumns.isNotEmpty', 'isLeafParent'),
+
+  sortedContent: Ember.computed(function() {
+    var content = this.get('content');
+    var sortingColumns = this.get('sortingColumns');
+    return sortingColumns.sortContent(content);
+  }).property('sortingColumns._columns', 'content'),
 
   /*---------------Override ArrayProxy -----------------------*/
   objectAtContent: function (index) {
@@ -144,17 +150,13 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
 
   addLoadingPlaceHolder: function (propertyName) {
     var content = this.get(propertyName || 'content');
-    content.pushObject(Ember.ObjectProxy.create({"isLoading": true, "isLoaded": false, "isError":false}));
+    content.pushObject(LoadingPlaceHolder.create());
   },
 
   updatePlaceHolderWithContent: function (content) {
     var _content = this.get('_content');
     var lastObject = _content.get('lastObject');
-    lastObject.setProperties({
-      'content': content,
-      'isLoading': false,
-      'isLoaded': true
-    });
+    lastObject.set('content', content);
   },
 
   length: Ember.computed.oneWay('_content.length'),
