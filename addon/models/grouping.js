@@ -5,8 +5,8 @@ var Grouping = Ember.Object.extend({
   groupingLevel: null,
   contents: [],
   isLeafParent: Ember.computed(function () {
-    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 1;
-  }).property('groupLevel', 'groupingMetadata.[]'),
+    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 2;
+  }).property('groupingLevel', 'groupingMetadata.[]'),
 
   isGroup: Ember.computed(function () {
     return this.get('groupingLevel') < this.get('groupingMetadata.length');
@@ -28,8 +28,8 @@ var Grouping = Ember.Object.extend({
   isGrandTotal: Ember.computed.equal('groupingLevel', -1),
 
   nextLevel: function (content) {
-    var contents = this.get('contents');
-    if (!this.get('isGrandTotal')) {
+    var contents = this.get('contents').slice();
+    if (this.get('groupingLevel') >= 0) {
       contents = contents.concat([content]);
     }
     return Grouping.create({

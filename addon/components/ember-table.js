@@ -4,9 +4,9 @@ import ResizeHandlerMixin from 'ember-table/mixins/resize-handler';
 import RowArrayController from 'ember-table/controllers/row-array';
 import GroupedRowArrayController from 'ember-table/controllers/grouped-row-array';
 import Row from 'ember-table/controllers/row';
+import GroupRow from 'ember-table/controllers/group-row';
 import ColumnDefinition from 'ember-table/models/column-definition';
 import TableContent from 'ember-table/models/table-content';
-import GroupedArray from 'ember-table/models/grouped-array';
 import SortingColumns from 'ember-table/models/sorting-columns';
 
 export default Ember.Component.extend(
@@ -204,8 +204,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     var self = this;
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
-      var contentClass = content.get('groupingMetadata') ?  GroupedArray : TableContent;
-      content = contentClass.create({content: content, sortingColumns: this.get('sortingColumns')});
+      if (!content.get('groupingMetadata')) {
+        content = TableContent.create({content: content, sortingColumns: this.get('sortingColumns')});
+      }
     }
     if(!content.get('status')){
       content.set('status', Ember.Object.create({
@@ -233,6 +234,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
       var content = this.get('wrappedContent');
       content.set('sortingColumns', sortingColumns);
+      var bodyContent = this.get('bodyContent');
+      if (bodyContent.tempSort) {
+        bodyContent.tempSort(sortingColumns);
+      }
       this.toggleProperty('_reloadBody');
       Ember.run.next(this, this.updateLayout);
     }
@@ -271,7 +276,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       target: this,
       parentController: this,
       container: this.get('container'),
-      itemController: Row,
+      itemController: GroupRow,
       content: content
     });
   }).property('content'),

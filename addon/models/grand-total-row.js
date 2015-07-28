@@ -7,22 +7,12 @@ var GrandTotalRow = Ember.ArrayProxy.extend({
   loadChildren: Ember.K,
   loadGrandTotal: Ember.K,
   groupingMetadata: null,
-  parentQuery: {},
-  sortingColumns: null,
   isEmberTableContent: true,
 
   init: function () {
     this.set('content', Ember.A());
-    this._super();
     this.addLoadingPlaceHolder();
-  },
-
-  objectAtContent: function (index) {
-    var object = this._super(index);
-    if (object.get('isLoading') && !this.get('_hasInProgressLoading')) {
-      this.triggerLoading(index);
-    }
-    return object;
+    this._super();
   },
 
   triggerLoading: function () {
@@ -44,9 +34,7 @@ var GrandTotalRow = Ember.ArrayProxy.extend({
         groupingLevel: -1
       }),
       content: row,
-      loadChildren: this.loadChildren,
-      parentQuery: this.get('parentQuery'),
-      root: this
+      loadChildren: this.loadChildren
     });
   },
 
