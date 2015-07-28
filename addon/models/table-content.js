@@ -11,14 +11,11 @@ export default Ember.ArrayProxy.extend({
 
   _content: Ember.computed(function () {
     var content = this.get('content');
-    var sortingColumns = this.get('sortingColumns');
-    if (sortingColumns && sortingColumns.get('isNotEmpty')) {
-      return content.slice().sort(function(prev, next) {
-        return sortingColumns.sortBy(prev, next);
-      });
-    } else {
-      return content.slice();
+    if (this.get('sortingColumns.isNotEmpty')) {
+      var sortingColumns = this.get('sortingColumns');
+      return sortingColumns.sortContent(content);
     }
+    return content.slice();
   }).property('sortingColumns._columns'),
 
   objectAt: function (index) {
