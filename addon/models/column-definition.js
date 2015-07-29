@@ -14,17 +14,27 @@ export default Ember.Object.extend({
   // Specified type of data, eg: datetime, decimal, percentage, and string.
   dataType: null,
 
-  sortBy: function(prev, next){
-    switch(this.get('dataType')){
+  sortBy: function (prev, next) {
+    var prevValue, nextValue;
+    switch (this.get('dataType')) {
       case "decimal":
-        return Ember.compare(Number(this.getCellContent(prev)), Number(this.getCellContent(next)));
+        prevValue = Number(this.getCellContent(prev));
+        nextValue = Number(this.getCellContent(next));
+        break;
       case "percentage":
-        var prevValue = Number(this.getCellContent(prev).replace("%",""));
-        var nextValue = Number(this.getCellContent(next).replace("%",""));
-        return Ember.compare(prevValue, nextValue);
+        prevValue = Number(this.getCellContent(prev).replace("%", ""));
+        nextValue = Number(this.getCellContent(next).replace("%", ""));
+        break;
+      case "datetime":
+        prevValue = Date.parse(this.getCellContent(prev));
+        nextValue = Date.parse(this.getCellContent(next));
+        break;
       default:
-        return Ember.compare(this.getCellContent(prev), this.getCellContent(next));
+        prevValue = this.getCellContent(prev);
+        nextValue = this.getCellContent(next);
+        break;
     }
+    return Ember.compare(prevValue, nextValue);
   },
 
   sortIndicatorStyles: Ember.computed(function() {
