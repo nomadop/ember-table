@@ -18,20 +18,19 @@ export default Ember.ArrayProxy.extend({
 
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
-    var sortingColumns = this.get('sortingColumns');
-    var needSort = sortingColumns && sortingColumns.get('isNotEmpty');
     var content = this.get('content');
-    if (needSort) {
+    if (this.get('needSort')) {
       if(this.get('isCompleted')){
-        return content.slice().sort(function (prev, next) {
-          return sortingColumns.sortBy(prev, next);
-        });
+        var sortingColumns = this.get('sortingColumns');
+        return sortingColumns.sortContent(content);
       } else{
         return Ember.A();
       }
     }
     return content;
   }).property('sortingColumns._columns'),
+
+  needSort: Ember.computed.oneWay('sortingColumns.isNotEmpty'),
 
   isEmberTableContent: true,
 

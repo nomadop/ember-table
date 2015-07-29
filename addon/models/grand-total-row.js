@@ -1,5 +1,7 @@
 import Ember from 'ember';
 import GroupingRowProxy from './grouping-row-proxy';
+import Grouping from './grouping';
+import LoadingPlaceHolder from './loading-place-holder';
 
 var GrandTotalRow = Ember.ArrayProxy.extend({
   loadChildren: Ember.K,
@@ -36,10 +38,11 @@ var GrandTotalRow = Ember.ArrayProxy.extend({
   },
 
   wrapLoadedContent: function (row) {
-    var groupingMetadata = this.get('groupingMetadata');
     return GroupingRowProxy.create({
-      groupingMetadata: groupingMetadata,
-      groupingLevel: -1,
+      grouping: Grouping.create({
+        groupingMetadata: this.get('groupingMetadata'),
+        groupingLevel: -1
+      }),
       content: row,
       loadChildren: this.loadChildren,
       parentQuery: this.get('parentQuery'),
@@ -48,16 +51,12 @@ var GrandTotalRow = Ember.ArrayProxy.extend({
   },
 
   addLoadingPlaceHolder: function () {
-    this.pushObject(Ember.ObjectProxy.create({"isLoading": true, "isLoaded": false}));
+    this.pushObject(LoadingPlaceHolder.create());
   },
 
   updatePlaceHolderWithContent: function (content) {
     var lastObject = this.get('lastObject');
-    lastObject.setProperties({
-      'content': content,
-      'isLoading': false,
-      'isLoaded': true
-    });
+    lastObject.set('content', content);
   }
 });
 
