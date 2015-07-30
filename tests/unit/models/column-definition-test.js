@@ -101,15 +101,15 @@ test('sort column when content value type is string', function (assert) {
 
 test('sort column when content value type is datetime', function (assert) {
   column.dataType = "datetime";
-  assert.equal(column.sortFn({col: "20150727 12:00"}, {col: "20150728 9:00"}), -1, "‘20150727 12:00’ is smaller than ‘20150728 9:00’");
+  assert.equal(column.sortFn({col: "2015-07-28T03:10:05.001Z"}, {col: "2015-07-28T03:10:05.002Z"}), -1, "‘2015-07-28T03:10:05.001Z’ is smaller than ‘2015-07-28T03:10:05.002Z’");
 });
 
-test('sort column when content value type is percentage', function (assert) {
-  column.dataType = "percentage";
-  assert.equal(column.sortFn({col: "2%"}, {col: "3%"}), -1, "‘2%’ should be smaller than ‘3%’");
-});
-
-test('sort column when content value type is percentage', function (assert) {
-  column.dataType = "percentage";
-  assert.equal(column.sortFn({col: "3%"}, {col: "12%"}), -1, "‘3%’ should be smaller than ‘12%’");
-});
+//test('sort column when content value type is percentage', function (assert) {
+//  column.dataType = "percentage";
+//  assert.equal(column.sortFn({col: "2%"}, {col: "3%"}), -1, "‘2%’ should be smaller than ‘3%’");
+//});
+//
+//test('sort column when content value type is percentage', function (assert) {
+//  column.dataType = "percentage";
+//  assert.equal(column.sortFn({col: "3%"}, {col: "12%"}), -1, "‘3%’ should be smaller than ‘12%’");
+//});
