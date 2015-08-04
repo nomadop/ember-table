@@ -224,7 +224,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   actions: {
     addColumn: Ember.K,
     sortByColumn: function(column, event){
-      if (this.get('content.loadingCount')){
+      if (this.get('content.loadingCount') || !column.sortFn){
         return;
       }
       var sortingColumns = this.get('sortingColumns');
@@ -397,6 +397,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       textAlign: 'text-align-left',
       isResizable: false,
       isSortable: false,
+      sortFn: null,
       savedWidth: groupingColumnWidth,
       tableCellView: 'grouping-column-cell',
       getCellContent: function (row) {
