@@ -141,6 +141,9 @@ export default Ember.Object.extend({
 
   // if you want to change sort order, you should invoke this function
   toggleSortState: function(recoverUnsorted){
+    if(!this.sortFn){
+      return;
+    }
     var sortState = this.get('_sortState');
     if(sortState !== 0 && recoverUnsorted){
       sortState = 0;

@@ -59,7 +59,7 @@ export default RowArrayController.extend({
     var result = 0;
     controllersMap.forEach(function (value) {
       if (self.isParentControllerExpanded(value)) {
-        result = Math.max(result, value.get('expandLevel'));
+        result = Math.max(result, value.get('expandLevel') || 0);
       }
     });
     return result;

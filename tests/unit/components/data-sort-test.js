@@ -9,6 +9,8 @@ import DefersPromise from '../../fixture/defer-promises';
 import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 import GrandTotalRow from 'ember-table/models/grand-total-row';
 import { defaultFixture } from '../../fixture/lazy-array-factory';
+import TableDom from '../../helpers/table-dom';
+
 
 var normalArray = [{
     id: 2
@@ -325,24 +327,16 @@ moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (o
   });
 });
 
-test('regular click to sort completed data for lazy group row array', function (assert) {
-  var defers = DefersPromise.create({count: 4});
+test('click grouping-column header cell', function(assert) {
+  var defers = DefersPromise.create({count: 2});
   var component = this.subject({defers: defers, height: 1000});
   this.render();
-  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var tableDom = TableDom.create({content: component.$()});
   defers.ready(function () {
-    helper.rowGroupingIndicator(0).click();
+    var groupingColumnHeader = tableDom.headerRow(0).cell(0);
+    groupingColumnHeader.click();
+    assert.noSortIndicator(groupingColumnHeader, 'it should not appear ascending indicator');
   }, [0, 1]);
-
-  return defers.ready(function () {
-    helper.assertCellContent(1, 0, '102', 'should unsorted before click header cell');
-    helper.getHeaderCell(0).click();
-    helper.assertCellContent(1, 0, '101', 'should sort ascending');
-    helper.getHeaderCell(0).click();
-    helper.assertCellContent(1, 0, '110', 'should sort descending');
-    helper.getHeaderCell(0).click();
-    helper.assertCellContent(1, 0, '101', 'should sort ascending');
-  });
 });
 
 test('multiple columns sort completed data for lazy group row array', function (assert) {

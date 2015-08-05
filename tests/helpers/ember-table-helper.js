@@ -20,6 +20,15 @@ export default Ember.Object.extend({
     );
   },
 
+  getFixedHeaderCell: function (colIndex){
+    var component = this.get('_component');
+    return component.$(
+      ".ember-table-left-table-block " +
+      ".ember-table-header-row " +
+      ".ember-table-header-cell:eq(%@) ".fmt(colIndex)
+    );
+  },
+
   getSortIndicatorContainer: function getSortIndicatorContainer(colIndex) {
     var component = this.get('_component');
     return component.$(
