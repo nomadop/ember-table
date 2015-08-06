@@ -2,8 +2,31 @@ import Ember from 'ember';
 import RowArrayController from 'ember-table/controllers/row-array';
 import GroupRow from './group-row';
 import Grouping from '../models/grouping';
+import LazyGroupRowArray from '../models/lazy-group-row-array';
 
 export default RowArrayController.extend({
+  init: function() {
+    var content = this.get('content');
+    if (content.grandTotalTitle && content.loadChildren) {
+      this.set('content', LazyGroupRowArray.create({
+        groupingMetadata: content.groupingMetadata,
+        grandTotalTitle: content.grandTotalTitle
+      }));
+    }
+
+    if (content.loadChildren) {
+      this.set('loadChildren', content.loadChildren);
+    }
+
+    if (content.onLoadError) {
+      this.set('onLoadError', content.onLoadError);
+    }
+
+    if (content.status) {
+      this.set('status', content.status);
+    }
+  },
+
   //TODO: temporary, rename to sort after refactoring
   tempSort: function (sortingColumns) {
     this.set('sortingColumns', sortingColumns);
@@ -12,6 +35,7 @@ export default RowArrayController.extend({
     root.sort(sortingColumns);
     this.propertyDidChange('length');
   },
+
   objectAt: function(idx) {
     var root = this.get('_virtualRootRow');
     var controller = root.findRow(idx);

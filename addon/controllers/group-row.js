@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import Row from './row';
 import SubRowArray from './sub-row-array';
+import LazyGroupRowArray from '../models/lazy-group-row-array';
 
 var GroupRow = Row.extend({
     expandedDepth: Ember.computed(function () {
@@ -159,10 +160,14 @@ var GroupRow = Row.extend({
       return undefined;
     },
 
-    hasChildren: Ember.computed(function () {
-      var children = this.get('content.children');
-      return (!!children) && children.length > 0;
-    }).property('content.children'),
+    children: Ember.computed(function() {
+      if (this.get('target.loadChildren') && this.get('grouping.isGroup') && this.get('expandLevel') >= 0) {
+        return LazyGroupRowArray.create();
+      }
+      return this.get('content.children');
+    }).property('target.loadChildren', 'grouping.isGroup'),
+
+    hasChildren: Ember.computed.oneWay('grouping.isGroup'),
 
     isExpanded: false,
 
