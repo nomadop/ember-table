@@ -9,6 +9,9 @@ import DefersPromise from '../../fixture/defer-promises';
 import GroupedRowDataProvider from '../../fixture/grouped-row-data-provider';
 import GrandTotalRow from 'ember-table/models/grand-total-row';
 import { defaultFixture } from '../../fixture/lazy-array-factory';
+
+import _loadSortIndicatorAssertions from '../../helpers/assert-sort-indicator';
+import _loadTextAssertions from '../../helpers/assert-text';
 import TableDom from '../../helpers/table-dom';
 
 
@@ -31,19 +34,22 @@ moduleForEmberTable('A normal JavaScript array as ember-table content', function
 test('regular click to sort by id column', function (assert) {
   var component = this.subject(normalArray);
   this.render();
-  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  var table = TableDom.create({content: component.$()});
 
-  helper.getHeaderCell(0).click();
-  helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
-  helper.assertCellContent(0, 0, '1', 'should sort as ascending');
+  var idHeaderCell = table.headerRow(0).cell(0);
+  var firstIdCell = table.cell(0, 0);
 
-  helper.getHeaderCell(0).click();
-  helper.assertDescendingIndicatorInHeaderCell(0, 'should show descending indicator');
-  helper.assertCellContent(0, 0, '4', 'should sort as descending');
+  idHeaderCell.click();
+  assert.ascendingIndicatorOn(idHeaderCell, 'should show ascending indicator');
+  assert.textOn(firstIdCell, '1', 'should sort as ascending');
 
-  helper.getHeaderCell(0).click();
-  helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
-  helper.assertCellContent(0, 0, '1', 'should sort as ascending');
+  idHeaderCell.click();
+  assert.descendingIndicatorOn(idHeaderCell, 'should show descending indicator');
+  assert.textOn(firstIdCell, '4', 'should sort as descending');
+
+  idHeaderCell.click();
+  assert.ascendingIndicatorOn(idHeaderCell, 'should show ascending indicator');
+  assert.textOn(firstIdCell, '1', 'should sort as ascending');
 });
 
 test('click with command key to sort by id column', function (assert) {
@@ -335,7 +341,7 @@ test('click grouping-column header cell', function(assert) {
   defers.ready(function () {
     var groupingColumnHeader = tableDom.headerRow(0).cell(0);
     groupingColumnHeader.click();
-    assert.noSortIndicator(groupingColumnHeader, 'it should not appear ascending indicator');
+    assert.noSortIndicatorOn(groupingColumnHeader, 'it should not appear ascending indicator');
   }, [0, 1]);
 });
 

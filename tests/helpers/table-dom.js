@@ -6,6 +6,8 @@ var TableDom = Ember.ObjectProxy.extend({
 
   aliasMethods: ['find', 'eq', 'click', 'text', 'has'],
 
+  length: Ember.computed.oneWay('content.length'),
+
   init: function() {
     var self = this;
     self.aliasMethods.forEach(function (methodName) {
@@ -46,8 +48,9 @@ var TableDom = Ember.ObjectProxy.extend({
     return this.createChildDom(dom);
   },
 
-  cell: function(idx) {
-    var dom = this.cells().eq(idx);
+  cell: function() {
+    var parent = arguments.length === 1 ? this : this.row(arguments[0]);
+    var dom = parent.cells().eq(arguments[arguments.length - 1]);
     return this.createChildDom(dom);
   },
 
@@ -60,4 +63,3 @@ var TableDom = Ember.ObjectProxy.extend({
 });
 
 export default TableDom;
-
