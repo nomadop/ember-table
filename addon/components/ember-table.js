@@ -235,8 +235,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       var content = this.get('wrappedContent');
       content.set('sortingColumns', sortingColumns);
       var bodyContent = this.get('bodyContent');
-      if (bodyContent.tempSort) {
-        bodyContent.tempSort(sortingColumns);
+      if (bodyContent.sort) {
+        bodyContent.sort(sortingColumns);
       }
       this.toggleProperty('_reloadBody');
       Ember.run.next(this, this.updateLayout);

@@ -27,8 +27,7 @@ export default RowArrayController.extend({
     }
   },
 
-  //TODO: temporary, rename to sort after refactoring
-  tempSort: function (sortingColumns) {
+  sort: function (sortingColumns) {
     this.set('sortingColumns', sortingColumns);
     this.propertyWillChange('length');
     var root = this.get('_virtualRootRow');
