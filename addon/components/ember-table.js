@@ -201,7 +201,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   },
 
   wrappedContent: Ember.computed(function() {
-    var self = this;
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
       if (!content.get('groupingMetadata')) {
@@ -213,9 +212,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       content.set('status', status);
       this.set('status', status);
     }
-    content.set('onLoadError', function(errorMessage, groupingName, chunkIndex) {
-      self.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
-    });
     return content;
   }).property('content'),
 
@@ -271,14 +267,18 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //Do not want to create a new groupedRowController, even if its content length did change as more chunks are loaded.
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
+    var self = this;
     var content = this.get('wrappedContent');
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
       container: this.get('container'),
       itemController: GroupRow,
-      content: content
-    });
+      content: content,
+      onLoadError: function(errorMessage, groupingName, chunkIndex) {
+        self.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
+      }
+  });
   }).property('content'),
 
   // An array of Ember.Table.Row computed based on `content`

@@ -18,10 +18,6 @@ export default RowArrayController.extend({
       this.set('loadChildren', content.loadChildren);
     }
 
-    if (content.onLoadError) {
-      this.set('onLoadError', content.onLoadError);
-    }
-
     if (content.status) {
       this.set('status', content.status);
     }
