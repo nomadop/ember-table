@@ -5,7 +5,7 @@ export default HeaderBlock.extend({
   classNames: ['ember-table-right-table-block', 'sortable'],
   classNameBindings: [ 'columnGroup.groupStyle', 'hasMultiInnerColumns:ember-table-multi-inner-block' ],
 
-  width: Ember.computed.alias('columnGroup.savedWidth'),
+  width: Ember.computed.alias('columnGroup.width'),
 
   headerHeight: Ember.computed.alias('tableComponent._headerHeight'),
 

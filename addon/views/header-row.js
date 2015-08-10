@@ -12,7 +12,7 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   columns: Ember.computed.alias('content'),
   width: Ember.computed(function() {
     var widths = this.get('columns').getEach('width');
-    return widths.reduce(function (width, res) {
+    return widths.reduce(function (res, width) {
       return width + res;
     }, 0);
   }).property('columns.@each.width'),
