@@ -13,25 +13,24 @@ moduleForEmberTable('Given a table with chunked group row data',
     return EmberTableFixture.create({
       height: 600,
       width: 700,
-      content: LazyGroupRowArray.create(
-        {
-          loadChildren: function getChunk(chunkIndex, parentQuery) {
-            var defer = defers.next();
-            var result = {
-              content: [],
-              meta: {totalCount: 10, chunkSize: chunkSize}
-            };
-            for (var i = 0; i < chunkSize; i++) {
-              var childrenStart = 10 * (chunkIndex + 1);
-              result.content.push({
-                id: i, firstLevel: 'firstLevel-' + i, secondLevel: 'secondLevel-' + i
-              });
-            }
-            defer.resolve(result);
-            return defer.promise;
-          },
-          groupingMetadata: [{"id": "firstLevel"}, {"id": "secondLevel"}]
-        })
+      groupMeta: {
+        loadChildren: function getChunk(chunkIndex, parentQuery) {
+          var defer = defers.next();
+          var result = {
+            content: [],
+            meta: {totalCount: 10, chunkSize: chunkSize}
+          };
+          for (var i = 0; i < chunkSize; i++) {
+            var childrenStart = 10 * (chunkIndex + 1);
+            result.content.push({
+              id: i, firstLevel: 'firstLevel-' + i, secondLevel: 'secondLevel-' + i
+            });
+          }
+          defer.resolve(result);
+          return defer.promise;
+        },
+        groupingMetadata: [{"id": "firstLevel"}, {"id": "secondLevel"}]
+      }
     });
   });
 
@@ -79,11 +78,12 @@ test('collapse chunked top level rows', function (assert) {
   });
 });
 
-moduleForEmberTable('Given a table with 3 chunked group row data', function subject(content) {
+moduleForEmberTable('Given a table with 3 chunked group row data', function subject(groupMeta) {
   return EmberTableFixture.create({
     height: 90,
     width: 700,
-    content: content
+    content: LazyGroupRowArray.create(),
+    groupMeta: groupMeta
   });
 });
 
@@ -91,8 +91,7 @@ test('load top level chunk data in need', function (assert) {
   var defers = DeferPromises.create({count: 1});
   var chunkSize = 5;
   var loadedChunkCount = 0;
-  var component = this.subject(LazyGroupRowArray.create(
-    {
+  var component = this.subject({
       loadChildren: function getChunk(pageIndex, parentQuery) {
         var defer = defers.next();
         loadedChunkCount++;
@@ -106,9 +105,8 @@ test('load top level chunk data in need', function (assert) {
         defer.resolve({content: result, meta: {totalCount: 15, chunkSize: 5}});
         return defer.promise;
       },
-
       groupingMetadata: [{"id": "firstLevel"}, {"id": "secondLevel"}]
-    }));
+    });
 
   this.render();
 
@@ -120,8 +118,7 @@ test('load top level chunk data in need', function (assert) {
 test('show grouping name in grouping column', function (assert) {
   var defers = DeferPromises.create({count: 2});
   var chunkSize = 5;
-  var component = this.subject(LazyGroupRowArray.create(
-    {
+  var component = this.subject({
       loadChildren: function getChunk(chunkIndex, parentQuery) {
         var defer = defers.next();
         var result = [];
@@ -132,7 +129,7 @@ test('show grouping name in grouping column', function (assert) {
         return defer.promise;
       },
       groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
-    }));
+    });
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   this.render();
@@ -149,20 +146,18 @@ test('show grouping name in grouping column', function (assert) {
   });
 });
 
-moduleForEmberTable('Given a table with 1 chunked data', function subject(content) {
+moduleForEmberTable('Given a table with 1 chunked data', function subject(groupMeta) {
   return EmberTableFixture.create({
     height: 90,
     width: 700,
-    content: content,
-    groupingMetadata: ["", ""]
+    groupMeta: groupMeta
   });
 });
 
 test('load chunked data', function (assert) {
   var chunkCount = 0;
   var defers = DeferPromises.create({count: 2});
-  var component = this.subject(LazyGroupRowArray.create(
-    {
+  var component = this.subject({
       loadChildren: function getChunk() {
         var defer = defers.next();
         var result = [];
@@ -178,7 +173,8 @@ test('load chunked data', function (assert) {
         return defer.promise;
       },
       groupingMetadata: [{id: 'firstLevel'}, {id: 'secondLevel'}]
-    }));
+    }
+  );
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   this.render();
 

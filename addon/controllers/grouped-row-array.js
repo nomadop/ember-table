@@ -6,20 +6,10 @@ import LazyGroupRowArray from '../models/lazy-group-row-array';
 
 export default RowArrayController.extend({
   init: function() {
-    var content = this.get('content');
-    if (content.grandTotalTitle && content.loadChildren) {
-      this.set('content', LazyGroupRowArray.create({
-        groupingMetadata: content.groupingMetadata,
-        grandTotalTitle: content.grandTotalTitle
-      }));
-    }
-
-    if (content.loadChildren) {
-      this.set('loadChildren', content.loadChildren);
-    }
-
-    if (content.status) {
-      this.set('status', content.status);
+    var groupMeta = this.get('groupMeta');
+    if (groupMeta.loadChildren) {
+      this.set('content', LazyGroupRowArray.create());
+      this.set('status', Ember.Object.create({loadingCount: 0}));
     }
   },
 
@@ -73,15 +63,15 @@ export default RowArrayController.extend({
 
 
   _virtualRootRow: Ember.computed(function () {
-    var groupingLevel = this.get('content.grandTotalTitle') ? -2 : -1;
+    var groupingLevel = this.get('groupMeta.grandTotalTitle') ? -2 : -1;
     var rootRow = GroupRow.create({
       content: {children: this.get('content')},
       expandLevel: -1,
-      grandTotalTitle: this.get('content.grandTotalTitle'),
+      grandTotalTitle: this.get('groupMeta.grandTotalTitle'),
       itemController: this.get('itemController'),
       parentController: this.get('parentController') || this,
       grouping: Grouping.create({
-        groupingMetadata: this.get('content.groupingMetadata'),
+        groupingMetadata: this.get('groupMeta.groupingMetadata'),
         groupingLevel: groupingLevel
       }),
       target: this

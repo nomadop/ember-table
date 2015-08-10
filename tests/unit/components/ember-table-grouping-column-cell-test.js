@@ -8,14 +8,14 @@ moduleForEmberTable('grouping column cell', function () {
   return EmberTableFixture.create({
     height: 330,
     width: 700,
-    content: Ember.ArrayProxy.create({
-      groupingMetadata: [{id: 'accountSection'}, {id:''}],
-      content: [
+    content:[
         {
           accountSection: "this is a very long string"
         }
-      ]
-    })
+      ],
+    groupMeta: {
+      groupingMetadata: [{id: 'accountSection'}, {id:''}]
+    }
   });
 });
 

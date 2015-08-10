@@ -14,6 +14,7 @@ export default Ember.Component.extend({
     ' content=content' +
     ' enableContentSelection=true' +
     ' numFixedColumns=numFixedColumns' +
+    ' groupMeta=groupMeta' +
     '}} '),
   columns: Ember.computed(function () {
     var columnFixture = ColumnFixture.create();
@@ -32,5 +33,6 @@ export default Ember.Component.extend({
   content: [],
   numFixedColumns: 0,
   groupedRowIndicatorView: null,
-  rowLoadingIndicatorView: null
+  rowLoadingIndicatorView: null,
+  groupMeta: null
 });

@@ -56,12 +56,12 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('numFixedColumns', '_hasGroupingColumn'),
 
   groupingMetadata: Ember.computed(function() {
-    return this.get('content.groupingMetadata') || [];
-  }).property('content.groupingMetadata'),
+    return this.get('groupMeta.groupingMetadata') || [];
+  }).property('groupMeta.groupingMetadata'),
 
   hasGrandTotalRow: Ember.computed(function() {
-    return !!this.get('content.grandTotalTitle');
-  }).property('content.grandTotalTitle'),
+    return !!this.get('groupMeta.grandTotalTitle');
+  }).property('groupMeta.grandTotalTitle'),
 
   // The number of footer rows in the table. Footer rows appear at the bottom of
   // the table and are always visible.
@@ -127,6 +127,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // if you want to custom grouped row view should set a custom view which inherit
   // from 'row-loading-indicator'.
   rowLoadingIndicatorView: null,
+
+  // Meta info for group data, including groupingMetadata, grandTotalTitle(optional), loadChildren(optional)
+  groupMeta: null,
 
   // ---------------------------------------------------------------------------
   // API - Outputs
@@ -203,14 +206,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   wrappedContent: Ember.computed(function() {
     var content = this.get('content');
     if(!content.get('isEmberTableContent')){
-      if (!content.get('groupingMetadata')) {
+      if (!this.get('groupMeta')) {
         content = TableContent.create({content: content, sortingColumns: this.get('sortingColumns')});
       }
-    }
-    if(!content.get('status')){
-      var status = Ember.Object.create({ loadingCount: 0});
-      content.set('status', status);
-      this.set('status', status);
     }
     return content;
   }).property('content'),
@@ -221,7 +219,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   actions: {
     addColumn: Ember.K,
     sortByColumn: function(column, event){
-      if (this.get('status.loadingCount') || this.get('content.loadingCount') || !column.sortFn){
+      if (this.get('bodyContent.status.loadingCount') || this.get('content.loadingCount') || !column.sortFn){
         return;
       }
       var sortingColumns = this.get('sortingColumns');
@@ -277,7 +275,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       content: content,
       onLoadError: function(errorMessage, groupingName, chunkIndex) {
         self.sendAction('handleDataLoadingError', errorMessage, groupingName, chunkIndex);
-      }
+      },
+      groupMeta: this.get('groupMeta')
   });
   }).property('content'),
 

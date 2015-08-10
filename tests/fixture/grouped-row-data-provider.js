@@ -86,51 +86,30 @@ var delayResolve = function(defer, result, time){
 
 export default Ember.Object.extend({
   loadChunkCount: 0,
-  groupingMetadata: null,
   defers: null,
   columnName: 'Column1',
   totalCount: 10,
   chunkSize: 5,
   delayTime: 0,
-  doLoadChildren: function (chunkIndex, sortingColumns, groupingMetadata, groupQuery) {
+  doLoadChildren: function (chunkIndex, sortingColumns, groupQuery) {
     var dataProvider = new DataProvider({columnName: this.get('columnName')});
     var defer = this.get('defers').next();
     var result = {
-      content: dataProvider.sortData(chunkIndex, sortingColumns, groupingMetadata, groupQuery),
+      content: dataProvider.sortData(chunkIndex, sortingColumns, this.get('groupingMetadata'), groupQuery),
       meta: {totalCount: this.get('totalCount'), chunkSize: this.get('chunkSize')}
     };
     delayResolve(defer, result, this.get('delayTime'));
     this.incrementProperty('loadChunkCount');
     return defer.promise;
   },
-  content: Ember.computed(function () {
-    var self = this;
-    return LazyGroupRowArray.create({
-      loadChildren: function (chunkIndex, sortingColumns, groupQuery) {
-        return self.doLoadChildren(chunkIndex,
-          sortingColumns, self.get('groupingMetadata'), groupQuery);
-      },
-      groupingMetadata: this.get('groupingMetadata')
-    });
-  }),
-  grandTotalRowContent: Ember.computed(function() {
-    var self = this;
-    return Ember.Object.create({
-      loadChildren: function (chunkIndex, sortingColumns, groupQuery) {
-        function loadGrandTotal() {
-          var defer = self.get('defers').next();
-          defer.resolve({content: [{id: 'grand total'}], meta: {}});
-          return defer.promise;
-        }
-        if (!groupQuery.key) {
-          return loadGrandTotal();
-        }
-        return self.doLoadChildren(chunkIndex,
-          sortingColumns, self.get('groupingMetadata'), groupQuery);
-      },
-
-      groupingMetadata: this.get('groupingMetadata'),
-      grandTotalTitle: "Total"
-    });
-  })
+  loadChildren: function (chunkIndex, sortingColumns, groupQuery) {
+    if (!groupQuery.key) {
+      var defer = this.get('defers').next();
+      defer.resolve({content: [{id: 'grand total'}], meta: {}});
+      return defer.promise;
+    }
+    return this.doLoadChildren(chunkIndex, sortingColumns, groupQuery);
+  },
+  groupingMetadata: null,
+  grandTotalTitle: null
 });
