@@ -3,7 +3,6 @@ import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableHelper from '../../helpers/ember-table-helper';
-import GrandTotalRow from 'ember-table/models/grand-total-row';
 import DeferPromises from '../../fixture/defer-promises';
 
 moduleForEmberTable('grand total', function () {
@@ -52,9 +51,17 @@ moduleForEmberTable('grand total with lazy load',
     return EmberTableFixture.create({
       height: 600,
       width: 700,
-      content: GrandTotalRow.create(
+      content: Ember.Object.create(
         {
-          loadChildren: function getChunk(chunkIndex, parentQuery) {
+          loadChildren: function getChunk(chunkIndex, sortingColumn, groupQuery) {
+            function loadGrandTotal() {
+              var defer = defers.next();
+              defer.resolve({content: [{id: 'grand total'}], meta: {}});
+              return defer.promise;
+            }
+            if (!groupQuery.key) {
+              return  loadGrandTotal();
+            }
             var defer = defers.next();
             var result = {
               content: [],
@@ -64,16 +71,16 @@ moduleForEmberTable('grand total with lazy load',
             for (var i = 0; i < chunkSize; i++) {
               result.content.push({id: i});
             }
-            parentQueries.push(parentQuery);
+
+            var queryObj = {};
+            groupQuery.upperGroupings.forEach(function(x) {
+              queryObj[x[0]] = Ember.get(x[1], 'id');
+            });
+            parentQueries.push(queryObj);
             defer.resolve(result);
             return defer.promise;
           },
 
-          loadGrandTotal: function loadGrandTotal() {
-            var defer = defers.next();
-            defer.resolve({id: 'grand total'});
-            return defer.promise;
-          },
           groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
           grandTotalTitle: "Total"
         })

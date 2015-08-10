@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
-import GrandTotalRow from 'ember-table/models/grand-total-row';
 
 var DataProvider = function(options) {
   options = options || {};
@@ -58,7 +57,7 @@ var DataProvider = function(options) {
   this.sortData = function (chunkIndex, sortingColumns, groupingMetadata, groupQuery) {
     var queryObj = {};
     groupQuery.upperGroupings.forEach(function(x) {
-      queryObj[x[0]] = x[1].id;
+      queryObj[x[0]] = Ember.get(x[1], 'id');
     });
     Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
     var isSecondLastLevel = queryObj.hasOwnProperty(groupingMetadata[groupingMetadata.length - 2].id);
@@ -107,7 +106,7 @@ export default Ember.Object.extend({
   content: Ember.computed(function () {
     var self = this;
     return LazyGroupRowArray.create({
-      loadChildren: function (chunkIndex, parentQuery, sortingColumns, groupQuery) {
+      loadChildren: function (chunkIndex, sortingColumns, groupQuery) {
         return self.doLoadChildren(chunkIndex,
           sortingColumns, self.get('groupingMetadata'), groupQuery);
       },
@@ -116,17 +115,20 @@ export default Ember.Object.extend({
   }),
   grandTotalRowContent: Ember.computed(function() {
     var self = this;
-    return GrandTotalRow.create({
-      loadChildren: function (chunkIndex, parentQuery, sortingColumns, groupQuery) {
+    return Ember.Object.create({
+      loadChildren: function (chunkIndex, sortingColumns, groupQuery) {
+        function loadGrandTotal() {
+          var defer = self.get('defers').next();
+          defer.resolve({content: [{id: 'grand total'}], meta: {}});
+          return defer.promise;
+        }
+        if (!groupQuery.key) {
+          return loadGrandTotal();
+        }
         return self.doLoadChildren(chunkIndex,
           sortingColumns, self.get('groupingMetadata'), groupQuery);
       },
 
-      loadGrandTotal: function () {
-        var defer = self.get('defers').next();
-        defer.resolve({id: 'grand total'});
-        return defer.promise;
-      },
       groupingMetadata: this.get('groupingMetadata'),
       grandTotalTitle: "Total"
     });

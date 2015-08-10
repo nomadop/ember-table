@@ -1,217 +1,108 @@
 import Ember from 'ember';
 import RowArrayController from 'ember-table/controllers/row-array';
+import GroupRow from './group-row';
+import Grouping from '../models/grouping';
+import LazyGroupRowArray from '../models/lazy-group-row-array';
 
 export default RowArrayController.extend({
-
   init: function() {
-    this._super();
-    this.set('_expandedGroupRowToChildrenMap', Ember.Map.create());
-    this.set('_controllersMap', Ember.Map.create());
+    var content = this.get('content');
+    if (content.grandTotalTitle && content.loadChildren) {
+      this.set('content', LazyGroupRowArray.create({
+        groupingMetadata: content.groupingMetadata,
+        grandTotalTitle: content.grandTotalTitle
+      }));
+    }
+
+    if (content.loadChildren) {
+      this.set('loadChildren', content.loadChildren);
+    }
+
+    if (content.onLoadError) {
+      this.set('onLoadError', content.onLoadError);
+    }
+
+    if (content.status) {
+      this.set('status', content.status);
+    }
   },
 
-  objectAtContent: function(idx) {
-    var target = this._findObject(idx);
-    var object = target.object;
-    var expandLevel = target.level;
-    var controllersMap = this.get('_controllersMap');
-    var controller = controllersMap.get(object);
+  sort: function (sortingColumns) {
+    this.set('sortingColumns', sortingColumns);
+    this.propertyWillChange('length');
+    var root = this.get('_virtualRootRow');
+    root.sort(sortingColumns);
+    this.propertyDidChange('length');
+  },
+
+  objectAt: function(idx) {
+    var root = this.get('_virtualRootRow');
+    var controller = root.findRow(idx);
     if (!controller) {
-      var groupingKey;
-      var groupingLevel = expandLevel;
-      if (this.get('content.grandTotalTitle')) {
-        groupingLevel -= 1;
-      }
-      if (groupingLevel > -1) {
-        var groupingMetadata = this.get('content.groupingMetadata');
-        groupingKey = groupingMetadata[groupingLevel].id;
-      }
-      controller = this.get('itemController').create({
-        target: this,
-        parentController: this.get('parentController') || this,
-        content: object,
-        expandLevel: expandLevel,
-        parentContent: target.parent,
-        groupingKey: groupingKey
-      });
-      if (idx === 0 && this.get('content.grandTotalTitle')) {
-        controller.set('grandTotalTitle', this.get('content.grandTotalTitle'));
-      }
-      controllersMap.set(object, controller);
+      controller = root.createRow(idx);
     }
     return controller;
   },
 
   expandChildren: function(row) {
-    var childrenRow = row.get('children');
-    row.addObserver('children.length', this, 'childrenLengthDidChange');
-    row.set('isExpanded', true);
-    if (this.arrayLength(childrenRow) > 0) {
-      var childrenRows = this.get('_expandedGroupRowToChildrenMap');
-      childrenRows.set(row.get('content'), childrenRow);
-      this.toggleProperty('_forceContentLengthRecalc');
-      this.set('_expandedDepth', this.getMaxExpandedDepth());
-    }
-  },
-
-  getMaxExpandedDepth: function() {
-    var controllersMap = this.get('_controllersMap');
-    var self = this;
-    var result = 0;
-    controllersMap.forEach(function (value) {
-      if (self.isParentControllerExpanded(value)) {
-        result = Math.max(result, value.get('expandLevel') || 0);
-      }
-    });
-    return result;
-  },
-
-  childrenLengthDidChange: function() {
-    this.toggleProperty('_forceContentLengthRecalc');
+    this.propertyWillChange('length');
+    row.expandChildren();
+    this.propertyDidChange('length');
   },
 
   collapseChildren: function(row) {
-    row.set('isExpanded', false);
-    var childrenRow = row.get('children') || [];
-    if (this.arrayLength(childrenRow) > 0) {
-      var childrenRows = this.get('_expandedGroupRowToChildrenMap');
-      childrenRows.delete(row.get('content'));
-      this.toggleProperty('_forceContentLengthRecalc');
-      this.set('_expandedDepth', this.getMaxExpandedDepth());
-    }
-  },
-
-  length: Ember.computed(function() {
-    return this.traverseExpandedControllers(function (prev, value) {
-        var childrenLength = value.get('children.length') || 0;
-        return prev + childrenLength;
-      }, 0) + this.get('content.length');
-  }).property('content.[]', '_forceContentLengthRecalc'),
-
-  traverseExpandedControllers: function traverseExpandedControllers(visit, init) {
-    var controllersMap = this.get('_controllersMap');
-    var self = this;
-    var result = init;
-    controllersMap.forEach(function (value) {
-      if (value.get('isExpanded') && self.isParentControllerExpanded(value)) {
-        result = visit(result, value);
-      }
-    });
-    return result;
-  },
-
-  isParentControllerExpanded: function isParentControllerExpanded(controller) {
-    var controllersMap = this.get('_controllersMap');
-    var parent = controller.get('parentContent');
-    if (!parent) {
-      return true;
-    }
-    var parentController = controllersMap.get(parent);
-    return parentController.get('isExpanded') && this.isParentControllerExpanded(parentController);
-  },
-
-  _findObject: function(idx) {
-    if (idx === this.get('length') - 1) {
-      return this._findLastObject();
-    }
-    var content = this.get('content');
-    var root = {children: content};
-    var theObject;
-    var theLevel;
-    var theParent;
-    var visitCount = 0;
-    var childrenRows = this.get('_expandedGroupRowToChildrenMap');
-    this.depthFirstTraverse(root, function(child, parent, level) {
-      if (visitCount === idx) {
-        theObject = child;
-        theParent = parent;
-        theLevel = level;
-        visitCount ++;
-        return {needGoDeeper: false, stop: true};
-      }
-
-      visitCount ++;
-
-      if (childrenRows.has(child)) {
-        return {needGoDeeper: true, stop: false};
-      }
-      return {needGoDeeper: false, stop: false};
-    });
-    if (theParent === root) {
-      theParent = null;
-    }
-    return {object: theObject, level: theLevel, parent: theParent};
+    this.propertyWillChange('length');
+    row.collapseChildren();
+    this.propertyDidChange('length');
   },
 
   /**
-   * ember-table will find last object on init, we don't want to access invisible content.
-   * @returns {*}
-   */
-  _findLastObject: function _findLastObject() {
-    var content = this.get('content');
-    var theObject = content.objectAt(this.arrayLength(content) -1);
-    var theLevel = 0;
-    var theParent = null;
+   * arrayContentDidChange will access last object, which may be a invisible loading placeholder.
+   * */
+  arrayContentDidChange: Ember.K,
 
-    var childrenRows = this.get('_expandedGroupRowToChildrenMap');
-
-    while (childrenRows.has(theObject)) {
-      var children = childrenRows.get(theObject);
-      theParent = theObject;
-      theObject =  children.objectAt(this.arrayLength(children) -1);
-      theLevel ++;
-    }
-    return {object: theObject, level: theLevel, parent: theParent};
-  },
-
-  extractAllChildren: function extractAllChildren(rowContent) {
-    var controllersMap = this.get('_controllersMap');
-    var allChildren = [];
-    this.depthFirstTraverse(rowContent, function(child) {
-      if (controllersMap.has(child)) {
-        allChildren.push(controllersMap.get(child));
+  _expandedDepth: Ember.computed(function () {
+    var root = this.get('_virtualRootRow');
+    return root.get('_childrenRow').definedControllers().reduce(function (previousValue, item) {
+      if (!item) {
+        return previousValue;
       }
-      return {needGoDeeper: true };
+      var expandedDepth = item.get('expandedDepth');
+      if (expandedDepth > previousValue) {
+        return expandedDepth;
+      }
+      return previousValue;
+    }, 0);
+  }).property('_virtualRootRow._childrenRow.@each.expandedDepth',  '_virtualRootRow._childrenRow.definedControllersCount'),
+
+
+  _virtualRootRow: Ember.computed(function () {
+    var groupingLevel = this.get('content.grandTotalTitle') ? -2 : -1;
+    var rootRow = GroupRow.create({
+      content: {children: this.get('content')},
+      expandLevel: -1,
+      grandTotalTitle: this.get('content.grandTotalTitle'),
+      itemController: this.get('itemController'),
+      parentController: this.get('parentController') || this,
+      grouping: Grouping.create({
+        groupingMetadata: this.get('content.groupingMetadata'),
+        groupingLevel: groupingLevel
+      }),
+      target: this
     });
-    return allChildren;
+    rootRow.expandChildren();
+    return rootRow;
+  }).property('content'),
+
+  notifyOneChunkLoaded: function() {
+    this.notifyPropertyChange('length');
   },
 
-  depthFirstTraverse: function(content, visitChild, level) {
-    var _this = this;
-    var children = Ember.get(content, 'children');
-    for (var i = 0; i < this.arrayLength(children); i++) {
-      var child = children.objectAt(i);
-      var decision = visitChild(child, content, level || 0);
-      if (decision.stop) {
-        return decision;
-      }
-      var needGoDeeper = decision.needGoDeeper;
-      if (needGoDeeper) {
-        var nextLevelDecision = _this.depthFirstTraverse(child, visitChild, (level || 0) + 1);
-        if (nextLevelDecision && nextLevelDecision.stop) {
-          return nextLevelDecision;
-        }
-      }
-    }
-    return {stop: false};
-  },
-
-  arrayLength: function(array) {
-    if (array) {
-      if (array.get) {
-        return array.get('length');
-      } else {
-        return array.length;
-      }
-    }
-    return 0;
-  },
-
-  _forceContentLengthRecalc: false,
-
-  _expandedGroupRowToChildrenMap: null,
-
-  //map between row content and row controller
-  _controllersMap: null,
-
-  _expandedDepth: 0
+  length: Ember.computed(function () {
+    var root = this.get('_virtualRootRow');
+    var subRowsCount = root.get('_childrenRow').definedControllers().reduce(function (previousValue, item) {
+      return item.get('subRowsCount') + previousValue;
+    }, 0);
+    return root.get('_childrenRow.length') + subRowsCount;
+  }).property('_virtualRootRow._childrenRow.@each.subRowsCount', '_virtualRootRow._childrenRow.definedControllersCount')
 });
