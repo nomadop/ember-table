@@ -10,7 +10,6 @@ moduleForEmberTable('grand total', function () {
     height: 330,
     width: 700,
     content: Ember.ArrayProxy.create({
-      groupingMetadata: [{id: "accountSection"}, {id: "accountType"}],
       content: [
         {
           id: 1,
@@ -20,9 +19,12 @@ moduleForEmberTable('grand total', function () {
             }
           ]
         }
-      ],
+      ]
+    }),
+    groupMeta: {
+      groupingMetadata: [{id: "accountSection"}, {id: "accountType"}],
       grandTotalTitle: "Total"
-    })
+    }
   });
 });
 
@@ -51,39 +53,37 @@ moduleForEmberTable('grand total with lazy load',
     return EmberTableFixture.create({
       height: 600,
       width: 700,
-      content: Ember.Object.create(
-        {
-          loadChildren: function getChunk(chunkIndex, sortingColumn, groupQuery) {
-            function loadGrandTotal() {
-              var defer = defers.next();
-              defer.resolve({content: [{id: 'grand total'}], meta: {}});
-              return defer.promise;
-            }
-            if (!groupQuery.key) {
-              return  loadGrandTotal();
-            }
+      groupMeta: {
+        groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
+        grandTotalTitle: "Total",
+        loadChildren: function getChunk(chunkIndex, sortingColumn, groupQuery) {
+          function loadGrandTotal() {
             var defer = defers.next();
-            var result = {
-              content: [],
-              meta: {totalCount: 5, chunkSize: chunkSize}
-            };
-
-            for (var i = 0; i < chunkSize; i++) {
-              result.content.push({id: i});
-            }
-
-            var queryObj = {};
-            groupQuery.upperGroupings.forEach(function(x) {
-              queryObj[x[0]] = Ember.get(x[1], 'id');
-            });
-            parentQueries.push(queryObj);
-            defer.resolve(result);
+            defer.resolve({content: [{id: 'grand total'}], meta: {}});
             return defer.promise;
-          },
+          }
+          if (!groupQuery.key) {
+            return  loadGrandTotal();
+          }
+          var defer = defers.next();
+          var result = {
+            content: [],
+            meta: {totalCount: 5, chunkSize: chunkSize}
+          };
 
-          groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
-          grandTotalTitle: "Total"
-        })
+          for (var i = 0; i < chunkSize; i++) {
+            result.content.push({id: i});
+          }
+
+          var queryObj = {};
+          groupQuery.upperGroupings.forEach(function(x) {
+            queryObj[x[0]] = Ember.get(x[1], 'id');
+          });
+          parentQueries.push(queryObj);
+          defer.resolve(result);
+          return defer.promise;
+        }
+      }
     });
   });
 

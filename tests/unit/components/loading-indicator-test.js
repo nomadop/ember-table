@@ -21,10 +21,10 @@ var firstRowObject = {
 
 moduleForEmberTable('loading indicator', function(content) {
   return EmberTableFixture.create({  
-    content: Ember.ArrayProxy.create({
-      content: content,
-      groupingMetadata: ["", ""]
-    }),
+    content: content,
+    groupMeta: {
+      groupingMetadata: ["accountSection", "accountType"]
+    },
     height: 157
   });
 });
@@ -63,10 +63,10 @@ test('expand grouped rows', function(assert) {
 
 moduleForEmberTable('custom loading indicator', function(content) {
   return EmberTableFixture.create({
-    content: Ember.ArrayProxy.create({
-      content: content,
+    content: content,
+    groupMeta: {
       groupingMetadata: ["", ""]
-    }),
+    },
     height: 157,
     rowLoadingIndicatorView: RowLoadingIndicator.extend()
   });

@@ -138,7 +138,6 @@ var GroupRow = Row.extend({
             parentController: this.get('parentController'),
             content: content,
             expandLevel: this.get('expandLevel') + 1,
-            grandTotalTitle: this.get('grandTotalTitle'),
             grouping: this.get('nextLevelGrouping'),
             itemController: this.get('itemController'),
             parentRow: this
@@ -161,18 +160,18 @@ var GroupRow = Row.extend({
     },
 
     children: Ember.computed(function() {
-      if (this.get('target.loadChildren') && this.get('grouping.isGroup') && this.get('expandLevel') >= 0) {
+      if (this.get('target.groupMeta.loadChildren') && this.get('grouping.isGroup') && this.get('expandLevel') >= 0) {
         return LazyGroupRowArray.create();
       }
       return this.get('content.children');
-    }).property('target.loadChildren', 'grouping.isGroup'),
+    }).property('target.groupMeta.loadChildren', 'grouping.isGroup'),
 
     hasChildren: Ember.computed.oneWay('grouping.isGroup'),
 
     isExpanded: false,
 
     expandLevel: null,
-    grandTotalTitle: null,
+    grandTotalTitle: Ember.computed.oneWay('target.groupMeta.grandTotalTitle'),
     grouping: null,
     groupingKey: Ember.computed.oneWay('grouping.key'),
     groupName: Ember.computed(function() {

@@ -1,9 +1,9 @@
 import Ember from 'ember';
 import { test } from 'ember-qunit';
 import moduleForEmberTable from '../../helpers/module-for-ember-table';
-import EmberTableFixture from '../../fixture/ember-table-with-gl-data';
+import EmberTableFixture from '../../fixture/ember-table';
+import GlData from '../../fixture/ember-table-with-gl-data';
 import EmberTableHelper from '../../helpers/ember-table-helper';
-import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
 import DeferPromises from '../../fixture/defer-promises';
 
 moduleForEmberTable('one level grouping',
@@ -12,7 +12,7 @@ moduleForEmberTable('one level grouping',
       height: 600,
       width: 700,
       defers: defers,
-      groupingMetadata: [{id: "accountSection"}, {id: "accountType"}]
+      groupMeta: GlData.create({defers: defers})
     });
   });
 

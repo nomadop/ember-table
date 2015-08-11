@@ -14,24 +14,17 @@ import _loadTextAssertions from '../../helpers/assert-text';
 import TableDom from '../../helpers/table-dom';
 
 
-var normalArray = [{
-    id: 2
-  }, {
-    id: 1
-  }, {
-    id: 4
-  }, {
-    id: 3
-  }];
+var normalArray = [{ id: 2}, { id: 1}, { id: 4}, { id: 3}];
 
-moduleForEmberTable('A normal JavaScript array as ember-table content', function (content) {
+moduleForEmberTable('A normal JavaScript array as ember-table content', function (options) {
   return EmberTableFixture.create({
-    content: content
+    content: options.content,
+    groupMeta: options.groupMeta
   });
 });
 
 test('regular click to sort by id column', function (assert) {
-  var component = this.subject(normalArray);
+  var component = this.subject({content:normalArray});
   this.render();
   var table = TableDom.create({content: component.$()});
 
@@ -52,7 +45,7 @@ test('regular click to sort by id column', function (assert) {
 });
 
 test('click with command key to sort by id column', function (assert) {
-  var component = this.subject(normalArray);
+  var component = this.subject({content:normalArray});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
@@ -72,9 +65,7 @@ test('click with command key to sort by id column', function (assert) {
 });
 
 test('sort with grouped row array', function(assert) {
-  var content = Ember.ArrayProxy.create({
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    content: [{
+  var content = [{
       id: 1,
       accountSection: 'f-1',
       children: [{
@@ -94,9 +85,11 @@ test('sort with grouped row array', function(assert) {
     }, {
       id: 2,
       accountSection: 'f-2'
-    }]
-  });
-  var component = this.subject(content);
+    }];
+  var groupMeta = {
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
+  };
+  var component = this.subject({content: content, groupMeta: groupMeta});
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
   this.render();
 
@@ -125,7 +118,7 @@ test('sort by id:asc, activity:desc', function(assert) {
     ["id-b", "activity-a"],
     ["id-c", "activity-a"]
   ];
-  var component = this.subject(content);
+  var component = this.subject({content: content});
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
 
   this.render();
@@ -321,14 +314,13 @@ test('multiple columns sort with complete data', function(assert) {
 });
 
 moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (options) {
-  var provider = GroupedRowDataProvider.create({
-    defers: options.defers,
-    delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
-  });
   return EmberTableFixture.create({
     height: options.height,
-    content: provider.get('content')
+    groupMeta: GroupedRowDataProvider.create({
+      defers: options.defers,
+      delayTime: options.delayTime || 0,
+      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
+    })
   });
 });
 
@@ -535,15 +527,14 @@ test('multiple column sort partial data for lazy group row array', function (ass
 });
 
 moduleForEmberTable('Grand total row as ember-table content', function (options) {
-  var groupedRowDataProvider = GroupedRowDataProvider.create({
-    defers: options.defers,
-    delayTime: options.delayTime || 0,
-    groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}]
-});
-
   return EmberTableFixture.create({
-    content: groupedRowDataProvider.get('grandTotalRowContent'),
-    height: options.height
+    height: options.height,
+    groupMeta: GroupedRowDataProvider.create({
+      defers: options.defers,
+      delayTime: options.delayTime || 0,
+      groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
+      grandTotalTitle: 'Total'
+    })
   });
 });
 

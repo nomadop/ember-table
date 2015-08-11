@@ -8,11 +8,11 @@ var subject;
 module('group row array controller with one level grouping', {
   beforeEach: function () {
     subject = GroupedRowArrayController.create({
-      content: Ember.ArrayProxy.create({
-        content: [{id: 1}, {id: 2}],
+      content:[{id: 1}, {id: 2}],
+      itemController: GroupRow,
+      groupMeta: {
         groupingMetadata: [{id: "firstLevel"}]
-      }),
-      itemController: GroupRow
+      }
     });
   }
 });
@@ -40,17 +40,17 @@ test('_expandedDepth', function (assert) {
 module('group row array controller with two level groupings', {
   beforeEach: function () {
     subject = GroupedRowArrayController.create({
-      content: Ember.ArrayProxy.create({
-        content: [
+      content:[
           {
             id: 10,
             children: [{id: 11}, {id: 12}, {id: 13}]
           },
           {id: 20}
         ],
+      itemController: GroupRow,
+      groupMeta: {
         groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
-      }),
-      itemController: GroupRow
+      }
     });
   }
 });
@@ -107,8 +107,7 @@ test('expanded level for second level rows', function (assert) {
 module('group row array controller with two level and first level has two groupings', {
   beforeEach: function () {
     subject = GroupedRowArrayController.create({
-      content: Ember.ArrayProxy.create({
-        content: [
+      content: [
           {
             id: 10,
             children: [{id: 11}, {id: 12}, {id: 13}]
@@ -118,9 +117,10 @@ module('group row array controller with two level and first level has two groupi
             children: [{id: 21}, {id: 22}]
           }
         ],
+      itemController: GroupRow,
+      groupMeta: {
         groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
-      }),
-      itemController: GroupRow
+      }
     });
   }
 });
@@ -177,20 +177,23 @@ test('collapse first and second children row', function (assert) {
 module('group row array controller defects');
 
 test('different instance', function (assert) {
-  var content = Ember.ArrayProxy.create({
-    content: [{
+  var content = [{
       id: 10,
       children: [{id: 11}, {id: 12}, {id: 13}]
-    }],
-    groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
-  });
+    }];
   var subject1 = GroupedRowArrayController.create({
     content: content,
-    itemController: GroupRow
+    itemController: GroupRow,
+    groupMeta: {
+      groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+    }
   });
   var subject2 = GroupedRowArrayController.create({
     content: content,
-    itemController: GroupRow
+    itemController: GroupRow,
+    groupMeta: {
+      groupingMetadata: [{id: "firstLevel"}, {id: "secondLevel"}]
+    }
   });
 
   subject1.expandChildren(subject1.objectAt(0));
@@ -226,15 +229,16 @@ test('different instance more levels', function (assert) {
       {id: 13}
     ]
   }];
+  var groupingMetadata = [
+    {id: "firstLevel"}, {id: "secondLevel"}, {id: "thirdLevel"},
+    {id: "fourthLevel"}, {id: "fifthLevel"}
+    ];
   var subject = GroupedRowArrayController.create({
-    content: Ember.ArrayProxy.create({
-      content: content,
-      groupingMetadata: [
-        {id: "firstLevel"}, {id: "secondLevel"}, {id: "thirdLevel"},
-        {id: "fourthLevel"}, {id: "fifthLevel"}
-      ]
-    }),
-    itemController: GroupRow
+    content: content,
+    itemController: GroupRow,
+    groupMeta: {
+      groupingMetadata: groupingMetadata
+    }
   });
 
   subject.expandChildren(subject.objectAt(0));

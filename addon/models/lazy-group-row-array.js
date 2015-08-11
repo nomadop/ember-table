@@ -19,17 +19,15 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
     var chunkIndex = this.chunkIndex(index);
     var self = this;
     target.incrementProperty('status.loadingCount');
-    target.loadChildren(chunkIndex, target.get('sortingColumns'), grouping.get('query'))
+    target.groupMeta.loadChildren(chunkIndex, target.get('sortingColumns'), grouping.get('query'))
       .then(function (result) {
         self.onOneChunkLoaded(result);
         self.notifyPropertyChange('length');
         target.decrementProperty('status.loadingCount');
-        if (target) {
-          target.notifyOneChunkLoaded();
-        }
+        target.notifyOneChunkLoaded();
       })
       .catch(function () {
-        target.onLoadError("Failed to load data.", grouping.get('key'), chunkIndex);
+        target.groupMeta.onLoadError("Failed to load data.", grouping.get('key'), chunkIndex);
         target.decrementProperty('status.loadingCount');
       });
   },
