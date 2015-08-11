@@ -27,7 +27,9 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
         target.notifyOneChunkLoaded();
       })
       .catch(function () {
-        target.groupMeta.onLoadError("Failed to load data.", grouping.get('key'), chunkIndex);
+        if (target.onLoadError) {
+          target.onLoadError("Failed to load data.", grouping.get('key'), chunkIndex);
+        }
         target.decrementProperty('status.loadingCount');
       });
   },
