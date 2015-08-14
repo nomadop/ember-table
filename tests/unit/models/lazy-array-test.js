@@ -26,7 +26,7 @@ function getChunk(chunkIndex) {
 }
 
 function accessObject(idx) {
-  return lazyArray.objectAt(idx - 1);
+  return lazyArray.fetchObjectAt(idx - 1);
 }
 
 function asyncAssert(callback) {
