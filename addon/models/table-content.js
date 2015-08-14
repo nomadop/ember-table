@@ -2,10 +2,6 @@ import Ember from 'ember';
 
 export default Ember.ArrayProxy.extend({
 
-  groupingMetadata: Ember.computed.alias('content.groupingMetadata'),
-  grandTotalTitle: Ember.computed.alias('content.grandTotalTitle'),
-  loadGrandTotal: Ember.computed.alias('content.loadGrandTotal'),
-
   // This property contains all sorted columns.
   sortingColumns: null,
 

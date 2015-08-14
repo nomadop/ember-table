@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import LazyGroupRowArray from 'ember-table/models/lazy-group-row-array';
 
 var DataProvider = function(options) {
   options = options || {};
