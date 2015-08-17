@@ -132,7 +132,11 @@ test('sort by id:asc, activity:desc', function(assert) {
 
 moduleForEmberTable('A normal JavaScript array as ember-table content', function () {
   var content = [
-    {id: 1, accountSection: 'as-2'},
+    {id: 1, accountSection: 'as-2', children: [
+      {id: 11, accountSection: 'as-2', accountType: 'at-3'},
+      {id: 12, accountSection: 'as-2', accountType: 'at-1'},
+      {id: 13, accountSection: 'as-2', accountType: 'at-2'}
+    ]},
     {id: 2, accountSection: 'as-1'},
     {id: 3, accountSection: 'as-3'}
   ];
@@ -177,6 +181,17 @@ test('change sort grouper account section from asc to unsorted', function(assert
   });
 
   assert.equal(helper.fixedBodyCell(0, 0).text().trim(), "as-2");
+});
+
+test('change expanded sort grouper account section to asc', function (assert) {
+  var component = this.subject();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  helper.rowGroupingIndicator(0).click();
+  Ember.run(component, 'setGrouperSortDirection', 0, 'asc');
+
+  assert.equal(helper.fixedBodyCell(2, 0).text().trim(), "at-3");
 });
 
 moduleForEmberTable('lazy-array as ember-table content', function (options) {

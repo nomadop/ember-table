@@ -93,11 +93,11 @@ var GroupRow = Row.extend({
     },
 
     sortByGroupers: function () {
-      var children = this.get('children');
       var grouping = this.get('nextLevelGrouping');
-      var newContent = grouping.sortContent(children);
+      var newContent = grouping.sortContent(this.get('children'));
       this.set('_childrenRow', SubRowArray.create({
-        content: newContent
+        content: newContent,
+        oldObject: this.get('_childrenRow')
       }));
     },
 
