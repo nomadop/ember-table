@@ -6,8 +6,6 @@ export default Ember.ArrayProxy.extend({
 
   loadingCount: 0,
 
-  sortingColumns: null,
-
   // Function to get next chunk of rows.
   // The callback should return a promise which will return an array of rows.
   // The callback function should maintain the sequence of chunks,
@@ -19,18 +17,9 @@ export default Ember.ArrayProxy.extend({
   // This is a content or _lazyContent cache for sortable order
   _contentCache: Ember.computed(function() {
     var content = this.get('content');
-    if (this.get('needSort')) {
-      if(this.get('isCompleted')){
-        var sortingColumns = this.get('sortingColumns');
-        return sortingColumns.sortContent(content);
-      } else{
-        return Ember.A();
-      }
-    }
-    return content;
-  }).property('sortingColumns._columns'),
 
-  needSort: Ember.computed.oneWay('sortingColumns.isNotEmpty'),
+    return content;
+  }).property('content'),
 
   isEmberTableContent: true,
 
@@ -40,7 +29,7 @@ export default Ember.ArrayProxy.extend({
     this.set('content', lazyContent);
   },
 
-  objectAt: function (index) {
+  fetchObjectAt: function (index) {
     var cacheContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
     if (!cacheContent[index] || cacheContent[index].get('isError')) {
@@ -52,6 +41,14 @@ export default Ember.ArrayProxy.extend({
 
   length: Ember.computed.alias('_totalCount'),
 
+  resetContent: function () {
+    this.set('content', new Array(this.get('_totalCount')));
+  },
+
+  sort: function (sortingColumns) {
+    this.set('content', sortingColumns.sortContent(this.get('content')));
+  },
+
   loadOneChunk: function (chunkIndex) {
     var lazyContent = this.get('_contentCache');
     var chunkSize = this.get('chunkSize');
@@ -60,7 +57,7 @@ export default Ember.ArrayProxy.extend({
     var self = this;
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
       if (!lazyContent[chunkStart + x]) {
-        lazyContent.replace(chunkStart + x, 1, Ember.ObjectProxy.create({"isLoaded": false, "isError": false}));
+        lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
       } else {
         lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
       }
@@ -88,7 +85,7 @@ export default Ember.ArrayProxy.extend({
     if (chunkEndIndex >= lastRowIndex) { return; }
 
     if (chunkEndIndex - index <= this.get('_preloadGate')) {
-      this.objectAt(chunkEndIndex + 1);
+      this.fetchObjectAt(chunkEndIndex + 1);
     }
   },
 

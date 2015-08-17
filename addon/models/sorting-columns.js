@@ -36,6 +36,9 @@ export default Ember.Object.extend({
   isMultipleColumns: Ember.computed.gt('_columns.length', 1),
 
   sortContent: function(content) {
+    if (!this.get('isNotEmpty')) {
+      return content;
+    }
     if (!content) {
       return content;
     }

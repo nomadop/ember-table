@@ -55,13 +55,13 @@ test('click with command key to sort by id column', function (assert) {
 
   helper.clickHeaderCellWithCommand(0);
   helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
-  helper.assertCellContent(0, 0, '2', ' should sort as unsorted');
+  helper.assertCellContent(0, 0, '1', ' should keep as ascending after unsort');
 
   helper.getHeaderCell(0).click();
   helper.getHeaderCell(0).click();
   helper.assertCellContent(0, 0, '4', 'should sort as descending');
   helper.clickHeaderCellWithCommand(0);
-  helper.assertCellContent(0, 0, '2', 'should sort as unsorted');
+  helper.assertCellContent(0, 0, '4', 'should keep as descending after unsort');
 });
 
 test('sort with grouped row array', function(assert) {
@@ -175,14 +175,14 @@ test('click with command key to sort column of id by completed data', function (
 
     helper.clickHeaderCellWithCommand(0);
     helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
-    helper.assertCellContent(0, 0, '3', 'should display unsorted state');
+    helper.assertCellContent(0, 0, '0', 'should keep ascending after unsort');
 
     helper.getHeaderCell(0).click();
     helper.getHeaderCell(0).click();
 
     helper.clickHeaderCellWithCommand(0);
     helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
-    helper.assertCellContent(0, 0, '3', 'should display unsorted state');
+    helper.assertCellContent(0, 0, '19', 'should keep descending after unsort');
   });
 });
 
@@ -255,7 +255,7 @@ test('sort quickly twice', function (assert) {
 });
 
 test('click with command key to sort column of id by partial data', function (assert) {
-  var defers = DefersPromise.create({count: 8});
+  var defers = DefersPromise.create({count: 12});
   var component = this.subject({defers:defers, height: 200});
   this.render();
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -267,20 +267,25 @@ test('click with command key to sort column of id by partial data', function (as
     helper.assertAscendingIndicatorInHeaderCell(0, 'should show ascending indicator');
     helper.assertCellContent(0, 0, '0', 'should sort as ascending');
     helper.clickHeaderCellWithCommand(0);
+  }, [2, 3]);
+  defers.ready(function () {
     helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
-    helper.getHeaderCell(0).click();
-  }, [2, 3]);
-
-  defers.ready(function(){
     helper.getHeaderCell(0).click();
   }, [4, 5]);
 
-  return defers.ready(function(){
+  defers.ready(function(){
+    helper.getHeaderCell(0).click();
+  }, [6, 7]);
+
+  defers.ready(function(){
     helper.clickHeaderCellWithCommand(0);
+  }, [8, 9]);
+
+  return defers.ready(function(){
     helper.assertNonSortIndicatorInHeaderCell(0, 'should not show loading indicator');
     helper.assertCellContent(0, 0, '3', 'should display unsorted state');
-  }, [6, 7]);
+  }, [10, 11]);
 });
 
 test('multiple columns sort with complete data', function(assert) {

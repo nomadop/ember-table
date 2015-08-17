@@ -22,3 +22,6 @@ testem.log
 
 # grunt-release-it
 .stage
+
+# test coverage
+coverage.json

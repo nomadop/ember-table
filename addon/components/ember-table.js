@@ -6,7 +6,6 @@ import GroupedRowArrayController from 'ember-table/controllers/grouped-row-array
 import Row from 'ember-table/controllers/row';
 import GroupRow from 'ember-table/controllers/group-row';
 import ColumnDefinition from 'ember-table/models/column-definition';
-import TableContent from 'ember-table/models/table-content';
 import SortingColumns from 'ember-table/models/sorting-columns';
 
 export default Ember.Component.extend(
@@ -175,10 +174,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // nearestWithProperty()
   isEmberTable: true,
 
-  _sortedColumn: undefined,
-
-  contentStatus: Ember.computed.alias('wrapedContent.status'),
-
   // true if is dragging an inner column of group
   // otherwise is false
   // the value is set when reordering starts
@@ -203,18 +198,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return this.prepareTableColumns();
   },
 
-  wrappedContent: Ember.computed(function() {
-    var content = this.get('content');
-    if(!content.get('isEmberTableContent')){
-      if (!this.get('groupMeta')) {
-        content = TableContent.create({content: content, sortingColumns: this.get('sortingColumns')});
-      }
-    }
-    return content;
-  }).property('content'),
-
-  _reloadBody: false,
-
   // TODO(azirbel): Document
   actions: {
     addColumn: Ember.K,
@@ -226,13 +209,10 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       sortingColumns.update(column, event);
       this.sendAction('sortAction', sortingColumns);
 
-      var content = this.get('wrappedContent');
-      content.set('sortingColumns', sortingColumns);
       var bodyContent = this.get('bodyContent');
       if (bodyContent.sort) {
         bodyContent.sort(sortingColumns);
       }
-      this.toggleProperty('_reloadBody');
       Ember.run.next(this, this.updateLayout);
     }
   },
@@ -266,7 +246,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   //If a new groupedRowController is created, the expanding state will be cleared.
   _groupedRowController: Ember.computed(function(){
     var self = this;
-    var content = this.get('wrappedContent');
+    var content = this.get('content');
     return GroupedRowArrayController.create({
       target: this,
       parentController: this,
@@ -290,9 +270,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       parentController: this,
       container: this.get('container'),
       itemController: Row,
-      content: this.get('wrappedContent')
+      content: this.get('content')
     });
-  }).property('content.[]', '_reloadBody', '_hasGroupingColumn'),
+  }).property('content.[]', '_hasGroupingColumn'),
 
   // An array of Ember.Table.Row
   footerContent: Ember.computed(function(key, value) {
