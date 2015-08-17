@@ -71,25 +71,40 @@ var GroupRow = Row.extend({
       if (!subRows) {
         return;
       }
-      if (this.get('grouping.isLeafParent')) {
-        subRows.willDestroy();
-        var newContent;
-        if (this.get('children.isNotCompleted')) {
-          newContent = this.get('children');
-          newContent.resetContent();
-        } else {
-          newContent = sortingColumns.sortContent(this.get('children'));
+      var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
+      if (groupingRowAffectedByColumnSort) {
+        var newContent = sortingColumns.sortContent(this.get('children'));
+        var newSubRowArray = SubRowArray.create({
+          content: newContent,
+          oldObject: this.get('_childrenRow')
+        });
+        this.set('_childrenRow', newSubRowArray);
+        newSubRowArray.forEach(function(controller) {
+          if(controller) {
+            controller.sort(sortingColumns);
+          }
+        });
+      } else {
+        if (this.get('grouping.isLeafParent')) {
+          subRows.willDestroy();
+          var newContent;
+          if (this.get('children.isNotCompleted')) {
+            newContent = this.get('children');
+            newContent.resetContent();
+          } else {
+            newContent = sortingColumns.sortContent(this.get('children'));
+          }
+          this.set('_childrenRow', SubRowArray.create({
+            content: newContent
+          }));
+          return;
         }
-        this.set('_childrenRow', SubRowArray.create({
-          content: newContent
-        }));
-        return;
+        subRows.forEach(function (r) {
+          if (r) {
+            r.sort(sortingColumns);
+          }
+        });
       }
-      subRows.forEach(function (r) {
-        if (r) {
-          r.sort(sortingColumns);
-        }
-      });
     },
 
     sortByGroupers: function () {

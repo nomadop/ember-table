@@ -13,7 +13,6 @@ import _loadSortIndicatorAssertions from '../../helpers/assert-sort-indicator';
 import _loadTextAssertions from '../../helpers/assert-text';
 import TableDom from '../../helpers/table-dom';
 
-
 var normalArray = [{ id: 2}, { id: 1}, { id: 4}, { id: 3}];
 
 moduleForEmberTable('A normal JavaScript array as ember-table content', function (options) {
@@ -62,6 +61,57 @@ test('click with command key to sort by id column', function (assert) {
   helper.assertCellContent(0, 0, '4', 'should sort as descending');
   helper.clickHeaderCellWithCommand(0);
   helper.assertCellContent(0, 0, '4', 'should keep as descending after unsort');
+});
+
+test('sort grouped row array by id column, no expand', function(assert) {
+  var content = [{
+    id: 2,
+    accountSection: 'f-2'
+  }, {
+    id: 1,
+    accountSection: 'f-1'
+  }];
+  var groupMeta = {
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
+    groupingRowAffectedByColumnSort: true
+  };
+  var component = this.subject({content: content, groupMeta: groupMeta});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  helper.getHeaderCell(0).click();
+
+  var expectedContent = [['1'], ['2']];
+  assert.deepEqual(helper.bodyCellsContent([0,1], [0]), expectedContent);
+});
+
+test('sort grouped row array by id column, expand', function(assert) {
+  var content = [{
+    id: 2,
+    accountSection: 'f-2',
+    children: [
+      {id: 22},
+      {id: 21, children: [{id: 211}]},
+      {id: 23}
+    ]
+  }, {
+    id: 1,
+    accountSection: 'f-1'
+  }];
+  var groupMeta = {
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
+    groupingRowAffectedByColumnSort: true
+  };
+  var component = this.subject({content: content, groupMeta: groupMeta});
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  helper.rowGroupingIndicator(0).click();
+  helper.rowGroupingIndicator(2).click();
+  helper.getHeaderCell(0).click();
+
+  var expectedContent = [['1'], ['2'], ['21'], ['211'], ['22'], ['23']];
+  assert.deepEqual(helper.bodyCellsContent([0,1,2,3,4,5], [0]), expectedContent);
 });
 
 test('sort with grouped row array', function(assert) {
