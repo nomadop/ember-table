@@ -73,9 +73,8 @@ var GroupRow = Row.extend({
       }
       var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
       if (groupingRowAffectedByColumnSort) {
-        var newContent = sortingColumns.sortContent(this.get('children'));
         var newSubRowArray = SubRowArray.create({
-          content: newContent,
+          content: sortingColumns.sortContent(this.get('children')),
           oldObject: this.get('_childrenRow')
         });
         this.set('_childrenRow', newSubRowArray);

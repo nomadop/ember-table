@@ -23,7 +23,7 @@ moduleForEmberTable('loading indicator', function(content) {
   return EmberTableFixture.create({  
     content: content,
     groupMeta: {
-      groupingMetadata: ["accountSection", "accountType"]
+      groupingMetadata: [{id: "accountSection"}, {id: "accountType"}]
     },
     height: 157
   });
@@ -65,7 +65,7 @@ moduleForEmberTable('custom loading indicator', function(content) {
   return EmberTableFixture.create({
     content: content,
     groupMeta: {
-      groupingMetadata: ["", ""]
+      groupingMetadata: [{id: ""}, {id: ""}]
     },
     height: 157,
     rowLoadingIndicatorView: RowLoadingIndicator.extend()
