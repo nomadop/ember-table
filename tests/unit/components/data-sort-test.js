@@ -130,6 +130,55 @@ test('sort by id:asc, activity:desc', function(assert) {
   assert.deepEqual(bodyCellsContent, sortedContent, "content should be sorted by multiple columns");
 });
 
+moduleForEmberTable('A normal JavaScript array as ember-table content', function () {
+  var content = [
+    {id: 1, accountSection: 'as-2'},
+    {id: 2, accountSection: 'as-1'},
+    {id: 3, accountSection: 'as-3'}
+  ];
+  var groupMeta = {
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
+  };
+
+  return EmberTableFixture.create({
+    content: content,
+    groupMeta: groupMeta
+  });
+});
+
+test('sort grouper account section asc', function(assert) {
+  var component = this.subject();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  Ember.run(component, 'setGrouperSortDirection', 0, 'asc');
+
+  assert.equal(helper.fixedBodyCell(0, 0).text().trim(), "as-1");
+});
+
+test('sort grouper account section desc', function(assert) {
+  var component = this.subject();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+
+  assert.equal(helper.fixedBodyCell(0, 0).text().trim(), "as-3");
+});
+
+test('change sort grouper account section from asc to unsorted', function(assert) {
+  var component = this.subject();
+  var helper = EmberTableHelper.create({_assert: assert, _component: component});
+  this.render();
+
+  Ember.run(function() {
+    component.setGrouperSortDirection(0, 'asc');
+    component.setGrouperSortDirection(0, null);
+  });
+
+  assert.equal(helper.fixedBodyCell(0, 0).text().trim(), "as-2");
+});
+
 moduleForEmberTable('lazy-array as ember-table content', function (options) {
   return EmberTableFixture.create({
     height: options.height,

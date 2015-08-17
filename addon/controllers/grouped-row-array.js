@@ -90,5 +90,11 @@ export default RowArrayController.extend({
       return item.get('subRowsCount') + previousValue;
     }, 0);
     return root.get('_childrenRow.length') + subRowsCount;
-  }).property('_virtualRootRow._childrenRow.@each.subRowsCount', '_virtualRootRow._childrenRow.definedControllersCount')
+  }).property('_virtualRootRow._childrenRow.@each.subRowsCount', '_virtualRootRow._childrenRow.definedControllersCount'),
+
+  groupMeta: null,
+
+  groupersSortingDidChange: Ember.observer('groupMeta.groupingMetadata.@each.sortDirection', function() {
+    this.get('_virtualRootRow').sortByGroupers();
+  })
 });
