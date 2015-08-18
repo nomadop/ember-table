@@ -717,6 +717,84 @@ test('multiple column sort partial data for lazy group row array', function (ass
   });
 });
 
+
+moduleForEmberTable('sort lazy-grouped-row-array by groupers', function (options) {
+  return EmberTableFixture.create({
+    height: options.height,
+    groupMeta: GroupedRowDataProvider.create({
+      defers: options.defers,
+      delayTime: options.delayTime || 0,
+      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
+      groupingRowAffectedByColumnSort: true
+    })
+  });
+});
+
+test('sort by grouper accountSection', function(assert) {
+  var defers = DefersPromise.create({count: 2});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+  }, [0]);
+
+  return defers.ready(function() {
+    assert.deepEqual(table.cellsContent([0, 1, 2], [0, 1]), [
+      ['as-10', '10'],
+      ['as-9', '9'],
+      ['as-8', '8']
+    ]);
+  });
+});
+
+test('sort by grouper accountSection with expand state', function(assert) {
+  var defers = DefersPromise.create({count: 4});
+  var component = this.subject({defers: defers, height: 1000});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    table.rows(0).groupIndicator().click();
+  }, [0, 1]);
+
+  return defers.ready(function() {
+    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+
+    assert.deepEqual(table.cellsContent([7, 8, 9, 10, 11, 12], [0, 1]), [
+      ['as-2', '2'],
+      ['as-10', '10'],
+      ['as-1', '1'],
+      ['at-102', '102'],
+      ['at-101', '101'],
+      ['at-105', '105']
+    ]);
+  });
+});
+
+test('expand grouping row after sorted by grouper accountSection', function(assert) {
+  var defers = DefersPromise.create({count: 4});
+  var component = this.subject({defers: defers, height: 1000});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    Ember.run(component, 'setGrouperSortDirection', 1, 'desc');
+    table.rows(0).groupIndicator().click();
+  }, [0, 1]);
+
+  return defers.ready(function() {
+    assert.deepEqual(table.cellsContent([0, 1, 2, 3, 4], [0, 1]), [
+      ['as-1', '1'],
+      ['at-110', '110'],
+      ['at-109', '109'],
+      ['at-108', '108'],
+      ['at-107', '107']
+    ]);
+  });
+});
+
 moduleForEmberTable('Grand total row as ember-table content', function (options) {
   return EmberTableFixture.create({
     height: options.height,

@@ -19,16 +19,19 @@ module('Grouping has no upper groupings', {
 });
 
 test('query', function (assert) {
-  assert.deepEqual(grouping.get('query'), {key: 'section', upperGroupings: []});
+  assert.deepEqual(grouping.get('query'), {key: 'section', upperGroupings: [], sortDirection: undefined});
 });
 
 test('nextLevel', function (assert) {
   var nextLevelGrouping = grouping.nextLevel({id: 22, section: 'Income'});
 
   assert.equal(nextLevelGrouping.get('key'), 'type', 'next level key should be "type"');
-  assert.deepEqual(nextLevelGrouping.get('query'),
-    {key: 'type', upperGroupings: [['section', {id: 22, section: 'Income'}]]}, 'next level query');
-  assert.deepEqual(grouping.get('query'), {key: 'section', upperGroupings: []}, 'grouping is not affected by nextLevel');
+  assert.deepEqual(nextLevelGrouping.get('query'), {
+    key: 'type',
+    upperGroupings: [['section', {id: 22, section: 'Income'}, undefined]],
+    sortDirection: undefined
+  }, 'next level query');
+  assert.deepEqual(grouping.get('query'), {key: 'section', upperGroupings: [], sortDirection: undefined}, 'grouping is not affected by nextLevel');
 });
 
 
@@ -46,7 +49,10 @@ module('Grouping has one upper groupings', {
 });
 
 test('query', function (assert) {
-  assert.deepEqual(grouping.get('query'), {key: 'type', upperGroupings: [['section', {section: 'Income', id: 22}]]});
+  assert.deepEqual(grouping.get('query'), {
+    key: 'type',
+    upperGroupings: [['section', {section: 'Income', id: 22}, undefined]],
+    sortDirection: undefined});
 });
 
 module('Grouping is grand total row', {
@@ -62,12 +68,19 @@ module('Grouping is grand total row', {
 });
 
 test('query', function(assert) {
-  assert.deepEqual(grouping.get('query'), {key: null, upperGroupings: []});
+  assert.deepEqual(grouping.get('query'), {
+    key: undefined,
+    upperGroupings: [],
+    sortDirection: undefined});
 });
 
 test('nextLevel', function(assert) {
   var nextLevelGrouping = grouping.nextLevel({id: 1, title: 'grand total'});
 
   assert.equal(nextLevelGrouping.get('key'), 'section', 'key is "section"');
-  assert.deepEqual(nextLevelGrouping.get('query'), {key: 'section', upperGroupings: []});
+  assert.deepEqual(nextLevelGrouping.get('query'), {
+    key: 'section',
+    upperGroupings: [],
+    sortDirection: undefined
+  });
 });

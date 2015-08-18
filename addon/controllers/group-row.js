@@ -109,22 +109,35 @@ var GroupRow = Row.extend({
     },
 
     sortByGroupers: function () {
-      var grouping = this.get('nextLevelGrouping');
       var children = this.get('children');
       if (!children) {
         return;
       }
-      var newContent = grouping.sortContent(children);
-      var newSubRowArray = SubRowArray.create({
-        content: newContent,
-        oldObject: this.get('_childrenRow')
-      });
-      this.set('_childrenRow', newSubRowArray);
-      newSubRowArray.forEach(function(controller) {
-        if(controller) {
-          controller.sortByGroupers();
-        }
-      });
+      if (this.get('children.isNotCompleted')) {
+        this.set('children', LazyGroupRowArray.create());
+        this.set('_childrenRow', SubRowArray.create({
+          content: this.get('children')
+        }));
+      } else {
+        var grouping = this.get('nextLevelGrouping');
+        var sortContent = grouping.sortContent(children);
+        this.set('_childrenRow', SubRowArray.create({
+          content: sortContent,
+          oldObject: this.get('_childrenRow')
+        }));
+      }
+      this.invokeSortByGrouperOnSubRows();
+    },
+
+    invokeSortByGrouperOnSubRows: function() {
+      var subRows = this.get('_childrenRow');
+      if (subRows) {
+        subRows.forEach(function(controller) {
+          if(controller) {
+            controller.sortByGroupers();
+          }
+        });
+      }
     },
 
     findRow: function (idx) {

@@ -21,7 +21,7 @@ var Grouping = Ember.Object.extend({
   }).property('groupingLevel', 'groupingMetadata.[]'),
 
   getGrouper: function(groupingLevel) {
-    return groupingLevel >= 0 ? this.get('groupingMetadata').objectAt(groupingLevel) : null;
+    return groupingLevel >= 0 ? this.get('groupingMetadata').objectAt(groupingLevel) : undefined;
   },
 
   isGrandTotal: Ember.computed.equal('groupingLevel', -1),
@@ -41,15 +41,17 @@ var Grouping = Ember.Object.extend({
   query: Ember.computed(function () {
     return {
       key: this.get('key'),
-      upperGroupings: this.get('upperGroupings')
+      upperGroupings: this.get('upperGroupings'),
+      sortDirection: this.get('sortDirection')
     };
-  }).property('contents.[]', 'key'),
+  }).property('contents.[]', 'key', 'sortDirection'),
 
   upperGroupings: Ember.computed(function () {
     var self = this;
     var contents = this.get('contents');
     return contents.map(function (x, i) {
-      return [Ember.get(self.getGrouper(i), 'id'), x];
+      var grouper = self.getGrouper(i);
+      return [Ember.get(grouper, 'id'), x, Ember.get(grouper, 'sortDirection')];
     });
   }),
 
@@ -60,7 +62,7 @@ var Grouping = Ember.Object.extend({
       return arrayContent;
     }
     return arrayContent.slice().sort(function (prev, next) {
-      return Ember.compare(prev[key], next[key]) * (sortDirection === 'asc' ? 1 : -1);
+      return Ember.compare(Ember.get(prev, key), Ember.get(next, key)) * (sortDirection === 'asc' ? 1 : -1);
     });
   }
 
