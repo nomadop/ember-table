@@ -21,7 +21,7 @@ var GroupRow = Row.extend({
         }
       }
       return expandLevel;
-    }).property('expandLevel', 'isExpanded',  '_childrenRow.definedControllersCount', '_childrenRow.@each.expandedDepth'),
+    }).property('expandLevel', 'isExpanded', '_childrenRow.definedControllersCount', '_childrenRow.@each.expandedDepth'),
 
     subRowsCount: Ember.computed(function () {
       if (!this.get('isExpanded')) {
@@ -71,39 +71,72 @@ var GroupRow = Row.extend({
       if (!subRows) {
         return;
       }
-      if (this.get('grouping.isLeafParent')) {
-        subRows.willDestroy();
-        var newContent;
-        if (this.get('children.isNotCompleted')) {
-          newContent = this.get('children');
-          newContent.resetContent();
-        } else {
-          newContent = sortingColumns.sortContent(this.get('children'));
+      var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
+      if (groupingRowAffectedByColumnSort) {
+        var newSubRowArray = SubRowArray.create({
+          content: sortingColumns.sortContent(this.get('children')),
+          oldObject: this.get('_childrenRow')
+        });
+        this.set('_childrenRow', newSubRowArray);
+        newSubRowArray.forEach(function(controller) {
+          if(controller) {
+            controller.sort(sortingColumns);
+          }
+        });
+      } else {
+        if (this.get('grouping.isLeafParent')) {
+          subRows.willDestroy();
+          var newContent;
+          if (this.get('children.isNotCompleted')) {
+            newContent = this.get('children');
+            newContent.resetContent();
+          } else {
+            newContent = sortingColumns.sortContent(this.get('children'));
+          }
+          this.set('_childrenRow', SubRowArray.create({
+            content: newContent
+          }));
+          return;
         }
-        this.set('_childrenRow', SubRowArray.create({
-          content: newContent
-        }));
+        subRows.forEach(function (r) {
+          if (r) {
+            r.sort(sortingColumns);
+          }
+        });
+      }
+    },
+
+    sortByGroupers: function () {
+      var grouping = this.get('nextLevelGrouping');
+      var children = this.get('children');
+      if (!children) {
         return;
       }
-      subRows.forEach(function(r) {
-        if (r) {
-          r.sort(sortingColumns);
+      var newContent = grouping.sortContent(children);
+      var newSubRowArray = SubRowArray.create({
+        content: newContent,
+        oldObject: this.get('_childrenRow')
+      });
+      this.set('_childrenRow', newSubRowArray);
+      newSubRowArray.forEach(function(controller) {
+        if(controller) {
+          controller.sortByGroupers();
         }
       });
     },
 
-    findRow: function(idx) {
+    findRow: function (idx) {
       var subRows = this.get('_childrenRow');
       if (!subRows) {
         return undefined;
       }
       var p = idx;
-      for(var i = 0; i<subRows.get('length'); i++) {
+      for (var i = 0; i < subRows.get('length'); i++) {
         if (p === 0) {
           return subRows.objectAt(i);
         }
         var row = subRows.objectAt(i);
-        p --;
+        p--;
         if (row && row.get('isExpanded')) {
           var subRowsCount = row.get('subRowsCount');
           if (p < subRowsCount) {
@@ -122,7 +155,7 @@ var GroupRow = Row.extend({
         return undefined;
       }
       var p = idx;
-      for(var i = 0; i<subRows.get('length'); i++) {
+      for (var i = 0; i < subRows.get('length'); i++) {
         if (p === 0) {
           var content = subRows.objectAtContent(i);
           if (content && Ember.get(content, 'isLoading')) {
@@ -144,7 +177,7 @@ var GroupRow = Row.extend({
           return newRow;
         }
         var row = subRows.objectAt(i);
-        p --;
+        p--;
         if (row && row.get('isExpanded')) {
           var subRowsCount = row.get('subRowsCount');
           if (p < subRowsCount) {
@@ -157,7 +190,7 @@ var GroupRow = Row.extend({
       return undefined;
     },
 
-    children: Ember.computed(function() {
+    children: Ember.computed(function () {
       if (this.get('target.groupMeta.loadChildren') && this.get('grouping.isGroup') && this.get('expandLevel') >= 0) {
         return LazyGroupRowArray.create();
       }
@@ -172,14 +205,14 @@ var GroupRow = Row.extend({
     grandTotalTitle: Ember.computed.oneWay('target.groupMeta.grandTotalTitle'),
     grouping: null,
     groupingKey: Ember.computed.oneWay('grouping.key'),
-    groupName: Ember.computed(function() {
+    groupName: Ember.computed(function () {
       if (this.get('grouping.isGrandTotal')) {
         return this.get('grandTotalTitle');
       }
       return this.get('content.' + this.get('grouping.key'));
     }).property('content', 'content.isLoaded', 'grouping.key'),
 
-    nextLevelGrouping: Ember.computed(function() {
+    nextLevelGrouping: Ember.computed(function () {
       var grouping = this.get('grouping');
       return grouping.nextLevel(this.get('content'));
     }).property('content', 'grouping'),

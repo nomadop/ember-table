@@ -34,5 +34,9 @@ export default Ember.Component.extend({
   numFixedColumns: 0,
   groupedRowIndicatorView: null,
   rowLoadingIndicatorView: null,
-  groupMeta: null
+  groupMeta: null,
+  setGrouperSortDirection: function(grouperIndex, sortDirection) {
+    var grouper = this.get('groupMeta.groupingMetadata').objectAt(grouperIndex);
+    Ember.set(grouper, 'sortDirection', sortDirection);
+  }
 });
