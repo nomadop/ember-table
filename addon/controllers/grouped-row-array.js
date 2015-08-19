@@ -31,15 +31,11 @@ export default RowArrayController.extend({
   },
 
   expandChildren: function(row) {
-    this.propertyWillChange('length');
     row.expandChildren();
-    this.propertyDidChange('length');
   },
 
   collapseChildren: function(row) {
-    this.propertyWillChange('length');
     row.collapseChildren();
-    this.propertyDidChange('length');
   },
 
   /**

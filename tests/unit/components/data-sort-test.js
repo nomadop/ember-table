@@ -749,7 +749,7 @@ test('sort by grouper accountSection', function(assert) {
   });
 });
 
-test('sort by grouper accountSection with expand state', function(assert) {
+test('sort by grouper accountSection in client side with expand state', function(assert) {
   var defers = DefersPromise.create({count: 4});
   var component = this.subject({defers: defers, height: 1000});
   this.render();
@@ -770,6 +770,34 @@ test('sort by grouper accountSection with expand state', function(assert) {
       ['at-101', '101'],
       ['at-105', '105']
     ]);
+  });
+});
+
+test('sort by grouper accountSection in server side with expand state', function(assert) {
+  var defers = DefersPromise.create({count: 5});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    table.rows(0).groupIndicator().click();
+  }, [0]);
+
+  defers.ready(function() {
+    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+  }, [1]);
+
+  defers.ready(function() {
+    table.scrollTop(90);
+  }, [2]);
+
+  defers.ready(function() {
+    table.scrollTop(210);
+  }, [3]);
+
+  return defers.ready(function() {
+    var indicator = table.cellWithContent('as-1').groupIndicator();
+    assert.ok(indicator.hasClass('unfold'));
   });
 });
 
