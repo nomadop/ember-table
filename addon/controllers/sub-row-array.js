@@ -3,19 +3,20 @@ import Ember from 'ember';
 var SubRowArray = Ember.ArrayController.extend({
   init: function() {
     this._super();
+    var self = this;
     var oldObject = this.get('oldObject');
     if (oldObject) {
       var oldControllers = oldObject.get('_subControllers');
-      if (!this.get('isLazyLoadContent')) {
-        var content = this.get('content');
+      if (!self.get('isLazyLoadContent')) {
+        var content = self.get('content');
         oldControllers.forEach(function(item) {
           if (item) {
             var index = content.indexOf(Ember.get(item, 'content'));
             if (index !== -1) {
-              this.setControllerAt(item, index);
+              self.setControllerAt(item, index);
             }
           }
-        }.bind(this));
+        });
       }
     }
   },
