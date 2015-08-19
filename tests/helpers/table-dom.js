@@ -23,8 +23,9 @@ var TableDom = Ember.ObjectProxy.extend({
     });
   },
 
-  headerRows: function() {
-    var dom = this.find('.ember-table-header-block').find('.ember-table-table-row');
+  headerRows: function(idx) {
+    var selector = idx === undefined ? '' : ':eq(' + idx + ')';
+    var dom = this.find('.ember-table-header-block').find('.ember-table-table-row' + selector);
     return this.createChildDom(dom);
   },
 
@@ -33,13 +34,28 @@ var TableDom = Ember.ObjectProxy.extend({
     return this.createChildDom(dom);
   },
 
-  rows: function() {
-    var dom = this.find('.ember-table-table-block.lazy-list-container').find('.ember-table-table-row');
+  rows: function(idx) {
+    var selector = idx === undefined ? '' : ':eq(' + idx + ')';
+    var dom = this.find('.ember-table-table-block.lazy-list-container').find('.ember-table-table-row' + selector);
     return this.createChildDom(dom);
   },
 
   row: function(idx) {
     var dom = this.rows().eq(idx);
+    return this.createChildDom(dom);
+  },
+
+  cellsContent: function(rows, cols) {
+    var self = this;
+    return rows.map(function(rIdx) {
+      return cols.map(function(cIdx) {
+        return self.cell(rIdx, cIdx).text().trim();
+      });
+    });
+  },
+
+  groupIndicator: function() {
+    var dom = this.find('.grouping-column-indicator:has(div)');
     return this.createChildDom(dom);
   },
 
@@ -49,7 +65,7 @@ var TableDom = Ember.ObjectProxy.extend({
   },
 
   cell: function() {
-    var parent = arguments.length === 1 ? this : this.row(arguments[0]);
+    var parent = arguments.length === 1 ? this : this.rows(arguments[0]);
     var dom = parent.cells().eq(arguments[arguments.length - 1]);
     return this.createChildDom(dom);
   },

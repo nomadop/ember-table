@@ -25,15 +25,15 @@ test('sort completed data of grouped row', function (assert) {
 
   return defers.ready(function () {
     helper.assertCellContent(1, 0, '102', 'second row id should be equal to 102 before sort');
-    helper.assertFixedCellContent(1, 0, '102', 'second row group name should be equal to 102 before sort');
+    helper.assertFixedCellContent(1, 0, 'at-102', 'second row group name should be equal to 102 before sort');
 
     helper.getHeaderCell(0).click();
     helper.assertCellContent(1, 0, '101', 'second row id should be equal to 101 when sort asc');
-    helper.assertFixedCellContent(1, 0, '101', 'second row groupName should be equal to 101 when sort asc');
+    helper.assertFixedCellContent(1, 0, 'at-101', 'second row groupName should be equal to 101 when sort asc');
 
     helper.getHeaderCell(0).click();
     helper.assertCellContent(1, 0, '110', 'second row id should be equal to 110 when sort desc');
-    helper.assertFixedCellContent(1, 0, '110', 'second row group name should be equal to 101 when sort asc');
+    helper.assertFixedCellContent(1, 0, 'at-110', 'second row group name should be equal to 101 when sort asc');
   });
 });
 

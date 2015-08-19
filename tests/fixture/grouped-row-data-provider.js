@@ -20,19 +20,23 @@ var DataProvider = function(options) {
         name: 'name-' + i,
         activity: 'activity-' + (i%2),
         state: 'state-' + (11 - i),
-        accountType: i + baseNum,
-        accountCode: i + baseNum
+        accountType: 'at-' + (i + baseNum),
+        accountCode: 'ac-' + (i + baseNum),
+        accountSection: 'as-' + (i + baseNum)
       };
     });
   };
   var sortDataMap = Ember.Object.create();
   var items = [
     ['chunkIndex=0', [1, 2, 3, 4, 5], 0],
+    ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=accountSection', [10, 9, 8, 7, 6], 0],
     ['chunkIndex=1', [6, 7, 8, 9, 10], 0],
     ['accountSection=1&chunkIndex=0', [2, 1, 5, 4, 3], 100],
     ['accountSection=1&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 100],
     ['accountSection=1&chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 100],
+    ['accountSection=1&chunkIndex=0&sortDirect[0]=desc&sortName[0]=accountType', [10, 9, 8, 7, 6], 100],
     ['accountSection=1&chunkIndex=1&sortDirect[0]=desc&sortName[0]=id', [5, 4, 3, 2, 1], 100],
+    ['accountSection=1&chunkIndex=1&sortDirect[0]=desc&sortName[0]=accountType', [5, 4, 3, 2, 1], 100],
     ['accountSection=1&accountType=102&chunkIndex=0', [3, 5, 1, 2, 4], 1000],
     ['accountSection=1&accountType=102&chunkIndex=1', [7, 9, 10, 6, 8], 1000],
     ['accountSection=1&accountType=102&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 1000],
@@ -58,6 +62,10 @@ var DataProvider = function(options) {
     groupQuery.upperGroupings.forEach(function(x) {
       queryObj[x[0]] = Ember.get(x[1], 'id');
     });
+    if (groupQuery.key && groupQuery.sortDirection) {
+      queryObj['sortName[0]'] = groupQuery.key;
+      queryObj['sortDirect[0]'] = groupQuery.sortDirection;
+    }
     Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
     var isSecondLastLevel = queryObj.hasOwnProperty(groupingMetadata[groupingMetadata.length - 2].id);
     delete queryObj.sortDirect;
