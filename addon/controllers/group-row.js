@@ -67,6 +67,13 @@ var GroupRow = Row.extend({
       }
     },
 
+    oldExpandedChildrenReused: function() {
+      var target = this.get('target');
+      if (target) {
+        target.notifyPropertyChange('length');
+      }
+    },
+
     subRowsCountDidChange: Ember.observer('subRowsCount', function () {
       var parentRow = this.get('parentRow');
       if (parentRow) {
@@ -116,7 +123,7 @@ var GroupRow = Row.extend({
       });
     },
 
-    sortByGroupers: function () {
+    nextLevelGroupingSortDirectionDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
       var children = this.get('children');
       if (!children) {
         return;
@@ -137,19 +144,7 @@ var GroupRow = Row.extend({
           oldObject: this.get('_childrenRow')
         }));
       }
-      this.invokeSortByGrouperOnSubRows();
-    },
-
-    invokeSortByGrouperOnSubRows: function() {
-      var subRows = this.get('_childrenRow');
-      if (subRows) {
-        subRows.forEach(function(controller) {
-          if(controller) {
-            controller.sortByGroupers();
-          }
-        });
-      }
-    },
+    }),
 
     findRow: function (idx) {
       var subRows = this.get('_childrenRow');

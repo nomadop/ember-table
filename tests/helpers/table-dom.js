@@ -77,8 +77,20 @@ var TableDom = Ember.ObjectProxy.extend({
     });
   },
 
-  scrollTop: function(y) {
-    this.find('.antiscroll-box .antiscroll-inner').scrollTop(y);
+  scrollTop: function (defer, count) {
+    var px = 0;
+    var scrollBar = this.find('.antiscroll-box .antiscroll-inner');
+    var scroll = function () {
+      px += 30;
+      scrollBar.scrollTop(px);
+      count--;
+      if (count > 0) {
+        setTimeout(scroll, 100);
+      } else {
+        defer.resolve();
+      }
+    };
+    setTimeout(scroll, 0);
   },
 
   cellWithContent: function(text) {

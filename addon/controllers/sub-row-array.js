@@ -6,18 +6,7 @@ var SubRowArray = Ember.ArrayController.extend({
     var oldObject = this.get('oldObject');
     if (oldObject) {
       var oldControllers = oldObject.get('_subControllers');
-      var isLazyLoadContent = this.get('isLazyLoadContent');
-      if (isLazyLoadContent) {
-        var oldExpandedControllers = [];
-        oldControllers.forEach(function(item) {
-        if (item) {
-            if (isLazyLoadContent && item.get('isExpanded')) {
-              oldExpandedControllers.push(item);
-            }
-          }
-        }.bind(this));
-        this.set('oldExpandedControllers', oldExpandedControllers);
-      } else {
+      if (!this.get('isLazyLoadContent')) {
         var content = this.get('content');
         oldControllers.forEach(function(item) {
           if (item) {
@@ -37,20 +26,27 @@ var SubRowArray = Ember.ArrayController.extend({
 
   setControllerAt: function (controller, idx) {
     this._subControllers[idx] = controller;
-    if (this.get('isLazyLoadContent') && this.isControllerExpandedBefore(controller)) {
-      controller.expandChildren();
+    if (this.get('isLazyLoadContent')) {
+      var oldExpandedController = this.oldExpandedController(controller);
+      if (oldExpandedController) {
+        this._subControllers[idx] = oldExpandedController;
+        oldExpandedController.oldExpandedChildrenReused();
+      }
     }
     this.incrementProperty('definedControllersCount', 1);
   },
 
-  isControllerExpandedBefore: function(controller) {
+  oldExpandedControllers: Ember.computed.filter('oldObject._subControllers', function(controller) {
+    return controller && Ember.get(controller, 'isExpanded');
+  }),
+
+  oldExpandedController: function(controller) {
     var oldExpandedControllers = this.get('oldExpandedControllers');
     if (oldExpandedControllers) {
-      return oldExpandedControllers.some(function(item) {
+      return oldExpandedControllers.find(function(item) {
         return item.get('id') === controller.get('id');
       });
     }
-    return false;
   },
 
   objectAtContent: function (idx) {
