@@ -23,14 +23,26 @@ http://emberjs.jsbin.com/fowoqu/1/edit
 #### Installation with Ember CLI (Recommended)
 
 ```bash
-# ember-cli >= 0.2.0
+**ember-cli >= 0.2.0**
 ember install:addon ember-table
       
-# ember-cli >= 0.2.3
+**ember-cli >= 0.2.3**
 ember install ember-table
 ```
 
 Once it's installed, you can customize the look of ember-table with CSS.
+
+#### upgrading ember-cli
+
+* `npm uninstall -g ember-cli`
+* `npm cache clean`
+* `bower cache clean`
+* `npm install -g ember-cli@1.13.8`
+* `rm -rf node_modules bower_components dist tmp`
+* `npm install`
+* `bower install` 
+
+* please refer to: [ember-cli-upgrading](http://www.ember-cli.com/user-guide/#upgrading)
 
 #### Installation with Bower (Globals-Based Version)
 
