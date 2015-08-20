@@ -4,7 +4,7 @@ var TableDom = Ember.ObjectProxy.extend({
 
   parent: null,
 
-  aliasMethods: ['find', 'eq', 'click', 'text', 'has'],
+  aliasMethods: ['find', 'eq', 'click', 'text', 'has', 'hasClass'],
 
   length: Ember.computed.oneWay('content.length'),
 
@@ -75,6 +75,27 @@ var TableDom = Ember.ObjectProxy.extend({
       content: dom,
       parent: this
     });
+  },
+
+  scrollTop: function (defer, count) {
+    var px = 0;
+    var scrollBar = this.find('.antiscroll-box .antiscroll-inner');
+    var scroll = function () {
+      px += 30;
+      scrollBar.scrollTop(px);
+      count--;
+      if (count > 0) {
+        setTimeout(scroll, 100);
+      } else {
+        defer.resolve();
+      }
+    };
+    setTimeout(scroll, 0);
+  },
+
+  cellWithContent: function(text) {
+    var dom = this.find('.ember-table-cell:contains(' + text + ')');
+    return this.createChildDom(dom);
   }
 });
 

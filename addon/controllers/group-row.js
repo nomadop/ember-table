@@ -45,6 +45,10 @@ var GroupRow = Row.extend({
     expandChildren: function () {
       this.set('isExpanded', true);
       this.createChildrenRow();
+      var target = this.get('target');
+      if (target) {
+        target.notifyPropertyChange('length');
+      }
     },
 
     createChildrenRow: function () {
@@ -57,6 +61,17 @@ var GroupRow = Row.extend({
 
     collapseChildren: function () {
       this.set('isExpanded', false);
+      var target = this.get('target');
+      if (target) {
+        target.notifyPropertyChange('length');
+      }
+    },
+
+    oldExpandedChildrenReused: function() {
+      var target = this.get('target');
+      if (target) {
+        target.notifyPropertyChange('length');
+      }
     },
 
     subRowsCountDidChange: Ember.observer('subRowsCount', function () {
@@ -108,7 +123,7 @@ var GroupRow = Row.extend({
       });
     },
 
-    sortByGroupers: function () {
+    nextLevelGroupingSortDirectionDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
       var children = this.get('children');
       if (!children) {
         return;
@@ -116,7 +131,10 @@ var GroupRow = Row.extend({
       if (this.get('children.isNotCompleted')) {
         this.set('children', LazyGroupRowArray.create());
         this.set('_childrenRow', SubRowArray.create({
-          content: this.get('children')
+          content: this.get('children'),
+          oldObject: this.get('_childrenRow'),
+          isLazyLoadContent: true,
+          target: this.get('target')
         }));
       } else {
         var grouping = this.get('nextLevelGrouping');
@@ -126,19 +144,7 @@ var GroupRow = Row.extend({
           oldObject: this.get('_childrenRow')
         }));
       }
-      this.invokeSortByGrouperOnSubRows();
-    },
-
-    invokeSortByGrouperOnSubRows: function() {
-      var subRows = this.get('_childrenRow');
-      if (subRows) {
-        subRows.forEach(function(controller) {
-          if(controller) {
-            controller.sortByGroupers();
-          }
-        });
-      }
-    },
+    }),
 
     findRow: function (idx) {
       var subRows = this.get('_childrenRow');

@@ -724,7 +724,7 @@ moduleForEmberTable('sort lazy-grouped-row-array by groupers', function (options
     groupMeta: GroupedRowDataProvider.create({
       defers: options.defers,
       delayTime: options.delayTime || 0,
-      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
+      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: "accountCode"}],
       groupingRowAffectedByColumnSort: true
     })
   });
@@ -749,7 +749,7 @@ test('sort by grouper accountSection', function(assert) {
   });
 });
 
-test('sort by grouper accountSection with expand state', function(assert) {
+test('sort by grouper accountSection in client side with expand state', function(assert) {
   var defers = DefersPromise.create({count: 4});
   var component = this.subject({defers: defers, height: 1000});
   this.render();
@@ -770,6 +770,58 @@ test('sort by grouper accountSection with expand state', function(assert) {
       ['at-101', '101'],
       ['at-105', '105']
     ]);
+  });
+});
+
+test('sort by grouper accountSection in server side with expand state', function(assert) {
+  var defers = DefersPromise.create({count: 5});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    table.rows(0).groupIndicator().click();
+  }, [0]);
+
+  defers.ready(function() {
+    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+  }, [1]);
+
+  defers.ready(function() {
+    table.scrollTop(defers.next(), 7);
+  }, [2]);
+
+  return defers.ready(function() {
+    var indicator = table.cellWithContent('as-1').groupIndicator();
+    assert.ok(indicator.hasClass('unfold'));
+  });
+});
+
+test('sort by grouper accountSection in server side with expand state of two levels', function(assert) {
+  var defers = DefersPromise.create({count: 6});
+  var component = this.subject({defers: defers, height: 120});
+  this.render();
+  var table = TableDom.create({content: component.$()});
+
+  defers.ready(function () {
+    table.rows(0).groupIndicator().click();
+  }, [0]);
+
+  defers.ready(function () {
+    table.rows(1).groupIndicator().click();
+  }, [1]);
+
+  defers.ready(function() {
+    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+  }, [2]);
+
+  defers.ready(function() {
+    table.scrollTop(defers.next(), 10);
+  }, [3]);
+
+  return defers.ready(function() {
+    var indicator = table.cellWithContent('at-102').groupIndicator();
+    assert.ok(indicator.hasClass('unfold'));
   });
 });
 
