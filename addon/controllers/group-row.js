@@ -87,14 +87,8 @@ var GroupRow = Row.extend({
         return;
       }
       var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
-      if (groupingRowAffectedByColumnSort) {
-        if (!this.get('nextLevelGrouping.sortDirection')) {
-          if (this.get('children.isNotCompleted')) {
-            this.recreateChildrenRow();
-          } else {
-            this.recreateSortedChildrenRow(sortingColumns);
-          }
-        }
+      if (groupingRowAffectedByColumnSort ) {
+        //
       } else {
         if (this.get('grouping.isLeafParent')) {
           subRows.willDestroy();
@@ -110,9 +104,28 @@ var GroupRow = Row.extend({
           }));
           return;
         }
+        this.invokeSortOnSubRows(sortingColumns);
       }
-      this.invokeSortOnSubRows(sortingColumns);
     },
+
+    sortingColumnsDidChange: Ember.observer('target.sortingColumns._columns', function() {
+      if (!this.get('_childrenRow')) {
+        return;
+      }
+      var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
+      if (groupingRowAffectedByColumnSort) {
+        var sortingColumns = this.get('target.sortingColumns');
+        if (!this.get('nextLevelGrouping.sortDirection')) {
+          if (this.get('children.isNotCompleted')) {
+            this.recreateChildrenRow();
+          } else {
+            if (sortingColumns.get('isNotEmpty') > 0) {
+              this.recreateSortedChildrenRow(sortingColumns);
+            }
+          }
+        }
+      }
+    }),
 
     recreateChildrenRow: function() {
       this.set('children', LazyGroupRowArray.create());

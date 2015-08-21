@@ -10,7 +10,6 @@ export default Ember.Object.extend({
   _columns: null,
 
   update: function (column, event) {
-    this.propertyWillChange('_columns');
     var isControlClick = event.ctrlKey || event.metaKey;
     var columns = this.get('_columns');
     column.toggleSortState(isControlClick);
@@ -27,11 +26,13 @@ export default Ember.Object.extend({
         columns.pushObject(column);
       }
     }
-    this.set('_columns', columns.filterBy('isSorted', true));
-    this.propertyDidChange('_columns');
+    var newColumns = columns.filterBy('isSorted', true);
+    this.set('_columns', newColumns);
   },
 
-  isNotEmpty: Ember.computed.notEmpty('_columns'),
+  isNotEmpty: Ember.computed(function() {
+    return this.get('_columns.length') > 0;
+  }).property('_columns'),
 
   isMultipleColumns: Ember.computed.gt('_columns.length', 1),
 

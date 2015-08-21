@@ -84,14 +84,19 @@ var TableDom = Ember.ObjectProxy.extend({
     });
   },
 
-  scrollTop: function (defer, count) {
+  scrollTop: function (defer, rowCount) {
+    var delta = 30;
+    if (rowCount < 0) {
+      rowCount = -rowCount;
+      delta = -30;
+    }
     var px = 0;
     var scrollBar = this.find('.antiscroll-box .antiscroll-inner');
     var scroll = function () {
-      px += 30;
+      px += delta;
       scrollBar.scrollTop(px);
-      count--;
-      if (count > 0) {
+      rowCount--;
+      if (rowCount > 0) {
         setTimeout(scroll, 100);
       } else {
         defer.resolve();
