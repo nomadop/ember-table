@@ -89,13 +89,8 @@ var DataProvider = function(options) {
       queryObj['sortName[0]'] = groupQuery.key;
       queryObj['sortDirect[0]'] = groupQuery.sortDirection;
     }
-    var isSecondLastLevel = queryObj.hasOwnProperty(groupingMetadata[groupingMetadata.length - 2].id);
-    var groupingRowAffectedByColumnSort = groupQuery.groupingRowAffectedByColumnSort;
-    var needColumnSorting =
-      (!groupingRowAffectedByColumnSort && isSecondLastLevel) ||
-      (groupingRowAffectedByColumnSort && !isSortByGrouper);
     var theQueryString = toQuery(queryObj);
-    if(needColumnSorting && sortingColumns && sortingColumns.get('isNotEmpty')) {
+    if(!isSortByGrouper && sortingColumns && sortingColumns.get('isNotEmpty')) {
       theQueryString += "&" + sortingColumns.map(function (column, index) {
           return "sortDirect[%@]=%@&sortName[%@]=%@".fmt(
             index, column.get("sortDirect"), index, column.get("contentPath"));

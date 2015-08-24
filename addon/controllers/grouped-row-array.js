@@ -15,10 +15,6 @@ export default RowArrayController.extend({
 
   sort: function (sortingColumns) {
     this.set('sortingColumns', sortingColumns);
-    this.propertyWillChange('length');
-    var root = this.get('_virtualRootRow');
-    root.sort(sortingColumns);
-    this.propertyDidChange('length');
   },
 
   objectAt: function(idx) {
@@ -68,8 +64,7 @@ export default RowArrayController.extend({
       parentController: this.get('parentController') || this,
       grouping: Grouping.create({
         groupingMetadata: this.get('groupMeta.groupingMetadata'),
-        groupingLevel: groupingLevel,
-        groupingRowAffectedByColumnSort: this.get('groupMeta.groupingRowAffectedByColumnSort')
+        groupingLevel: groupingLevel
       }),
       target: this
     });

@@ -3,11 +3,11 @@ import Ember from 'ember';
 var SubRowArray = Ember.ArrayController.extend({
   init: function() {
     this._super();
-    var self = this;
     var oldControllersMap = this.get('oldControllersMap');
     if (oldControllersMap) {
-      if (!self.get('isLazyLoadContent')) {
-        var content = self.get('content');
+      if (!this.get('isContentIncomplete')) {
+        var content = this.get('content');
+        var self = this;
         content.forEach(function (item, index) {
           var controller = oldControllersMap.get(Ember.get(item, 'id'));
           if (controller) {
@@ -24,31 +24,33 @@ var SubRowArray = Ember.ArrayController.extend({
 
   setControllerAt: function (controller, idx) {
     this._subControllers[idx] = controller;
-    if (this.get('isLazyLoadContent')) {
-      var id = controller.get('id');
-      var oldControllersMap = this.get('oldControllersMap');
-      if (oldControllersMap && id !== undefined) {
-        var oldExpandedController = oldControllersMap.get(id);
-        if (oldExpandedController) {
-          this._subControllers[idx] = oldExpandedController;
-          oldExpandedController.oldExpandedChildrenReused();
-        }
+    if (this.get('isContentIncomplete')) {
+      var content = controller.get('content');
+      var oldExpandedController = this.findOldControllerById(content);
+      if (oldExpandedController) {
+        this._subControllers[idx] = oldExpandedController;
+        oldExpandedController.notifyLengthChange();
       }
     }
     this.incrementProperty('definedControllersCount', 1);
   },
 
   refreshControllerAt: function(idx, content) {
+    var oldExpandedController = this.findOldControllerById(content);
+    if (oldExpandedController) {
+      oldExpandedController.set('content', content);
+      this._subControllers[idx] = oldExpandedController;
+      oldExpandedController.notifyLengthChange();
+    }
+  },
+
+  findOldControllerById: function(content) {
     var id = Ember.get(content, 'id');
     var oldControllersMap = this.get('oldControllersMap');
     if (oldControllersMap && id !== undefined) {
-      var oldExpandedController = oldControllersMap.get(id);
-      if (oldExpandedController) {
-        oldExpandedController.set('content', content);
-        this._subControllers[idx] = oldExpandedController;
-        oldExpandedController.oldExpandedChildrenReused();
-      }
+      return oldControllersMap.get(id);
     }
+    return null;
   },
 
   objectAtContent: function (idx) {

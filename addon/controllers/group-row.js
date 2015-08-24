@@ -67,13 +67,6 @@ var GroupRow = Row.extend({
       }
     },
 
-    oldExpandedChildrenReused: function() {
-      var target = this.get('target');
-      if (target) {
-        target.notifyPropertyChange('length');
-      }
-    },
-
     subRowsCountDidChange: Ember.observer('subRowsCount', function () {
       var parentRow = this.get('parentRow');
       if (parentRow) {
@@ -81,58 +74,36 @@ var GroupRow = Row.extend({
       }
     }),
 
-    sort: function (sortingColumns) {
-      var subRows = this.get('_childrenRow');
-      if (!subRows) {
-        return;
-      }
-      var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
-      if (groupingRowAffectedByColumnSort ) {
-        //
-      } else {
-        if (this.get('grouping.isLeafParent')) {
-          subRows.willDestroy();
-          var newContent;
-          if (this.get('children.isNotCompleted')) {
-            newContent = this.get('children');
-            newContent.resetContent();
-          } else {
-            newContent = sortingColumns.sortContent(this.get('children'));
-          }
-          this.set('_childrenRow', SubRowArray.create({
-            content: newContent
-          }));
-          return;
-        }
-        this.invokeSortOnSubRows(sortingColumns);
-      }
-    },
-
     sortingColumnsDidChange: Ember.observer('target.sortingColumns._columns', function() {
-      if (!this.get('_childrenRow')) {
-        return;
-      }
-      var groupingRowAffectedByColumnSort = this.get('target.groupMeta.groupingRowAffectedByColumnSort');
-      if (groupingRowAffectedByColumnSort) {
-        var sortingColumns = this.get('target.sortingColumns');
-        if (!this.get('nextLevelGrouping.sortDirection')) {
-          if (this.get('children.isNotCompleted')) {
-            this.recreateChildrenRow();
-          } else {
-            if (sortingColumns.get('isNotEmpty') > 0) {
-              this.recreateSortedChildrenRow(sortingColumns);
-            }
-          }
-        }
+      if (this.get('_childrenRow') && !this.get('nextLevelGrouping.sortDirection')) {
+        this.sortingConditionsChanged(this.get('target.sortingColumns'), this.get('target.sortingColumns.isNotEmpty'));
       }
     }),
+
+    sortingGroupersDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
+      if (this.get('_childrenRow')) {
+        this.sortingConditionsChanged(this.get('nextLevelGrouping'), this.get('nextLevelGrouping.sortDirection'));
+      }
+    }),
+
+    sortingConditionsChanged: function(sorter, isSortConditionEmpty) {
+      if (this.get('children.isNotCompleted')) {
+        this.recreateChildrenRow();
+        this.notifyLengthChange();
+      } else {
+        if (isSortConditionEmpty) {
+          this.recreateSortedChildrenRow(sorter);
+          this.notifyLengthChange();
+        }
+      }
+    },
 
     recreateChildrenRow: function() {
       this.set('children', LazyGroupRowArray.create());
       this.set('_childrenRow', SubRowArray.create({
         content: this.get('children'),
         oldControllersMap: this.get('_childrenRow').getAvailableControllersMap(),
-        isLazyLoadContent: true
+        isContentIncomplete: true
       }));
     },
 
@@ -142,32 +113,6 @@ var GroupRow = Row.extend({
         oldControllersMap: this.get('_childrenRow').getAvailableControllersMap()
       }));
     },
-
-    invokeSortOnSubRows: function(sortingColumns) {
-      var subRows = this.get('_childrenRow');
-      subRows.forEach(function (r) {
-        if (r) {
-          r.sort(sortingColumns);
-        }
-      });
-    },
-
-    nextLevelGroupingSortDirectionDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
-      var children = this.get('children');
-      if (!children) {
-        return;
-      }
-      if (this.get('children.isNotCompleted')) {
-        this.recreateChildrenRow();
-        this.notifyLengthChange();
-      } else {
-        var grouper = this.get('nextLevelGrouping');
-        if (grouper && grouper.get('sortDirection')) {
-          this.recreateSortedChildrenRow(grouper);
-          this.notifyLengthChange();
-        }
-      }
-    }),
 
     notifyLengthChange: function() {
       if (this.get('target')) {

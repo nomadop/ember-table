@@ -76,8 +76,7 @@ test('sort grouped row array by id column, no expand', function(assert) {
     accountSection: 'f-1'
   }];
   var groupMeta = {
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
   };
   var component = this.subject({content: content, groupMeta: groupMeta});
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -103,8 +102,7 @@ test('sort grouped row array by id column, expand', function(assert) {
     accountSection: 'f-1'
   }];
   var groupMeta = {
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
   };
   var component = this.subject({content: content, groupMeta: groupMeta});
   var helper = EmberTableHelper.create({_assert: assert, _component: component});
@@ -135,8 +133,7 @@ test('sort grouped row array by id column, expand two levels ', function(assert)
     },
     {id: 2}];
   var groupMeta = {
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
   };
   var component = this.subject({content: content, groupMeta: groupMeta});
   this.render();
@@ -204,8 +201,7 @@ test('sort group row array by column id, expanded row invisible', function(asser
     {id: 4}
   ];
   var groupMeta = {
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
   };
   var component = this.subject({
     content: content,
@@ -265,8 +261,7 @@ moduleForEmberTable('Sort a normal JavaScript array by groupers', function (opti
     {id: 3, accountSection: 'as-3'}
   ];
   var groupMeta = {
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: 'accountCode'}]
   };
 
   var subject = EmberTableFixture.create({
@@ -602,8 +597,7 @@ moduleForEmberTable('lazy-grouped-row-array as ember-table content', function (o
     groupMeta: GroupedRowDataProvider.create({
       defers: options.defers,
       delayTime: options.delayTime || 0,
-      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-      groupingRowAffectedByColumnSort: true
+      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
     })
   });
 });
@@ -1138,8 +1132,7 @@ moduleForEmberTable('sort lazy-grouped-row-array by groupers', function (options
     groupMeta: GroupedRowDataProvider.create({
       defers: options.defers,
       delayTime: options.delayTime || 0,
-      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: "accountCode"}],
-      groupingRowAffectedByColumnSort: true
+      groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}, {id: "accountCode"}]
     })
   });
 });
@@ -1292,8 +1285,7 @@ test('sort by column after expand and sorted by grouper accountSection', functio
 moduleForEmberTable("lazy group row array defects", function (options) {
   return EmberTableFixture.create({
     height: 120,
-    groupMeta: options.groupMeta,
-    groupingRowAffectedByColumnSort: true
+    groupMeta: options.groupMeta
   });
 });
 
@@ -1301,8 +1293,7 @@ test('expand second level rows twice', function(assert) {
   var defers = DefersPromise.create({count: 2});
   var groupMeta = GroupedRowDataProvider.create({
     defers: defers,
-    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}],
-    groupingRowAffectedByColumnSort: true
+    groupingMetadata: [{id: 'accountSection'}, {id: 'accountType'}]
   });
   var component = this.subject({groupMeta: groupMeta});
   this.render();
@@ -1325,8 +1316,7 @@ moduleForEmberTable('Grand total row as ember-table content', function (options)
       defers: options.defers,
       delayTime: options.delayTime || 0,
       groupingMetadata: [{id: 'accountSection'}, {id: "accountType"}],
-      grandTotalTitle: 'Total',
-      groupingRowAffectedByColumnSort: true
+      grandTotalTitle: 'Total'
     })
   });
 });

@@ -31,27 +31,19 @@ var Grouping = Ember.Object.extend({
     if (this.get('groupingLevel') >= 0) {
       contents = contents.concat([content]);
     }
-    var result = Grouping.create({
+    return Grouping.create({
       groupingMetadata: this.get('groupingMetadata'),
       groupingLevel: this.get('groupingLevel') + 1,
       contents: contents
     });
-    if (this.get('groupingRowAffectedByColumnSort')) {
-      result.set('groupingRowAffectedByColumnSort', this.get('groupingRowAffectedByColumnSort'));
-    }
-    return result;
   },
 
   query: Ember.computed(function () {
-    var result = {
+    return {
       key: this.get('key'),
       upperGroupings: this.get('upperGroupings'),
       sortDirection: this.get('sortDirection')
     };
-    if (this.get('groupingRowAffectedByColumnSort')) {
-      result['groupingRowAffectedByColumnSort'] = this.get('groupingRowAffectedByColumnSort');
-    }
-    return result;
   }).property('contents.[]', 'key', 'sortDirection'),
 
   upperGroupings: Ember.computed(function () {
