@@ -65,11 +65,6 @@ test('expanded level for first level rows', function (assert) {
   assert.equal(subject.objectAt(1).get('expandLevel'), 0);
 });
 
-test('grouping key for first level rows', function (assert) {
-  assert.equal(subject.objectAt(0).get('groupingKey'), 'firstLevel');
-  assert.equal(subject.objectAt(1).get('groupingKey'), 'firstLevel');
-});
-
 test('expand children', function (assert) {
   var groupRow = subject.objectAt(0);
 
@@ -78,7 +73,6 @@ test('expand children', function (assert) {
   assert.equal(groupRow.get('isExpanded'), true, 'group row should be expanded');
   assert.equal(subject.get('length'), 5, 'length should include expanded children rows');
   assert.equal(subject.objectAt(1).get('id'), 11, 'children rows should be inserted after parent row');
-  assert.equal(subject.objectAt(1).get('groupingKey'), "secondLevel", 'grouping key should be generated for children');
   assert.equal(subject.get('_expandedDepth'), 1, '_expandedDepth should increase 1 after expanding');
 });
 
