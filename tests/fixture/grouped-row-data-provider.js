@@ -29,8 +29,18 @@ var DataProvider = function(options) {
   var sortDataMap = Ember.Object.create();
   var items = [
     ['chunkIndex=0', [1, 2, 3, 4, 5], 0],
+    ['chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 0],
+    ['chunkIndex=0&sortDirect[0]=asc&sortName[0]=activity', [2, 4, 6, 8, 10], 0],
+    ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=activity', [1, 3, 5, 7, 9], 0],
+    ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 0],
+    ['chunkIndex=1&sortDirect[0]=desc&sortName[0]=id', [5, 4, 3, 2, 1], 0],
+    ['chunkIndex=0&sortDirect[0]=asc&sortName[0]=accountSection', [1, 2, 3, 4, 5], 0],
+    ['chunkIndex=1&sortDirect[0]=asc&sortName[0]=accountSection', [6, 7, 8, 9, 10], 0],
     ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=accountSection', [10, 9, 8, 7, 6], 0],
     ['chunkIndex=1&sortDirect[0]=desc&sortName[0]=accountSection', [5, 4, 3, 2, 1], 0],
+    ['chunkIndex=0&sortDirect[0]=asc&sortName[0]=activity&sortDirect[1]=asc&sortName[1]=state', [10, 8, 6, 4, 2], 0],
+    ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=activity&sortDirect[1]=asc&sortName[1]=state', [9, 7, 5, 3, 1], 0],
+    ['chunkIndex=0&sortDirect[0]=desc&sortName[0]=activity&sortDirect[1]=desc&sortName[1]=state', [1, 3, 5, 7, 9], 0],
     ['chunkIndex=1', [6, 7, 8, 9, 10], 0],
     ['accountSection=1&chunkIndex=0', [2, 1, 5, 4, 3], 100],
     ['accountSection=1&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 100],
@@ -43,15 +53,25 @@ var DataProvider = function(options) {
     ['accountSection=1&accountType=102&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 1000],
     ['accountSection=1&accountType=102&chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 1000],
     ['accountSection=1&chunkIndex=1', [8, 7, 9, 10, 6], 100],
+    ['accountSection=10&chunkIndex=0', [3, 4, 5, 1, 2], 100],
+    ['accountSection=10&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 100],
+    ['accountSection=10&chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 100],
+    ['accountSection=10&chunkIndex=1&sortDirect[0]=desc&sortName[0]=id', [5, 4, 3, 2, 1], 100],
     ['accountSection=3&chunkIndex=0', [3, 4, 5, 1, 2], 300],
     ['accountSection=3&chunkIndex=1', [8, 9, 10, 6, 7], 300],
     ['accountSection=3&chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 300],
     ['accountSection=3&chunkIndex=1&sortDirect[0]=desc&sortName[0]=id', [5, 4, 3, 2, 1], 300],
+    ['accountSection=8&chunkIndex=0&sortDirect[0]=desc&sortName[0]=id', [10, 9, 8, 7, 6], 800],
+    ['accountSection=8&chunkIndex=1&sortDirect[0]=desc&sortName[0]=id', [5, 4, 3, 2, 1], 800],
+    ['accountSection=8&chunkIndex=0', [3, 4, 5, 1, 2], 800],
     ['accountSection=3&chunkIndex=1&sortDirect[0]=asc&sortName[0]=id', [6, 7, 8, 9, 10], 300],
     ['accountSection=3&chunkIndex=0&sortDirect[0]=asc&sortName[0]=id', [1, 2, 3, 4, 5], 300],
     ['accountSection=1&chunkIndex=0&sortDirect[0]=asc&sortName[0]=activity', [2, 4, 6, 8, 10], 100],
+    ['accountSection=1&chunkIndex=0&sortDirect[0]=desc&sortName[0]=activity', [1, 3, 5, 7, 9], 100],
     ['accountSection=1&chunkIndex=0&sortDirect[0]=asc&sortName[0]=activity&sortDirect[1]=asc&sortName[1]=state',
-      [10, 8, 6, 4, 2], 100]
+      [10, 8, 6, 4, 2], 100],
+    ['accountSection=1&chunkIndex=0&sortDirect[0]=desc&sortName[0]=activity&sortDirect[1]=desc&sortName[1]=state',
+      [1, 3, 5, 7, 9], 100]
   ];
   items.forEach(function(item) {
     sortDataMap.set(item[0], function () {
@@ -63,16 +83,14 @@ var DataProvider = function(options) {
     groupQuery.upperGroupings.forEach(function(x) {
       queryObj[x[0]] = Ember.get(x[1], 'id');
     });
-    if (groupQuery.key && groupQuery.sortDirection) {
+    Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
+    var isSortByGrouper = groupQuery.key && groupQuery.sortDirection;
+    if (isSortByGrouper) {
       queryObj['sortName[0]'] = groupQuery.key;
       queryObj['sortDirect[0]'] = groupQuery.sortDirection;
     }
-    Ember.setProperties(queryObj, {chunkIndex: chunkIndex});
-    var isSecondLastLevel = queryObj.hasOwnProperty(groupingMetadata[groupingMetadata.length - 2].id);
-    delete queryObj.sortDirect;
-    delete queryObj.sortName;
     var theQueryString = toQuery(queryObj);
-    if(isSecondLastLevel && sortingColumns && sortingColumns.get('isNotEmpty')) {
+    if(!isSortByGrouper && sortingColumns && sortingColumns.get('isNotEmpty')) {
       theQueryString += "&" + sortingColumns.map(function (column, index) {
           return "sortDirect[%@]=%@&sortName[%@]=%@".fmt(
             index, column.get("sortDirect"), index, column.get("contentPath"));

@@ -10,10 +10,6 @@ var LazyGroupRowArray = Ember.ArrayProxy.extend({
     this._super();
   },
 
-  resetContent: function () {
-    this.setObjects(Ember.A([LoadingPlaceHolder.create()]));
-  },
-
   /*---------------Private methods -----------------------*/
   triggerLoading: function (index, target, grouping) {
     var chunkIndex = this.chunkIndex(index);

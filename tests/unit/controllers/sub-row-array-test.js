@@ -23,24 +23,50 @@ test('init with no controller in old object', function(assert) {
   assert.ok(!subRowArray.objectAt(0));
 });
 
-test('init with two controller in old object', function(assert) {
-  var firstOldController = {
+test('init with an old object having two controllers', function(assert) {
+  var firstOldController = Ember.ObjectProxy.create({
     expanded: true,
     content: content.objectAt(0)
-  };
-  var secondOldController = {
+  });
+  var secondOldController = Ember.ObjectProxy.create({
     expanded: false,
     content: content.objectAt(1)
-  };
+  });
   oldObject.setControllerAt(firstOldController, 0);
   oldObject.setControllerAt(secondOldController, 1);
 
   var subRowArray = SubRowArray.create({
     content: sortedContent,
-    oldObject: oldObject
+    oldControllersMap: oldObject.getAvailableControllersMap()
   });
 
   assert.equal(subRowArray.objectAt(0), secondOldController);
   assert.equal(subRowArray.objectAt(1), firstOldController);
   assert.ok(!subRowArray.objectAt(2));
+});
+
+test('getAvailableControllersMap', function(assert) {
+  var firstOldController = Ember.ObjectProxy.create({
+    expanded: true,
+    content: content.objectAt(0)
+  });
+  var secondOldController = Ember.ObjectProxy.create({
+    expanded: false,
+    content: content.objectAt(1)
+  });
+  oldObject.setControllerAt(firstOldController, 0);
+  oldObject.setControllerAt(secondOldController, 1);
+
+  var subRowArray = SubRowArray.create({
+    content: sortedContent,
+    oldControllersMap: oldObject.getAvailableControllersMap()
+  });
+  subRowArray.setControllerAt(Ember.ObjectProxy.create({
+    content: sortedContent.objectAt(2)
+  }), 2);
+
+  var availableControllersMap = subRowArray.getAvailableControllersMap();
+  assert.ok(availableControllersMap.has(1), 'has 1');
+  assert.ok(availableControllersMap.has(2), 'has 2');
+  assert.ok(availableControllersMap.has(3), 'has 3');
 });

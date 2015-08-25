@@ -3,18 +3,15 @@ import Ember from 'ember';
 var SubRowArray = Ember.ArrayController.extend({
   init: function() {
     this._super();
-    var self = this;
-    var oldObject = this.get('oldObject');
-    if (oldObject) {
-      var oldControllers = oldObject.get('_subControllers');
-      if (!self.get('isLazyLoadContent')) {
-        var content = self.get('content');
-        oldControllers.forEach(function(item) {
-          if (item) {
-            var index = content.indexOf(Ember.get(item, 'content'));
-            if (index !== -1) {
-              self.setControllerAt(item, index);
-            }
+    var oldControllersMap = this.get('oldControllersMap');
+    if (oldControllersMap) {
+      if (!this.get('isContentIncomplete')) {
+        var content = this.get('content');
+        var self = this;
+        content.forEach(function (item, index) {
+          var controller = oldControllersMap.get(Ember.get(item, 'id'));
+          if (controller) {
+            self.setControllerAt(controller, index);
           }
         });
       }
@@ -27,27 +24,33 @@ var SubRowArray = Ember.ArrayController.extend({
 
   setControllerAt: function (controller, idx) {
     this._subControllers[idx] = controller;
-    if (this.get('isLazyLoadContent')) {
-      var oldExpandedController = this.oldExpandedController(controller);
+    if (this.get('isContentIncomplete')) {
+      var content = controller.get('content');
+      var oldExpandedController = this.findOldControllerById(content);
       if (oldExpandedController) {
         this._subControllers[idx] = oldExpandedController;
-        oldExpandedController.oldExpandedChildrenReused();
+        oldExpandedController.notifyLengthChange();
       }
     }
     this.incrementProperty('definedControllersCount', 1);
   },
 
-  oldExpandedControllers: Ember.computed.filter('oldObject._subControllers', function(controller) {
-    return controller && Ember.get(controller, 'isExpanded');
-  }),
-
-  oldExpandedController: function(controller) {
-    var oldExpandedControllers = this.get('oldExpandedControllers');
-    if (oldExpandedControllers) {
-      return oldExpandedControllers.find(function(item) {
-        return item.get('id') === controller.get('id');
-      });
+  refreshControllerAt: function(idx, content) {
+    var oldExpandedController = this.findOldControllerById(content);
+    if (oldExpandedController) {
+      oldExpandedController.set('content', content);
+      this._subControllers[idx] = oldExpandedController;
+      oldExpandedController.notifyLengthChange();
     }
+  },
+
+  findOldControllerById: function(content) {
+    var id = Ember.get(content, 'id');
+    var oldControllersMap = this.get('oldControllersMap');
+    if (oldControllersMap && id !== undefined) {
+      return oldControllersMap.get(id);
+    }
+    return null;
   },
 
   objectAtContent: function (idx) {
@@ -61,6 +64,24 @@ var SubRowArray = Ember.ArrayController.extend({
     return this._subControllers.filter(function (item) {
       return !!item;
     });
+  },
+
+  getAvailableControllersMap: function () {
+    var map = Ember.Map.create();
+    this._subControllers.forEach(function (controller) {
+      if (controller) {
+        var id = controller.get('id');
+        if (id) {
+          map.set(id, controller);
+        }
+      }
+    });
+    if (this.get('oldControllersMap')) {
+      this.get('oldControllersMap').forEach(function (value, key) {
+        map.set(key, value);
+      });
+    }
+    return map;
   }
 });
 

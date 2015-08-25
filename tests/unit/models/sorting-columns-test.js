@@ -40,6 +40,9 @@ test('command click to add column', function (assert) {
   assert.sortingStateEqual(['id:asc'], sortingColumns);
 });
 
+test('isNotEmpty', function (assert) {
+  assert.ok(!sortingColumns.get('isNotEmpty'));
+});
 
 module('SortingColumns contains "id" column', {
   beforeEach: function() {
