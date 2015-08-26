@@ -14,13 +14,6 @@ export default Ember.ArrayProxy.extend({
 
   chunkSize: undefined,
 
-  // This is a content or _lazyContent cache for sortable order
-  _contentCache: Ember.computed(function() {
-    var content = this.get('content');
-
-    return content;
-  }).property('content'),
-
   isEmberTableContent: true,
 
   init: function () {
@@ -30,13 +23,13 @@ export default Ember.ArrayProxy.extend({
   },
 
   fetchObjectAt: function (index) {
-    var cacheContent = this.get('_contentCache');
+    var content = this.get('content');
     var chunkSize = this.get('chunkSize');
-    if (!cacheContent[index] || cacheContent[index].get('isError')) {
+    if (!content[index] || content[index].get('isError')) {
       this.loadOneChunk(Math.floor(index / chunkSize));
     }
     this.tryPreload(index, chunkSize);
-    return cacheContent[index];
+    return content[index];
   },
 
   length: Ember.computed.alias('_totalCount'),
@@ -50,28 +43,28 @@ export default Ember.ArrayProxy.extend({
   },
 
   loadOneChunk: function (chunkIndex) {
-    var lazyContent = this.get('_contentCache');
+    var content = this.get('content');
     var chunkSize = this.get('chunkSize');
     var chunkStart = chunkIndex * chunkSize;
     var totalCount = this.get('_totalCount');
     var self = this;
     for (var x = 0; x < chunkSize && chunkStart + x < totalCount; x++) {
-      if (!lazyContent[chunkStart + x]) {
-        lazyContent[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
+      if (!content[chunkStart + x]) {
+        content[chunkStart + x] = Ember.ObjectProxy.create({"isLoaded": false, "isError": false});
       } else {
-        lazyContent[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
+        content[chunkStart + x].setProperties({"isLoaded": false, "isError": false});
       }
     }
     this.incrementProperty('loadingCount');
     this.callback(chunkIndex, this.get('sortingColumns')).then(function (chunk) {
-      lazyContent.slice(chunkStart, chunkStart + chunkSize)
+      content.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row, x) {
           row.set('isLoaded', true);
           row.set('content', chunk[x]);
         });
       self.decrementProperty('loadingCount');
     }, function () {
-      lazyContent.slice(chunkStart, chunkStart + chunkSize)
+      content.slice(chunkStart, chunkStart + chunkSize)
         .forEach(function (row) {
           row.set('isError', true);
         });

@@ -203,7 +203,6 @@ var GroupRow = Row.extend({
     expandLevel: null,
     grandTotalTitle: Ember.computed.oneWay('target.groupMeta.grandTotalTitle'),
     grouping: null,
-    groupingKey: Ember.computed.oneWay('grouping.key'),
     groupName: Ember.computed(function () {
       if (this.get('grouping.isGrandTotal')) {
         return this.get('grandTotalTitle');
@@ -216,9 +215,7 @@ var GroupRow = Row.extend({
       return grouping.nextLevel(this.get('content'));
     }).property('content', 'grouping'),
 
-    parentRow: null,
-
-    parentContent: Ember.computed.oneWay('parentRow.content')
+    parentRow: null
   }
 );
 
