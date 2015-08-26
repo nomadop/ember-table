@@ -52,15 +52,30 @@ var Grouping = Ember.Object.extend({
   }),
 
   sortContent: function(arrayContent) {
-    var key = this.get('key');
-    var sortDirection = this.get('sortDirection');
-    if (!sortDirection) {
+    var sortFactor = this.get('sortFactor');
+    if (!sortFactor) {
       return arrayContent;
     }
+    var sortFn = this.get('grouper.sortFn') || this.get('defaultSortFn');
     return arrayContent.slice().sort(function (prev, next) {
-      return Ember.compare(Ember.get(prev, key), Ember.get(next, key)) * (sortDirection === 'asc' ? 1 : -1);
+      return sortFn(prev, next) * sortFactor;
     });
-  }
+  },
+
+  sortFactor: Ember.computed(function() {
+    var sortDirection = this.get('sortDirection');
+    if(sortDirection){
+      return sortDirection === 'asc' ? 1 : -1;
+    }
+    return 0;
+  }).property('sortDirection'),
+
+  defaultSortFn: Ember.computed(function() {
+    var key = this.get('key');
+    return function (prev, next) {
+      return Ember.compare(Ember.get(prev, key), Ember.get(next, key));
+    };
+  }).property('key')
 
 });
 
