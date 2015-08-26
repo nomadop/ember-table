@@ -4,6 +4,10 @@ var Grouping = Ember.Object.extend({
   groupingMetadata: null,
   groupingLevel: null,
   contents: [],
+  isLeafParent: Ember.computed(function () {
+    return this.get('groupingLevel') === this.get('groupingMetadata.length') - 2;
+  }).property('groupingLevel', 'groupingMetadata.[]'),
+
   isGroup: Ember.computed(function () {
     return this.get('groupingLevel') < this.get('groupingMetadata.length') - 1;
   }).property('groupingMetadata.[]', 'groupingLevel'),
