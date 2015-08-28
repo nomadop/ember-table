@@ -1,9 +1,10 @@
 import Ember from 'ember';
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 import RegisterTableComponentMixin from 'ember-table/mixins/register-table-component';
+import SortabelMixin from 'ember-table/mixins/sortable';
 
 export default Ember.CollectionView.extend(
-  StyleBindingsMixin, RegisterTableComponentMixin, {
+  StyleBindingsMixin, RegisterTableComponentMixin, SortabelMixin, {
     classNames: ['ember-table-table-block', 'ember-table-header-groups-block'],
     styleBindings: ['width'],
     columnGroups: undefined,
@@ -45,29 +46,13 @@ export default Ember.CollectionView.extend(
       return this._super(childView, attrs);
     },
 
-    // Options for jQuery UI sortable
-    sortableOption: Ember.computed(function () {
-      return {
-        axis: 'x',
-        containment: 'parent',
-        cursor: 'move',
-        helper: 'clone',
-        items: ".ember-table-header-block.sortable",
-        opacity: 0.9,
-        placeholder: 'ui-state-highlight group-column-reorder-indicator',
-        scroll: true,
-        tolerance: 'pointer',
-        update: Ember.$.proxy(this.onColumnSortDone, this),
-        stop: Ember.$.proxy(this.onColumnSortStop, this),
-        sort: Ember.$.proxy(this.onColumnSortChange, this),
-        start: Ember.$.proxy(this.onColumnSortStart, this)
-      };
-    }),
+    // for sortable mixin
+    reorderPlaceHolderClass: 'group-column-reorder-indicator',
+    sortableItemSelector: '.ember-table-header-block',
+    sortableTargetElement: '> .ui-state-highlight.group-column-reorder-indicator',
+    sortItemName: 'columnGroup',
 
-    onColumnSortStart: function(event, ui) {
-      // show the dragging element
-      ui.item.show();
-
+    columnSortDidStart: function() {
       this.set('tableComponent._isReorderInnerColumns', false);
     },
 
@@ -87,25 +72,5 @@ export default Ember.CollectionView.extend(
         }
       }
       this._super();
-    },
-
-    onColumnSortStop: function () {
-      this.set('tableComponent._isShowingSortableIndicator', false);
-    },
-
-    onColumnSortChange: function () {
-      var left = this.$('> .ui-state-highlight.group-column-reorder-indicator').offset().left -
-        this.$().closest('.ember-table-tables-container').offset().left;
-      this.set('tableComponent._isShowingSortableIndicator', true);
-      this.set('tableComponent._sortableIndicatorLeft', left);
-    },
-
-    onColumnSortDone: function (event, ui) {
-      var newIndex = ui.item.index();
-      this.$().sortable('cancel');
-      var view = Ember.View.views[ui.item.attr('id')];
-      var column = view.get('columnGroup');
-      this.get('tableComponent').onColumnSort(column, newIndex);
-      this.set('tableComponent._isShowingSortableIndicator', false);
     }
-  });
+});
