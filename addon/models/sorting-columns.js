@@ -1,5 +1,6 @@
 import Ember from 'ember';
 
+
 export default Ember.Object.extend({
 
   init:  function() {
@@ -43,7 +44,7 @@ export default Ember.Object.extend({
       return content;
     }
     var self = this;
-    return content.slice().stableSort(function (prev, next) {
+    return content.slice().sort(function (prev, next) {
       return self.sortBy(prev, next);
     });
   },
