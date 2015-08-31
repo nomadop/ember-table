@@ -61,7 +61,7 @@ var Grouping = Ember.Object.extend({
       return arrayContent;
     }
     var sortFn = this.get('grouper.sortFn') || this.get('defaultSortFn');
-    return arrayContent.slice().sort(function (prev, next) {
+    return arrayContent.slice().stableSort(function (prev, next) {
       return sortFn(prev, next) * sortFactor;
     });
   },
