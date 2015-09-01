@@ -14,28 +14,38 @@ export default Ember.Object.extend({
   // Specified type of data, eg: datetime, decimal, percentage, and string.
   dataType: null,
 
-  sortBy: function (prev, next) {
-    var prevValue, nextValue;
-    switch (this.get('dataType')) {
-      case "decimal":
-        prevValue = Number(this.getCellContent(prev));
-        nextValue = Number(this.getCellContent(next));
-        break;
-      case "percentage":
-        prevValue = Number(this.getCellContent(prev).replace("%", ""));
-        nextValue = Number(this.getCellContent(next).replace("%", ""));
-        break;
-      case "datetime":
-        prevValue = Date.parse(this.getCellContent(prev));
-        nextValue = Date.parse(this.getCellContent(next));
-        break;
-      default:
-        prevValue = this.getCellContent(prev);
-        nextValue = this.getCellContent(next);
-        break;
-    }
-    return Ember.compare(prevValue, nextValue);
-  },
+  parseFnMap: Ember.computed(function() {
+    var column = this;
+    var numberParse = function(item) {
+      return Number(column.getCellContent(item));
+    };
+    var percentageParse = function(item) {
+      return Number(column.getCellContent(item).replace("%", ""));
+    };
+    var dateParse = function(item) {
+      return Date.parse(column.getCellContent(item)) || 0;
+    };
+    var defaultParse = function(item) {
+      return column.getCellContent(item);
+    };
+    return {
+      decimal: numberParse,
+      percentage: percentageParse,
+      datetime: dateParse,
+      date: dateParse,
+      default: defaultParse
+    };
+  }),
+
+  sortBy: Ember.computed(function() {
+    var dataType = this.get('dataType');
+    var parseFn = this.get('parseFnMap.' + dataType) || this.get('parseFnMap.default');
+    return function(prev, next) {
+      var prevValue = parseFn(prev);
+      var nextValue = parseFn(next);
+      return Ember.compare(prevValue, nextValue);
+    };
+  }).property('dataType'),
 
   sortIndicatorStyles: Ember.computed(function() {
     var sortIndicatorStyles = ['sort-indicator-icon'];
@@ -136,7 +146,7 @@ export default Ember.Object.extend({
   }).property('width', 'maxWidth'),
 
   sortFn: function(prev, next){
-    return this.get('_sortState') * this.sortBy(prev, next);
+    return this.get('_sortState') * this.get('sortBy')(prev, next);
   },
 
   // if you want to change sort order, you should invoke this function
