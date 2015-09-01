@@ -82,16 +82,21 @@ var GroupRow = Row.extend({
 
     sortingGroupersDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
       if (this.get('_childrenRow')) {
-        this.sortingConditionsChanged(this.get('nextLevelGrouping'), this.get('nextLevelGrouping.sortDirection'));
+        var previousSortDirection = this.get('_previousGrouperSortDirection');
+        var currentSortDirection = this.get('nextLevelGrouping.sortDirection');
+        if (previousSortDirection !== currentSortDirection) {
+          this.sortingConditionsChanged(this.get('nextLevelGrouping'), this.get('nextLevelGrouping.sortDirection'));
+          this.set('_previousGrouperSortDirection', currentSortDirection);
+        }
       }
     }),
 
-    sortingConditionsChanged: function(sorter, isSortConditionEmpty) {
+    sortingConditionsChanged: function(sorter, isSortConditionNotEmpty) {
       if (this.get('children.isNotCompleted')) {
         this.recreateChildrenRow();
         this.notifyLengthChange();
       } else {
-        if (isSortConditionEmpty) {
+        if (isSortConditionNotEmpty) {
           this.recreateSortedChildrenRow(sorter);
           this.notifyLengthChange();
         }
