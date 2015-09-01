@@ -11,7 +11,7 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   // TODO: Doc
   templateName: 'header-cell',
   classNames: ['ember-table-cell', 'ember-table-header-cell'],
-  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'columnCellStyle'],
+  classNameBindings: ['column.isSortable:sortable', 'column.textAlign', 'columnCellStyle', 'column.isSorted:sorted'],
 
   styleBindings: ['width', 'height'],
 
@@ -164,8 +164,9 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   },
 
   click: function(event) {
-    if(!this.get('column.isGroup')) {
+    if (!this.get('column.isGroup')) {
       this.get('controller').send('sortByColumn', this.get('content'), event);
     }
+    Ember.run.schedule('afterRender', this, this.elementSizeDidChange);
   }
 });
