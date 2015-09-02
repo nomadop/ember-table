@@ -422,6 +422,14 @@
       font-weight: bold;
       width: 100%;
     }
+
+    .column-sort-indicator {
+      width: 10px;
+      right: 0px;
+      bottom: 2px;
+      position: absolute;
+      line-height: normal;
+    }
   }
 
   .ember-table-toggle {
@@ -431,6 +439,13 @@
       position: absolute;
       bottom: 8px;
       font-size: 13px;
+    }
+  }
+
+  &.sorted {
+    .ember-table-content-container .ember-table-content {
+      right: 10px;
+      padding-left: 15px;
     }
   }
 }
@@ -696,18 +711,6 @@
 .sort-indicator-icon-down > span:after {
   display: block;
   border-color: #000 transparent transparent transparent;
-}
-.ember-table-header-cell {
-  span.column-sort-indicator {
-    float: right;
-    overflow: hidden;
-    line-height: normal;
-
-    span {
-      color: black;
-      margin-left: 5px;
-    }
-  }
 }
 
 .grouping-column-indicator {

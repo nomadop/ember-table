@@ -684,7 +684,7 @@ test('sort partial data by grouper accountSection', function(assert) {
   });
 });
 
-test('unsort partial data by setting grouper "accountSection" to null', function(assert) {
+test('unSort partial data by setting grouper "accountSection" to null', function(assert) {
   var defers = DefersPromise.create({count: 3});
   var component = this.subject({defers: defers, height: 120});
   this.render();
@@ -709,7 +709,7 @@ test('unsort partial data by setting grouper "accountSection" to null', function
   });
 });
 
-test('unsort partial data by setting grouper "accountSection" to undefined', function(assert) {
+test('unSort partial data by setting grouper "accountSection" to undefined', function(assert) {
   var defers = DefersPromise.create({count: 3});
   var component = this.subject({defers: defers, height: 120});
   this.render();
