@@ -80,6 +80,10 @@ var GroupRow = Row.extend({
       }
     }),
 
+    _previousGrouperSortDirection: Ember.computed(function() {
+      return this.get('nextLevelGrouping.sortDirection');
+    }),
+
     sortingGroupersDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
       if (this.get('_childrenRow')) {
         var previousSortDirection = this.get('_previousGrouperSortDirection');
