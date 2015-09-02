@@ -37,16 +37,17 @@ export default Ember.Object.extend({
     };
   }),
 
-  sortBy: Ember.computed(function() {
+  _sortParseFn: Ember.computed(function() {
     var dataType = this.get('dataType');
-    var parseFn = this.get('parseFnMap.' + dataType) || this.get('parseFnMap.default');
-    return function(prev, next) {
-      var prevValue = parseFn(prev);
-      var nextValue = parseFn(next);
-      return Ember.compare(prevValue, nextValue);
-    };
+    return this.get('parseFnMap.' + dataType) || this.get('parseFnMap.default');
   }).property('dataType'),
 
+  sortBy: function(prev, next) {
+    var parseFn = this.get('_sortParseFn');
+    var prevValue = parseFn(prev);
+    var nextValue = parseFn(next);
+    return Ember.compare(prevValue, nextValue);
+  },
   sortIndicatorStyles: Ember.computed(function() {
     var sortIndicatorStyles = ['sort-indicator-icon'];
     var sortIndicatorClassMap = {
@@ -146,7 +147,7 @@ export default Ember.Object.extend({
   }).property('width', 'maxWidth'),
 
   sortFn: function(prev, next){
-    return this.get('_sortState') * this.get('sortBy')(prev, next);
+    return this.get('_sortState') * this.sortBy(prev, next);
   },
 
   // if you want to change sort order, you should invoke this function
