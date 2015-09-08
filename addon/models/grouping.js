@@ -3,7 +3,6 @@ import Ember from 'ember';
 var Grouping = Ember.Object.extend({
   groupingMetadata: null,
   groupingLevel: null,
-  contents: [],
   isLeafParent: Ember.computed(function () {
     return this.get('groupingLevel') === this.get('groupingMetadata.length') - 2;
   }).property('groupingLevel', 'groupingMetadata.[]'),
@@ -26,34 +25,12 @@ var Grouping = Ember.Object.extend({
 
   isGrandTotal: Ember.computed.equal('groupingLevel', -1),
 
-  nextLevel: function (content) {
-    var contents = this.get('contents').slice();
-    if (this.get('groupingLevel') >= 0) {
-      contents = contents.concat([content]);
-    }
+  nextLevelGrouping: Ember.computed(function () {
     return Grouping.create({
       groupingMetadata: this.get('groupingMetadata'),
       groupingLevel: this.get('groupingLevel') + 1,
-      contents: contents
     });
-  },
-
-  query: Ember.computed(function () {
-    return {
-      key: this.get('key'),
-      upperGroupings: this.get('upperGroupings'),
-      sortDirection: this.get('sortDirection')
-    };
-  }).property('contents.[]', 'key', 'sortDirection'),
-
-  upperGroupings: Ember.computed(function () {
-    var self = this;
-    var contents = this.get('contents');
-    return contents.map(function (x, i) {
-      var grouper = self.getGrouper(i);
-      return [Ember.get(grouper, 'id'), x, Ember.get(grouper, 'sortDirection')];
-    });
-  }),
+  }).property('groupingLevel', 'groupingMetadata.@each'),
 
   sortContent: function(arrayContent) {
     var sortFactor = this.get('sortFactor');

@@ -2,6 +2,7 @@ import Ember from 'ember';
 import Row from './row';
 import SubRowArray from './sub-row-array';
 import LazyGroupRowArray from '../models/lazy-group-row-array';
+import RowPath from 'ember-table/models/row-path';
 
 var GroupRow = Row.extend({
     expandedDepth: Ember.computed(function () {
@@ -78,10 +79,6 @@ var GroupRow = Row.extend({
       if (this.get('_childrenRow') && !this.get('nextLevelGrouping.sortDirection')) {
         this.sortingConditionsChanged(this.get('target.sortingColumns'), this.get('target.sortingColumns.isNotEmpty'));
       }
-    }),
-
-    _previousGrouperSortDirection: Ember.computed(function() {
-      return this.get('nextLevelGrouping.sortDirection');
     }),
 
     sortingGroupersDidChange: Ember.observer('nextLevelGrouping.sortDirection', function() {
@@ -169,7 +166,11 @@ var GroupRow = Row.extend({
             }));
             var subRowsContent = this.get('children');
             if (subRowsContent.triggerLoading) {
-              subRowsContent.triggerLoading(i, this.get('target'), this.get('nextLevelGrouping'));
+              var group = Ember.Object.create({
+                query: this.get('path').toQuery(),
+                key: this.get('nextLevelGrouping.key')
+              });
+              subRowsContent.triggerLoading(i, this.get('target'), group);
             }
           }
           var newRow = this.get('itemController').create({
@@ -219,12 +220,15 @@ var GroupRow = Row.extend({
       return this.get('content.' + this.get('grouping.key'));
     }).property('content', 'content.isLoaded', 'grouping.key'),
 
-    nextLevelGrouping: Ember.computed(function () {
-      var grouping = this.get('grouping');
-      return grouping.nextLevel(this.get('content'));
-    }).property('content', 'grouping'),
+    nextLevelGrouping: Ember.computed.alias('grouping.nextLevelGrouping'),
 
-    parentRow: null
+    parentRow: null,
+
+    path: Ember.computed(function() {
+      var parentPath = this.get('parentRow.path') || RowPath.create();
+      return parentPath.createChild(this);
+    }).property('parentRow.path', 'grouping.key', 'content')
+
   }
 );
 

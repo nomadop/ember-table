@@ -783,7 +783,7 @@ test('sort partial data by grouper accountSection then expand', function(assert)
   }, [2]);
 
   defers.ready(function () {
-    Ember.run(component, 'setGrouperSortDirection', 0, 'desc');
+    Ember.run.later(component, 'setGrouperSortDirection', 0, 'desc');
   }, [3]);
 
   return defers.ready(function () {
