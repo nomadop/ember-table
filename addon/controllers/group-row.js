@@ -22,7 +22,7 @@ var GroupRow = Row.extend({
         }
       }
       return expandLevel;
-    }).property('expandLevel', 'isExpanded', '_childrenRow.definedControllersCount', '_childrenRow.@each.expandedDepth'),
+    }).property('expandLevel', 'isExpanded', '_childrenRow.@each.expandedDepth'),
 
     subRowsCount: Ember.computed(function () {
       if (!this.get('isExpanded')) {

@@ -51,7 +51,7 @@ export default RowArrayController.extend({
       }
       return previousValue;
     }, 0);
-  }).property('_virtualRootRow._childrenRow.@each.expandedDepth',  '_virtualRootRow._childrenRow.definedControllersCount'),
+  }).property('_virtualRootRow._childrenRow.@each.expandedDepth'),
 
 
   _virtualRootRow: Ember.computed(function () {
@@ -82,7 +82,7 @@ export default RowArrayController.extend({
       return item.get('subRowsCount') + previousValue;
     }, 0);
     return root.get('_childrenRow.length') + subRowsCount;
-  }).property('_virtualRootRow._childrenRow.@each.subRowsCount', '_virtualRootRow._childrenRow.definedControllersCount'),
+  }).property('_virtualRootRow._childrenRow.@each.subRowsCount'),
 
   groupMeta: null
 });
