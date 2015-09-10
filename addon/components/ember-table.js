@@ -310,9 +310,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   tableColumnGroups: Ember.computed(function() {
     var columns = this.get('_columns');
-    var numFixedColumns = this.get('numFixedColumns') || 0;
+    var numFixedColumns = this.get('_numFixedColumns');
     return columns.slice(numFixedColumns, columns.get('length')) || [];
-  }).property('_columns.@each', 'numFixedColumns'),
+  }).property('_columns.@each', '_numFixedColumns'),
 
   prepareTableColumns: function() {
     var _this = this;
@@ -537,8 +537,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // tables-container height adjusts to the content height
   _tablesContainerHeight: Ember.computed(function() {
     var height = this.get('_height');
-    var contentHeight = this.get('_tableContentHeight') +
-        this.get('_headerHeight') + this.get('_footerHeight');
+    var _headerHeight = this.get('_headerHeight');
+    var headerHeight = _headerHeight * (this.get('hasColumnGroup') ? 2 : 1);
+    var contentHeight = this.get('_tableContentHeight') + headerHeight + this.get('_footerHeight');
     return Math.min(contentHeight, height);
   }).property('_height', '_tableContentHeight', '_headerHeight',
       '_footerHeight'),
