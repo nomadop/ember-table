@@ -17,6 +17,7 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
 
   isNotTopRow: Ember.computed.alias('parentView.isNotTopRow'),
 
+  // TODO(Stephen): Should be remove and remove style binding from 'classNameBindings'
   columnCellStyle: Ember.computed(function(){
     var columnClasses = [];
     var cellStyle = this.get('column.cellStyle');
