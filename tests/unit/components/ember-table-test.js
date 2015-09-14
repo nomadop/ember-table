@@ -10,6 +10,7 @@ import EmberTableFixture from '../../fixture/ember-table';
 import EmberTableGroupFixture from '../../fixture/ember-table-with-group';
 import EmberTableGroupAndFixedFixture from '../../fixture/ember-table-with-group-and-fixed';
 import EmberTableHelper from '../../helpers/ember-table-helper';
+import ColumnFixture from '../../fixture/columns';
 
 var tableFixture = TableFixture.create();
 
@@ -232,4 +233,20 @@ test('render fixed group column', function(assert) {
 
   helper.assertFixedColumnGroupHeader('Group1', 'Group1 should be fixed');
   helper.assertBodyContentCellCountInRow(1, 'Non-fixed cell count should be 1 for first row');
+});
+
+moduleForEmberTable("ember table height", function() {
+  var column = ColumnFixture.create();
+  return EmberTableFixture.create({
+    content: [{}, {}],
+    columns: [column.get('firstColumn'), column.get('firstGroup')],
+    height: 1000
+  });
+});
+
+test('ember table height', function(assert) {
+  var component = this.subject();
+  this.render();
+  var tableHeight = component.$('.ember-table-tables-container').css('height');
+  assert.equal(tableHeight, '120px');
 });
