@@ -388,7 +388,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
         return row.get('groupName');
       },
       expandedDepthChanged: function(expandedDepth) {
-        this.resize(groupingColumnWidth + groupIndicatorWidth * expandedDepth);
+        if(!this.get('isResizable')){
+          this.resize(groupingColumnWidth + groupIndicatorWidth * expandedDepth);
+        }
       }
     });
   }),

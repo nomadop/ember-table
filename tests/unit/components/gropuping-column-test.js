@@ -46,3 +46,14 @@ test('resize grouping column', function(assert) {
   var widthAfterResize = groupingColumnHeader.width();
   assert.equal(widthAfterResize, widthBeforeResize + distanceX);
 });
+
+test('Resizable grouping column does not auto adjust width', function(assert) {
+  var component = this.subject(true);
+  this.render();
+  var tableDom = TableDom.create({content: component.$()});
+  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
+  var widthBeforeResize = groupingColumnHeader.width();
+  Ember.run(() => tableDom.rows(0).groupIndicator().click());
+  var widthAfterResize = groupingColumnHeader.width();
+  assert.equal(widthAfterResize, widthBeforeResize);
+});
