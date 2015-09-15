@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-var TableDom = Ember.ObjectProxy.extend({
+let TableDom = Ember.ObjectProxy.extend({
 
   parent: null,
 
@@ -8,108 +8,106 @@ var TableDom = Ember.ObjectProxy.extend({
 
   length: Ember.computed.oneWay('content.length'),
 
-  init: function() {
-    var self = this;
-    self.aliasMethods.forEach(function (methodName) {
-      self.defineMethod(methodName);
+  init() {
+    this.aliasMethods.forEach((methodName) => {
+      this.defineMethod(methodName);
     });
     this._super();
   },
 
-  defineMethod: function(name) {
-    this.set(name, function () {
-      var content = this.get('content');
-      return content[name].apply(content, arguments);
+  defineMethod(name) {
+    this.set(name, (...args) => {
+      let content = this.get('content');
+      return content[name](...args);
     });
   },
 
-  headerRows: function(idx) {
-    var selector = idx === undefined ? '' : ':eq(' + idx + ')';
-    var dom = this.find('.ember-table-header-block').find('.ember-table-table-row' + selector);
+  headerRows(idx) {
+    let selector = idx === undefined ? '' : `:eq(${idx})`;
+    let dom = this.find('.ember-table-header-block').find(`.ember-table-table-row${selector}`);
     return this.createChildDom(dom);
   },
 
-  headerRow: function(idx) {
-    var dom = this.headerRows().eq(idx);
+  headerRow(idx) {
+    let dom = this.headerRows().eq(idx);
     return this.createChildDom(dom);
   },
 
-  rows: function(idx) {
-    var selector = idx === undefined ? '' : ':eq(' + idx + ')';
-    var dom = this.find('.ember-table-table-block.lazy-list-container').find('.ember-table-table-row' + selector);
+  rows(idx) {
+    let selector = idx === undefined ? '' : `:eq(${idx})`;
+    let dom = this.find('.ember-table-table-block.lazy-list-container').find(`.ember-table-table-row${selector}`);
     return this.createChildDom(dom);
   },
 
-  row: function(idx) {
-    var dom = this.rows().eq(idx);
+  row(idx) {
+    let dom = this.rows().eq(idx);
     return this.createChildDom(dom);
   },
 
-  cellsContent: function(rows, cols) {
-    if (typeof(rows) === 'number'){
-      var rowIdxs = [];
-      for(var i=0;i<rows;i++) {
+  cellsContent(rows, cols) {
+    if (typeof(rows) === 'number') {
+      let rowIdxs = [];
+      for (let i = 0; i < rows; i++) {
         rowIdxs.push(i);
       }
       rows = rowIdxs;
     }
-    var self = this;
-    return rows.map(function(rIdx) {
-      return cols.map(function(cIdx) {
-        return self.cell(rIdx, cIdx).text().trim();
+    return rows.map((rIdx) => {
+      return cols.map((cIdx) => {
+        return this.cell(rIdx, cIdx).text().trim();
       });
     });
   },
 
-  groupIndicator: function() {
-    var dom = this.find('.grouping-column-indicator:has(div)');
+  groupIndicator() {
+    let dom = this.find('.grouping-column-indicator:has(div)');
     return this.createChildDom(dom);
   },
 
-  cells: function(){
-    var dom = this.find('.ember-table-cell');
+  cells(){
+    let dom = this.find('.ember-table-cell');
     return this.createChildDom(dom);
   },
 
-  cell: function() {
-    var parent = arguments.length === 1 ? this : this.rows(arguments[0]);
-    var dom = parent.cells().eq(arguments[arguments.length - 1]);
+  cell(...args) {
+    let parent = args.length === 1 ? this : this.rows(args[0]);
+    let dom = parent.cells().eq(args[args.length - 1]);
     return this.createChildDom(dom);
   },
 
-  createChildDom: function(dom) {
+  createChildDom(dom) {
     return TableDom.create({
       content: dom,
       parent: this
     });
   },
 
-  cellWithContent: function(text) {
-    var dom = this.find('.ember-table-cell:contains(' + text + ')');
+  cellWithContent(text) {
+    let dom = this.find('.ember-table-cell:contains(' + text + ')');
     return this.createChildDom(dom);
   },
 
   // actions
 
-  clickWithCommand: function() {
+  clickWithCommand() {
     this.trigger({type: 'click', metaKey: true});
   },
 
   resizeX(dx) {
-    var dom = this.find(".ui-resizable-e");
+    let dom = this.find(".ui-resizable-e");
     // simulate drag will miss 1px;
     dom.simulate('mouseover').simulate('drag', {dx: dx + 1});
   },
 
-  scrollTop: function (defer, rowCount) {
-    var delta = 30;
+  scrollTop(defer, rowCount) {
+    let delta = 30;
     if (rowCount < 0) {
       rowCount = -rowCount;
       delta = -30;
     }
-    var px = 0;
-    var scrollBar = this.find('.antiscroll-box .antiscroll-inner');
-    var scroll = function () {
+    let px = 0;
+    let scrollBar = this.find('.antiscroll-box .antiscroll-inner');
+    let scroll = () => {
       px += delta;
       scrollBar.scrollTop(px);
       rowCount--;
