@@ -4,6 +4,7 @@ import moduleForEmberTable from '../../helpers/module-for-ember-table';
 import EmberTableFixture from '../../fixture/ember-table';
 import GroupedRowIndicator from 'ember-table/views/grouped-row-indicator';
 import EmberTableHelper from '../../helpers/ember-table-helper';
+import TableDom from '../../helpers/table-dom';
 
 var content = [
     {
@@ -709,4 +710,72 @@ test('expand and collapse grouped rows when row.children is null or undefined', 
 
   var bodyRows = helper.bodyRows();
   assert.ok(bodyRows.length - 2 > 5, "body rows should be larger than 5");
+});
+
+
+moduleForEmberTable('Resize grouping column', function (groupingColumnResizable) {
+  return EmberTableFixture.create({
+    groupMeta: {
+      groupingColumnResizable: groupingColumnResizable,
+      groupingMetadata: [
+        {id: 'accountSection'},
+        {id: 'accountType'}
+      ]
+    },
+    content: [
+      {
+        id: 1, accountSection: 'as-1',
+        children: [
+          {id: 11, accountType: 'at-11'}
+        ]
+      },
+      {id: 2, accountSection: 'as-2'}
+    ]
+  });
+});
+
+test('Can not resize grouping column by default', function (assert) {
+  var component = this.subject();
+  this.render();
+  var tableDom = TableDom.create({content: component.$()});
+  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
+  var widthBefore = groupingColumnHeader.width();
+
+  Ember.run(function () {
+    groupingColumnHeader.resizeX(60);
+  });
+
+  var widthAfter = groupingColumnHeader.width();
+  assert.equal(widthAfter, widthBefore);
+});
+
+test('Can resize grouping column', function (assert) {
+  var component = this.subject(true);
+  this.render();
+  var tableDom = TableDom.create({content: component.$()});
+  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
+  var widthBefore = groupingColumnHeader.width();
+
+  var distanceX = 60;
+  Ember.run(function () {
+    groupingColumnHeader.resizeX(distanceX);
+  });
+
+  var widthAfter = groupingColumnHeader.width();
+  assert.equal(widthAfter, widthBefore + distanceX);
+});
+
+test('Disable auto adjusting for resizable grouping column', function (assert) {
+  var component = this.subject(true);
+  this.render();
+  var tableDom = TableDom.create({content: component.$()});
+  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
+  var widthBefore = groupingColumnHeader.width();
+
+  Ember.run(function () {
+    tableDom.rows(0).groupIndicator().click();
+  });
+
+  var widthAfter = groupingColumnHeader.width();
+  assert.equal(widthAfter, widthBefore);
 });
