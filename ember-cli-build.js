@@ -51,10 +51,13 @@ module.exports = function(defaults) {
   }
 
   app.import(app.bowerDirectory + '/d3/d3.js');
+
   /*
    * Support test of jquery-ui-sortable
    */
-  app.import(app.bowerDirectory + '/jquery-simulate/jquery.simulate.js');
+  if(app.env === 'test') {
+    app.import(app.bowerDirectory + '/jquery-simulate/jquery.simulate.js');
+  }
 
   return app.toTree();
 };

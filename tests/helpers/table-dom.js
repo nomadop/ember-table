@@ -110,8 +110,22 @@ var TableDom = Ember.ObjectProxy.extend({
     return this.createChildDom(dom);
   },
 
+  // actions
+
   clickWithCommand: function() {
     this.trigger({type: 'click', metaKey: true});
+  },
+
+  resizeX(dx) {
+    var dom = this.find(".ui-resizable-e");
+    // simulate drag will miss 1px;
+    dom.simulate('mouseover').simulate('drag', {dx: dx + 1});
+  },
+
+  // attributes
+
+  width() {
+    return parseInt(this.content.css('width'));
   }
 });
 

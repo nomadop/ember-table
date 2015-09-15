@@ -379,7 +379,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
     return ColumnDefinition.create({
       headerCellName: '', //Todo: Fix grouping header name
       textAlign: 'text-align-left',
-      isResizable: false,
+      isResizable: this.getWithDefault('groupMeta.groupingColumnResizable', false),
       isSortable: false,
       sortFn: null,
       savedWidth: groupingColumnWidth,
