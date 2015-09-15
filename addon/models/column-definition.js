@@ -9,7 +9,7 @@ export default Ember.Object.extend({
   // TODO(new-api): Change to `columnName`
   headerCellName: undefined,
 
-  cellStyle: undefined,
+  cellStyle: '',
 
   sortBy: function(prev, next) {
     var prevValue = this.getCellContent(prev);

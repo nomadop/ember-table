@@ -27,7 +27,7 @@ export default ColumnDefinition.extend({
     }, 0);
   }).property('innerColumns.@each.width'),
 
-  innerColumnStyle: undefined,
+  innerColumnStyle: '',
 
   groupStyle: undefined,
 
@@ -51,18 +51,38 @@ export default ColumnDefinition.extend({
 
   columns: Ember.computed(function () {
     var columns = this.get('innerColumns');
+    this._updateInnerColumnStyle(columns);
+    return columns;
+  }).property('innerColumns.@each'),
+
+  innerColumnStyleDidChange: Ember.observer('innerColumnStyle', 'lastColumnStyle', 'firstColumnStyle', function() {
+    var innerColumns = this.get('columns');
+    this._updateInnerColumnStyle(innerColumns);
+  }),
+
+  _updateInnerColumnStyle: function(innerColumns) {
     var innerColumnStyle = this.get('innerColumnStyle');
 
-    columns.setEach('cellStyle', innerColumnStyle);
+    innerColumns.setEach('cellStyle', innerColumnStyle);
 
-    columns[0].set('cellStyle', this.get('firstColumnStyle') + ' ' +
-      innerColumnStyle);
-    columns[columns.length - 1].set('cellStyle', this.get(
-      'lastColumnStyle') + ' ' + innerColumnStyle);
+    var fistColumn = innerColumns[0];
+    fistColumn.set('cellStyle', this._combineSpecificStyle(innerColumnStyle, 'firstColumnStyle'));
 
-    return columns;
-  }).property('innerColumns.@each', 'innerColumnStyle', 'lastColumnStyle',
-    'firstColumnStyle'),
+    var lastColumn = innerColumns[innerColumns.length - 1];
+    lastColumn.set('cellStyle', this._combineSpecificStyle(innerColumnStyle, 'lastColumnStyle'));
+  },
+
+  _combineSpecificStyle: function (defaultStyle, specificStyleName) {
+    var specificStyle = this.get(specificStyleName);
+    if (specificStyle) {
+      if (defaultStyle) {
+        return specificStyle + " " + defaultStyle;
+      } else {
+        return specificStyle;
+      }
+    }
+    return defaultStyle;
+  },
 
   lastColumn: Ember.computed(function () {
     var columns = this.get('columns');
