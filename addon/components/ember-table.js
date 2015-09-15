@@ -382,13 +382,14 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       isResizable: this.getWithDefault('groupMeta.groupingColumnResizable', false),
       isSortable: false,
       sortFn: null,
+      minWidth: 40, // Prevent cell content from changing into '...' then into normal string.
       savedWidth: groupingColumnWidth,
       tableCellView: 'grouping-column-cell',
       getCellContent: function (row) {
         return row.get('groupName');
       },
       expandedDepthChanged: function(expandedDepth) {
-        if(!this.get('isResizable')){
+        if (!this.get('isResizable')) {
           this.resize(groupingColumnWidth + groupIndicatorWidth * expandedDepth);
         }
       }

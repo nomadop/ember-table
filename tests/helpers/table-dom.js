@@ -84,6 +84,23 @@ var TableDom = Ember.ObjectProxy.extend({
     });
   },
 
+  cellWithContent: function(text) {
+    var dom = this.find('.ember-table-cell:contains(' + text + ')');
+    return this.createChildDom(dom);
+  },
+
+  // actions
+
+  clickWithCommand: function() {
+    this.trigger({type: 'click', metaKey: true});
+  },
+
+  resizeX(dx) {
+    var dom = this.find(".ui-resizable-e");
+    // simulate drag will miss 1px;
+    dom.simulate('mouseover').simulate('drag', {dx: dx + 1});
+  },
+
   scrollTop: function (defer, rowCount) {
     var delta = 30;
     if (rowCount < 0) {
@@ -103,23 +120,6 @@ var TableDom = Ember.ObjectProxy.extend({
       }
     };
     setTimeout(scroll, 0);
-  },
-
-  cellWithContent: function(text) {
-    var dom = this.find('.ember-table-cell:contains(' + text + ')');
-    return this.createChildDom(dom);
-  },
-
-  // actions
-
-  clickWithCommand: function() {
-    this.trigger({type: 'click', metaKey: true});
-  },
-
-  resizeX(dx) {
-    var dom = this.find(".ui-resizable-e");
-    // simulate drag will miss 1px;
-    dom.simulate('mouseover').simulate('drag', {dx: dx + 1});
   },
 
   // attributes
