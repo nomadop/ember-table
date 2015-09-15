@@ -184,6 +184,15 @@
   width: 0;
 }
 
+/* Header Block */
+.ember-table-header-block {
+  .ember-table-table-row:nth-child(1) {
+    .ember-table-header-cell:nth-child(1) {
+      text-align: center;
+    }
+  }
+}
+
 .ember-table-header-row,
 .ember-table-header-container .ember-table-table-fixed-wrapper {
   background-color: @table-header-cell-background-color;
@@ -449,7 +458,7 @@
   &.sorted {
     .ember-table-content-container .ember-table-content {
       right: 25px;
-      padding-left: 15px;
+      padding-left: 25px;
     }
   }
 }
