@@ -75,6 +75,15 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   }).property('width', 'minWidth', 'tableComponent.columnMode',
       'nextResizableColumn.{width,minWidth}'),
 
+  sortIndicatorViewName: Ember.computed(function() {
+    var name = this.get('tableComponent.sortIndicatorViewName');
+    return name ? name : 'column-sort-indicator';
+  }).property('tableComponent.sortIndicatorViewName'),
+
+  sortIndicatorViewNameDidChange: Ember.observer('tableComponent.sortIndicatorViewName', function() {
+    this.rerender();
+  }),
+
   // jQuery UI resizable option
   resizableOption: Ember.computed(function() {
     return {

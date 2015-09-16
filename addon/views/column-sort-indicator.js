@@ -4,6 +4,8 @@ import RegisterTableComponentMixin from 'ember-table/mixins/register-table-compo
 export default Ember.View.extend(RegisterTableComponentMixin,{
   templateName: 'column-sort-indicator',
 
+  classNames: [ 'column-sort-indicator'],
+
   classNameBindings: ['columnCellStyle'],
 
   tagName: 'span',

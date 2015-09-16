@@ -2,7 +2,5 @@
   <span class="ember-table-content">
     {{view.content.headerCellName}}
   </span>
-  {{view "column-sort-indicator" classNames="column-sort-indicator"
-  column=view.column
-  }}
+  {{view view.sortIndicatorViewName column=view.column}}
 </div>
