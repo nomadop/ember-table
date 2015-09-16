@@ -109,6 +109,8 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   sortAction: null,
 
+  sortIndicatorViewName: null,
+
   groupingColumnWidth: 150,
 
   // By default the indicator view should be supported by ember-table.
