@@ -29,6 +29,10 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
     return this.get('tableComponent.rowLoadingIndicatorView') || RowLoadingIndicator;
   }).property('tableComponent.rowLoadingIndicatorView'),
 
+  rowLoadingIndicatorViewDidChange: Ember.observer('rowLoadingIndicatorView', function () {
+    this.rerender();
+  }),
+
   hasCustomRowLoadingIndicatorView: Ember.computed(function() {
     return this.get('rowLoadingIndicatorView') !== RowLoadingIndicator;
   }).property('tableComponent.rowLoadingIndicatorView'),
