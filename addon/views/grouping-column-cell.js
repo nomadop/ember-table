@@ -17,6 +17,10 @@ export default TableCell.extend(
     return view || GroupedRowIndicator;
   }).property('tableComponent.groupedRowIndicatorView'),
 
+  groupedRowIndicatorViewDidChange: Ember.observer('groupedRowIndicatorView', function() {
+    this.rerender();
+  }),
+
   hasChildren: Ember.computed(function() {
     return this.get('groupingLevel') < this.get('tableComponent.groupingMetadata.length') - 1;
   }).property('groupingLevel', 'tableComponent.groupingMetadata.length'),
@@ -43,11 +47,12 @@ export default TableCell.extend(
   },
 
   groupIndicatorWidth: Ember.computed.alias('tableComponent.groupIndicatorWidth'),
-  "padding-left": Ember.computed(function() {
+
+  "padding-left": Ember.computed(function () {
     var groupIndicatorWidth = this.get('groupIndicatorWidth');
     var numOfGroupIndicators = this.get('expandLevel') + 1; //expandLevel is zero based
     return numOfGroupIndicators * groupIndicatorWidth + 5;
-  }).property('expandLevel'),
+  }).property('expandLevel', 'groupIndicatorWidth'),
 
   isExpanded: Ember.computed.alias('row.isExpanded')
 });
