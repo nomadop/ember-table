@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import RowLoadingIndicator from './row-loading-indicator';
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 import RegisterTableComponentMixin from 'ember-table/mixins/register-table-component';
 
@@ -36,7 +35,8 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   }),
 
   hasCustomRowLoadingIndicatorView: Ember.computed(function() {
-    return this.get('tableComponent.rowLoadingIndicatorViewName') !== this._defaultRowLoadingIndicatorViewName;
+    var givenViewName = this.get('tableComponent.rowLoadingIndicatorViewName');
+    return givenViewName && givenViewName !== this._defaultRowLoadingIndicatorViewName;
   }).property('tableComponent.rowLoadingIndicatorViewName'),
 
   _defaultRowLoadingIndicatorViewName: 'row-loading-indicator',

@@ -546,14 +546,12 @@ test('grouped row indicator style', function(assert){
   assert.equal(secondLevelRowId, '21', 'it should show second level rows');
 });
 
-moduleForEmberTable('table with custom grouped row indicator view', function () {
-    var indicatorView = GroupedRowIndicator.extend({
-      indicatorClass: 'custom-grouped-row-indicator'
-    });
+moduleForEmberTable('Customize grouped row indicator view', function (CustomIndicatorView) {
+    this.container.register('view:custom-grouped-row-indicator', CustomIndicatorView);
     return EmberTableFixture.create({
       height: 330,
       width: 700,
-      groupedRowIndicatorView: indicatorView,
+      groupedRowIndicatorViewName: 'custom-grouped-row-indicator',
       content:[
           {
             firstLevel: 'first level row 1',
@@ -574,18 +572,41 @@ moduleForEmberTable('table with custom grouped row indicator view', function () 
   }
 );
 
-test('display custom grouped row indicator', function(assert){
-  var component = this.subject();
+test('add customized css class', function (assert) {
+  var CustomIndicatorView = GroupedRowIndicator.extend({
+    classNames: ['custom-grouped-row-indicator']
+  });
+  var component = this.subject(CustomIndicatorView);
   this.render();
   var helper = EmberTableHelper.create({
     _assert: assert,
     _component: component
   });
 
-  var secondLevelRowCell = helper.fixedBodyCell(1, 0);
-  assert.equal(secondLevelRowCell.find('.custom-grouped-row-indicator').length, 1, "custom grouped row should show custom indicator view");
+  var indicator = helper.fixedBodyCell(1, 0);
+  assert.equal(indicator.find('.custom-grouped-row-indicator').length, 1, "should show bind customized css class");
 });
 
+test('use customized template and display expand state, expand level', function (assert) {
+  var CustomIndicatorView = GroupedRowIndicator.extend({
+    template: Ember.Handlebars.compile(`
+      {{view.displayText}}
+    `),
+    displayText: Ember.computed(function () {
+      return this.get('isExpanded') + '-' + this.get('expandLevel');
+    }).property('isExpanded', 'expandLevel')
+
+  });
+  var component = this.subject(CustomIndicatorView);
+  this.render();
+  var helper = EmberTableHelper.create({
+    _assert: assert,
+    _component: component
+  });
+
+  var indicator = helper.fixedBodyCell(1, 0).find('.grouping-column-indicator');
+  assert.equal(indicator.text().trim(), 'false-0', "should show expand state and level");
+});
 
 moduleForEmberTable('table with two grouping rows which has three levels', function () {
     return EmberTableFixture.create({
