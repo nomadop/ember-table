@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import TableCell from './table-cell';
-import GroupedRowIndicator from './grouped-row-indicator';
 import RegisterTableComponentMixin from 'ember-table/mixins/register-table-component';
 
 export default TableCell.extend(
@@ -13,13 +12,16 @@ export default TableCell.extend(
   styleBindings: ['padding-left'],
 
   groupedRowIndicatorView: Ember.computed(function(){
-    var view =  this.get('tableComponent.groupedRowIndicatorView');
-    return view || GroupedRowIndicator;
-  }).property('tableComponent.groupedRowIndicatorView'),
+    var customizeViewName =  this.get('tableComponent.groupedRowIndicatorViewName');
+    var viewName = customizeViewName ? customizeViewName : this._defaultGroupIndicatorViewName;
+    return this.container.lookupFactory('view:' + viewName);
+  }).property('tableComponent.groupedRowIndicatorViewName'),
 
   groupedRowIndicatorViewDidChange: Ember.observer('groupedRowIndicatorView', function() {
     this.rerender();
   }),
+
+  _defaultGroupIndicatorViewName: 'grouped-row-indicator',
 
   hasChildren: Ember.computed(function() {
     return this.get('groupingLevel') < this.get('tableComponent.groupingMetadata.length') - 1;

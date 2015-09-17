@@ -1,12 +1,15 @@
 import Ember from 'ember';
 import ColumnFixture from './columns';
 import * as StableSort from 'ember-table/initializers/stable-sort';
-export default Ember.Component.extend({
+import TableSelector from '../helpers/table-selector';
+
+export default Ember.Component.extend(TableSelector, {
   init: function(){
     this._super();
     StableSort.initialize();
+    this.set('_component', this);
   },
-  
+
   height: 330,
   width: 1500,
 
@@ -14,8 +17,8 @@ export default Ember.Component.extend({
     '{{ember-table ' +
     ' columns=columns ' +
     ' hasFooter=hasFooter ' +
-    ' groupedRowIndicatorView=groupedRowIndicatorView ' +
-    ' rowLoadingIndicatorView=rowLoadingIndicatorView ' +
+    ' groupedRowIndicatorViewName=groupedRowIndicatorViewName ' +
+    ' rowLoadingIndicatorViewName=rowLoadingIndicatorViewName ' +
     ' content=content' +
     ' enableContentSelection=true' +
     ' numFixedColumns=numFixedColumns' +
@@ -37,8 +40,8 @@ export default Ember.Component.extend({
   enableContentSelection: true,
   content: [],
   numFixedColumns: 0,
-  groupedRowIndicatorView: null,
-  rowLoadingIndicatorView: null,
+  groupedRowIndicatorViewName: null,
+  rowLoadingIndicatorViewName: null,
   groupMeta: null,
   setGrouperSortDirection: function(grouperIndex, sortDirection) {
     var grouper = this.get('groupMeta.groupingMetadata').objectAt(grouperIndex);

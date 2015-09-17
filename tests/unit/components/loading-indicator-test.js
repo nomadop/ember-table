@@ -62,13 +62,14 @@ test('expand grouped rows', function(assert) {
 });
 
 moduleForEmberTable('custom loading indicator', function(content) {
+  this.container.register('view:custom-row-loading-indicator', RowLoadingIndicator.extend());
   return EmberTableFixture.create({
     content: content,
     groupMeta: {
       groupingMetadata: [{id: ""}, {id: ""}]
     },
     height: 157,
-    rowLoadingIndicatorView: RowLoadingIndicator.extend()
+    rowLoadingIndicatorViewName: "custom-row-loading-indicator"
   });
 });
 
