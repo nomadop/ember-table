@@ -1,10 +1,13 @@
 import Ember from 'ember';
 import ColumnFixture from './columns';
 import * as StableSort from 'ember-table/initializers/stable-sort';
-export default Ember.Component.extend({
+import TableSelector from '../helpers/table-selector';
+
+export default Ember.Component.extend(TableSelector, {
   init: function(){
     this._super();
     StableSort.initialize();
+    this.set('_component', this);
   },
 
   height: 330,
