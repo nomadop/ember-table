@@ -26,16 +26,20 @@ StyleBindingsMixin, RegisterTableComponentMixin, {
   },
 
   rowLoadingIndicatorView: Ember.computed(function () {
-    return this.get('tableComponent.rowLoadingIndicatorView') || RowLoadingIndicator;
-  }).property('tableComponent.rowLoadingIndicatorView'),
+    var customizeViewName = this.get('tableComponent.rowLoadingIndicatorViewName');
+    var viewName = customizeViewName ? customizeViewName : this._defaultRowLoadingIndicatorViewName;
+    return this.container.lookupFactory('view:' + viewName);
+  }).property('tableComponent.rowLoadingIndicatorViewName'),
 
   rowLoadingIndicatorViewDidChange: Ember.observer('rowLoadingIndicatorView', function () {
     this.rerender();
   }),
 
   hasCustomRowLoadingIndicatorView: Ember.computed(function() {
-    return this.get('rowLoadingIndicatorView') !== RowLoadingIndicator;
-  }).property('tableComponent.rowLoadingIndicatorView'),
+    return this.get('tableComponent.rowLoadingIndicatorViewName') !== this._defaultRowLoadingIndicatorViewName;
+  }).property('tableComponent.rowLoadingIndicatorViewName'),
+
+  _defaultRowLoadingIndicatorViewName: 'row-loading-indicator',
 
   row: Ember.computed.alias('parentView.row'),
   column: Ember.computed.alias('content'),

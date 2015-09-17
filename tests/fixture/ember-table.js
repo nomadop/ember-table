@@ -6,7 +6,7 @@ export default Ember.Component.extend({
     this._super();
     StableSort.initialize();
   },
-  
+
   height: 330,
   width: 1500,
 
@@ -15,7 +15,7 @@ export default Ember.Component.extend({
     ' columns=columns ' +
     ' hasFooter=hasFooter ' +
     ' groupedRowIndicatorView=groupedRowIndicatorView ' +
-    ' rowLoadingIndicatorView=rowLoadingIndicatorView ' +
+    ' rowLoadingIndicatorViewName=rowLoadingIndicatorViewName ' +
     ' content=content' +
     ' enableContentSelection=true' +
     ' numFixedColumns=numFixedColumns' +
@@ -38,7 +38,7 @@ export default Ember.Component.extend({
   content: [],
   numFixedColumns: 0,
   groupedRowIndicatorView: null,
-  rowLoadingIndicatorView: null,
+  rowLoadingIndicatorViewName: null,
   groupMeta: null,
   setGrouperSortDirection: function(grouperIndex, sortDirection) {
     var grouper = this.get('groupMeta.groupingMetadata').objectAt(grouperIndex);
