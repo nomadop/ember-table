@@ -33,10 +33,6 @@ test('expandLevel', function (assert) {
   assert.equal(firstObject.get('expandLevel'), 0, 'the row should has expandLevel');
 });
 
-test('_expandedDepth', function (assert) {
-  assert.equal(subject.get('_expandedDepth'), 0);
-});
-
 module('group row array controller with two level groupings', {
   beforeEach: function () {
     subject = GroupedRowArrayController.create({
@@ -73,7 +69,6 @@ test('expand children', function (assert) {
   assert.equal(groupRow.get('isExpanded'), true, 'group row should be expanded');
   assert.equal(subject.get('length'), 5, 'length should include expanded children rows');
   assert.equal(subject.objectAt(1).get('id'), 11, 'children rows should be inserted after parent row');
-  assert.equal(subject.get('_expandedDepth'), 1, '_expandedDepth should increase 1 after expanding');
 });
 
 test('collapse children', function (assert) {
@@ -85,7 +80,6 @@ test('collapse children', function (assert) {
   assert.equal(groupRow.get('isExpanded'), false, 'group row should be collapsed');
   assert.equal(subject.get('length'), 2, 'length should be updated');
   assert.equal(subject.objectAt(1).get('id'), 20, 'objectAt should return first level row');
-  assert.equal(subject.get('_expandedDepth'), 0, '_expandedDepth should decrease 1 after collapsing');
 });
 
 test('expanded level for second level rows', function (assert) {
@@ -130,8 +124,6 @@ test('expand two grouping rows', function (assert) {
   assert.equal(subject.objectAt(4).get('id'), 20, 'second grouped row is after last children row of first group');
   assert.equal(subject.objectAt(4).get('isExpanded'), true, 'second group row should change expand state');
   assert.equal(subject.objectAt(5).get('id'), 21, 'children row of second group is inserted after grouped row');
-  assert.equal(subject.get('_expandedDepth'), 1,
-    '_expandedDepth should not be increased two times when expand same level two times');
 });
 
 test('collapse first children row', function (assert) {
@@ -141,8 +133,6 @@ test('collapse first children row', function (assert) {
 
   assert.equal(subject.get('length'), 4, 'length should not include children rows of first group');
   assert.equal(subject.objectAt(1).get('id'), 20, 'first group should be collapsed');
-  assert.equal(subject.get('_expandedDepth'), 1,
-    '_expandedDepth should not be decreased when collapse one of two group rows on the same level');
 });
 
 test('collapse second children row', function (assert) {
@@ -152,8 +142,6 @@ test('collapse second children row', function (assert) {
 
   assert.equal(subject.get('length'), 5, 'length should not include children rows of first group');
   assert.equal(subject.objectAt(4).get('id'), 20, 'collapsed row should stay after children row of first group');
-  assert.equal(subject.get('_expandedDepth'), 1,
-    '_expandedDepth should not be decreased when collapse one of two group rows on the same level');
 });
 
 test('collapse first and second children row', function (assert) {
@@ -163,8 +151,6 @@ test('collapse first and second children row', function (assert) {
   subject.collapseChildren(subject.objectAt(0));
 
   assert.equal(subject.get('length'), 2, 'length should not include children rows');
-  assert.equal(subject.get('_expandedDepth'), 0,
-    '_expandedDepth should be decreased when collapse two of two group rows on the same level');
 });
 
 

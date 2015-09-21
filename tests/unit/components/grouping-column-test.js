@@ -234,19 +234,6 @@ test('toggle expand indicator', function(assert) {
   assert.ok(!!!secondGroupingIndicator.hasClass('unfold'), 'second grouping row indicator should not be changed');
 });
 
-test('expand grouping column width', function(assert) {
-  var component = this.subject();
-  this.render();
-
-  var indicator = component.rowGroupingIndicator(1);
-  var columnWidthBefore = component.nthColumnHeader(1).width();
-
-  indicator.click();
-
-  var columnWidthAfter = component.nthColumnHeader(1).width();
-  assert.equal(columnWidthAfter, columnWidthBefore + 10, 'should expand width 10px when expanded one level');
-});
-
 test('keep grouping column width on expanding', function(assert) {
   var component = this.subject();
   this.render();
@@ -476,20 +463,6 @@ test('collapse unlimited grouped data', function(assert) {
   assert.equal(component.nthColumnHeader(0).outerWidth(), 150, "should collapse all children rows");
 });
 
-
-test('re-expand unlimited grouped data', function(assert) {
-  var component = this.subject();
-  this.render();
-  component.expandGroupingRows([0,1,2,3]);
-
-  var firstLevelRowIndicator = component.rowGroupingIndicator(0);
-  firstLevelRowIndicator.click();
-  firstLevelRowIndicator.click();
-
-  assert.equal(component.nthColumnHeader(0).outerWidth(), 190, "should re-expand all children rows");
-});
-
-
 moduleForEmberTable('table with two levels of grouped rows', function () {
     return EmberTableFixture.create({
       height: 330,
@@ -626,17 +599,6 @@ moduleForEmberTable('table with two grouping rows which has three levels', funct
   }
 );
 
-test('auto expanding grouping column width', function(assert) {
-  var component = this.subject();
-  this.render();
-
-  component.expandGroupingRows([0, 1, 3, 4]);
-  component.rowGroupingIndicator(3).click();
-  component.rowGroupingIndicator(1).click();
-
-  assert.equal(component.nthColumnHeader(0).outerWidth(), 160, 'grouping column should be width of expand depth 1');
-});
-
 moduleForEmberTable('table with three levels rows1', function() {
     return EmberTableFixture.create({
       height: 330,
@@ -703,10 +665,9 @@ test('expand and collapse grouped rows when row.children is null or undefined', 
 });
 
 
-moduleForEmberTable('Resize grouping column', function (groupingColumnResizable) {
+moduleForEmberTable('Resize grouping column', function () {
   return EmberTableFixture.create({
     groupMeta: {
-      groupingColumnResizable: groupingColumnResizable,
       groupingMetadata: [
         {id: 'accountSection'},
         {id: 'accountType'}
@@ -724,23 +685,8 @@ moduleForEmberTable('Resize grouping column', function (groupingColumnResizable)
   });
 });
 
-test('Can not resize grouping column by default', function (assert) {
+test('Resize grouping column', function (assert) {
   var component = this.subject();
-  this.render();
-  var tableDom = TableDom.create({content: component.$()});
-  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
-  var widthBefore = groupingColumnHeader.width();
-
-  Ember.run(function () {
-    groupingColumnHeader.resizeX(60);
-  });
-
-  var widthAfter = groupingColumnHeader.width();
-  assert.equal(widthAfter, widthBefore);
-});
-
-test('Can resize grouping column', function (assert) {
-  var component = this.subject(true);
   this.render();
   var tableDom = TableDom.create({content: component.$()});
   var groupingColumnHeader = tableDom.headerRows(0).cell(0);
@@ -753,19 +699,4 @@ test('Can resize grouping column', function (assert) {
 
   var widthAfter = groupingColumnHeader.width();
   assert.equal(widthAfter, widthBefore + distanceX);
-});
-
-test('Disable auto adjusting for resizable grouping column', function (assert) {
-  var component = this.subject(true);
-  this.render();
-  var tableDom = TableDom.create({content: component.$()});
-  var groupingColumnHeader = tableDom.headerRows(0).cell(0);
-  var widthBefore = groupingColumnHeader.width();
-
-  Ember.run(function () {
-    tableDom.rows(0).groupIndicator().click();
-  });
-
-  var widthAfter = groupingColumnHeader.width();
-  assert.equal(widthAfter, widthBefore);
 });

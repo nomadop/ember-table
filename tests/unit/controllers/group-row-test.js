@@ -42,12 +42,6 @@ module('grouping row is expanded', {
   }
 });
 
-test('expandedDepth', function(assert) {
-  var expandedDepth = groupRow.get('expandedDepth');
-
-  assert.equal(expandedDepth, 1);
-});
-
 test('subRowsCount', function(assert) {
   var subRowsCount = groupRow.get('subRowsCount');
 
@@ -67,12 +61,6 @@ module('grouping row is collapsed', {
   }
 });
 
-test('expandedDepth', function(assert) {
-  var expandedDepth = groupRow.get('expandedDepth');
-
-  assert.equal(expandedDepth, 0);
-});
-
 test('subRowsCount', function(assert) {
   var subRowsCount = groupRow.get('subRowsCount');
 
@@ -89,12 +77,6 @@ module('grouping row is expanded but has no children row', {
   afterEach: function() {
     groupRow = null;
   }
-});
-
-test('expandedDepth', function(assert) {
-  var expandedDepth = groupRow.get('expandedDepth');
-
-  assert.equal(expandedDepth, 0);
 });
 
 test('subRowsCount', function(assert) {

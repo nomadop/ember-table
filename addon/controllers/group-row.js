@@ -5,25 +5,6 @@ import LazyGroupRowArray from '../models/lazy-group-row-array';
 import RowPath from 'ember-table/models/row-path';
 
 var GroupRow = Row.extend({
-    expandedDepth: Ember.computed(function () {
-      var expandLevel = this.get('expandLevel');
-      if (this.get('isExpanded')) {
-        if (this.get('_childrenRow.length') > 0) {
-          return this.get('_childrenRow').definedControllers().reduce(function (previousValue, item) {
-            if (!item) {
-              return previousValue;
-            }
-            var expandedDepth = item.get('expandedDepth');
-            if (expandedDepth > previousValue) {
-              return expandedDepth;
-            }
-            return previousValue;
-          }, expandLevel + 1);
-        }
-      }
-      return expandLevel;
-    }).property('expandLevel', 'isExpanded', '_childrenRow.@each.expandedDepth'),
-
     subRowsCount: Ember.computed(function () {
       if (!this.get('isExpanded')) {
         return 0;
