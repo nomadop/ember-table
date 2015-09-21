@@ -119,8 +119,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
   // This view is expected to be positioned as absolute.
   groupedRowIndicatorViewName: null,
 
-  //Width of group indicator, grouping column will auto expand with each level expanded and
-  //cell content will positioned to the right of group indicator.
+  //Width of group indicator and default value is 10 px.
   //If width of custom group row indicator view is not 10 pixel, this property must be set with the real value.
   groupIndicatorWidth: 10,
 
@@ -377,11 +376,9 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   _groupingColumn: Ember.computed(function () {
     var groupingColumnWidth = this.get('groupingColumnWidth');
-    var groupIndicatorWidth = this.get('groupIndicatorWidth');
     return ColumnDefinition.create({
       headerCellName: '', //Todo: Fix grouping header name
       textAlign: 'text-align-left',
-      isResizable: this.getWithDefault('groupMeta.groupingColumnResizable', false),
       isSortable: false,
       sortFn: null,
       minWidth: 40, // Prevent cell content from changing into '...' then into normal string.
@@ -389,11 +386,6 @@ StyleBindingsMixin, ResizeHandlerMixin, {
       tableCellView: 'grouping-column-cell',
       getCellContent: function (row) {
         return row.get('groupName');
-      },
-      expandedDepthChanged: function(expandedDepth) {
-        if (!this.get('isResizable')) {
-          this.resize(groupingColumnWidth + groupIndicatorWidth * expandedDepth);
-        }
       }
     });
   }),

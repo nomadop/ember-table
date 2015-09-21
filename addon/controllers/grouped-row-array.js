@@ -39,21 +39,6 @@ export default RowArrayController.extend({
    * */
   arrayContentDidChange: Ember.K,
 
-  _expandedDepth: Ember.computed(function () {
-    var root = this.get('_virtualRootRow');
-    return root.get('_childrenRow').definedControllers().reduce(function (previousValue, item) {
-      if (!item) {
-        return previousValue;
-      }
-      var expandedDepth = item.get('expandedDepth');
-      if (expandedDepth > previousValue) {
-        return expandedDepth;
-      }
-      return previousValue;
-    }, 0);
-  }).property('_virtualRootRow._childrenRow.@each.expandedDepth'),
-
-
   _virtualRootRow: Ember.computed(function () {
     var groupingLevel = this.get('groupMeta.grandTotalTitle') ? -2 : -1;
     var rootRow = GroupRow.create({

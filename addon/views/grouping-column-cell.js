@@ -44,7 +44,6 @@ export default TableCell.extend(
       } else {
         target.expandChildren(row);
       }
-      this.get('column').expandedDepthChanged(target.get('_expandedDepth'));
     }
   },
 
