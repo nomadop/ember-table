@@ -101,12 +101,16 @@
   // Height and Width defined dynamically through JS
   // Let Antiscroll handle the overflow
   overflow: hidden;
-  // deal with Linux Chrome v38 wrapping bug
-  // reset to normal in .ember-table-table-block
   white-space: nowrap;
   position: relative;
   z-index: 3;
   .box-sizing();
+
+  // deal with Linux Chrome v38 wrapping bug
+  // reset to normal in .ember-table-table-block
+  .ember-table-table-block {
+    white-space: nowrap;
+  }
 }
 
 .ember-table-table-fixed-wrapper,
