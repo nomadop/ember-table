@@ -73,10 +73,10 @@
 .gradient (@startColor: #eee, @endColor: white) {
   background-color: @startColor;
   background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
-  background: -webkit-linear-gradient(top, @startColor, @endColor);
-  background: -moz-linear-gradient(top, @startColor, @endColor);
-  background: -ms-linear-gradient(top, @startColor, @endColor);
-  background: -o-linear-gradient(top, @startColor, @endColor);
+  background: -webkit-linear-gradient(to bottom, @startColor, @endColor);
+  background: -moz-linear-gradient(to bottom, @startColor, @endColor);
+  background: -ms-linear-gradient(to bottom, @startColor, @endColor);
+  background: -o-linear-gradient(to bottom, @startColor, @endColor);
 }
 .horizontal-gradient (@startColor: #eee, @endColor: white) {
   background-color: @startColor;
