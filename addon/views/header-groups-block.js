@@ -54,6 +54,14 @@ export default Ember.CollectionView.extend(
 
     columnSortDidStart: function() {
       this.set('tableComponent._isReorderInnerColumns', false);
+      this.onScrollLeftDidChange();
+    },
+
+    columnSortDidEnd: function() {
+      var self = this;
+      Ember.run.schedule('afterRender', function() {
+        self.onScrollLeftDidChange();
+      });
     },
 
     didInsertElement: function () {
