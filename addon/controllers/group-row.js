@@ -67,21 +67,24 @@ var GroupRow = Row.extend({
         var previousSortDirection = this.get('_previousGrouperSortDirection');
         var currentSortDirection = this.get('nextLevelGrouping.sortDirection');
         if (previousSortDirection !== currentSortDirection) {
-          this.sortingConditionsChanged(this.get('nextLevelGrouping'), this.get('nextLevelGrouping.sortDirection'));
+          var self = this;
+          this.sortingConditionsChanged(this.get('nextLevelGrouping'), this.get('nextLevelGrouping.sortDirection'), function() {
+            self.sortingColumnsDidChange();
+          });
           this.set('_previousGrouperSortDirection', currentSortDirection);
         }
       }
     }),
 
-    sortingConditionsChanged: function(sorter, isSortConditionNotEmpty) {
+    sortingConditionsChanged: function(sorter, isSortConditionNotEmpty, otherSortAction) {
       if (this.get('children.isNotCompleted')) {
         this.recreateChildrenRow();
         this.notifyLengthChange();
-      } else {
-        if (isSortConditionNotEmpty) {
-          this.recreateSortedChildrenRow(sorter);
-          this.notifyLengthChange();
-        }
+      } else if (isSortConditionNotEmpty) {
+        this.recreateSortedChildrenRow(sorter);
+        this.notifyLengthChange();
+      } else if (otherSortAction) {
+        otherSortAction();
       }
     },
 
