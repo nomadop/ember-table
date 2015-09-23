@@ -37,10 +37,6 @@ StyleBindingsMixin, RegisterTableComponentMixin, SortableMixin, {
     }
   },
 
-  onScrollLeftDidChange: Ember.observer(function() {
-    this.$().scrollLeft(this.get('scrollLeft'));
-  }, 'scrollLeft'),
-
   didInsertElement: function() {
     this._super();
     if (this.get('enableColumnReorder')) {
@@ -57,10 +53,5 @@ StyleBindingsMixin, RegisterTableComponentMixin, SortableMixin, {
       }
     }
     this._super();
-  },
-
-  onScroll: function(event) {
-    this.set('scrollLeft', event.target.scrollLeft);
-    event.preventDefault();
   }
 });

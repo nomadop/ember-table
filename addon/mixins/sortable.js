@@ -31,7 +31,6 @@ export default Ember.Mixin.create({
   onColumnSortStart: function(event, ui) {
     // show the dragging element
     ui.item.show();
-
     this.columnSortDidStart();
   },
 
@@ -52,6 +51,9 @@ export default Ember.Mixin.create({
   sortableElement: null,
 
   sortItemName: 'column',
+
+  columnSortDidEnd: Ember.K,
+
   onColumnSortDone: function (event, ui) {
     var newIndex = ui.item.index();
     var sortableElement = this.get('sortableElement');
@@ -60,5 +62,6 @@ export default Ember.Mixin.create({
     var column = view.get(this.get('sortItemName'));
     this.get('tableComponent').onColumnSort(column, newIndex);
     this.set('tableComponent._isShowingSortableIndicator', false);
+    this.columnSortDidEnd();
   }
 });
