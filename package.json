@@ -1,6 +1,6 @@
 {
   "name": "ember-table",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Table built using Ember.js that lazily renders rows.",
   "directories": {
     "doc": "doc",
@@ -55,6 +55,7 @@
     "grunt-banner": "~0.2.2",
     "grunt-broccoli": "~0.4.0",
     "grunt-broccoli-build": "~0.6.0",
+    "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-uglify": "0.8.0",
     "grunt-release-it": "~0.2.1",
     "grunt-text-replace": "~0.3.11",
@@ -66,6 +67,7 @@
     "ember-addon"
   ],
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "https://addepar.github.io/ember-table/#/overview"
   }
 }
